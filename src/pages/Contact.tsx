@@ -83,9 +83,19 @@ const markerIcon = divIcon({
   popupAnchor: [0, -32],
 });
 
+const contactEmail = 'info@nacetem.gov.ng';
+
 export default function Contact() {
   const [mapZoom, setMapZoom] = useState(6);
   const [map, setMap] = useState<LeafletMap | null>(null);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [subject, setSubject] = useState('');
+  const [message, setMessage] = useState('');
+  const [serverStatus, setServerStatus] = useState<string | null>(null);
+  const [showFallbackHint, setShowFallbackHint] = useState(false);
+  const [isServerSubmitting, setIsServerSubmitting] = useState(false);
   const minZoom = 4;
   const maxZoom = 12;
 
@@ -94,6 +104,49 @@ export default function Contact() {
       map.setZoom(mapZoom);
     }
   }, [map, mapZoom]);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const mailSubject = `NACETEM Contact Form: ${subject || 'General Inquiry'}`;
+    const mailBody = `Name: ${name}%0D%0AEmail: ${email}%0D%0APhone: ${phone || 'N/A'}%0D%0A%0D%0AMessage:%0D%0A${message}`;
+    window.location.href = `mailto:${contactEmail}?subject=${encodeURIComponent(mailSubject)}&body=${mailBody}`;
+    setShowFallbackHint(true);
+  };
+
+  const handleServerSubmit = async () => {
+    setServerStatus(null);
+    setIsServerSubmitting(true);
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, phone, subject, message }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data?.error || 'Unable to send message via server.');
+      }
+
+      setServerStatus('Message sent successfully via server fallback.');
+      setName('');
+      setEmail('');
+      setPhone('');
+      setSubject('');
+      setMessage('');
+      setShowFallbackHint(false);
+    } catch (error) {
+      setServerStatus(
+        `Server fallback failed: ${error instanceof Error ? error.message : 'please try again later.'}`,
+      );
+    } finally {
+      setIsServerSubmitting(false);
+    }
+  };
 
   return (
     <div className="bg-slate-50 min-h-screen font-sans overflow-hidden">
@@ -184,34 +237,92 @@ export default function Contact() {
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="lg:w-2/3">
               <div className="bg-slate-50 border-[2.11px] border-slate-200 rounded-[11px] p-8 md:p-12">
                 <h2 className="text-3xl font-serif text-slate-900 mb-8">Send Us a Message</h2>
-                <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+                <form className="space-y-6" onSubmit={handleSubmit}>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label htmlFor="name" className="block text-xs font-bold text-slate-700 uppercase tracking-widest mb-2">Full Name</label>
-                      <input type="text" id="name" className="w-full px-4 py-3 bg-white border border-slate-300 rounded-[6px] focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 text-slate-900 transition-colors" placeholder="Your full name" required />
+                      <input
+                        type="text"
+                        id="name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-[6px] focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 text-slate-900 transition-colors"
+                        placeholder="Your full name"
+                        required
+                      />
                     </div>
                     <div>
                       <label htmlFor="email" className="block text-xs font-bold text-slate-700 uppercase tracking-widest mb-2">Email Address</label>
-                      <input type="email" id="email" className="w-full px-4 py-3 bg-white border border-slate-300 rounded-[6px] focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 text-slate-900 transition-colors" placeholder="your.email@example.com" required />
+                      <input
+                        type="email"
+                        id="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-[6px] focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 text-slate-900 transition-colors"
+                        placeholder="your.email@example.com"
+                        required
+                      />
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label htmlFor="phone" className="block text-xs font-bold text-slate-700 uppercase tracking-widest mb-2">Phone Number</label>
-                      <input type="tel" id="phone" className="w-full px-4 py-3 bg-white border border-slate-300 rounded-[6px] focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 text-slate-900 transition-colors" placeholder="+234 XXX XXX XXXX" />
+                      <input
+                        type="tel"
+                        id="phone"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-[6px] focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 text-slate-900 transition-colors"
+                        placeholder="+234 XXX XXX XXXX"
+                      />
                     </div>
                     <div>
                       <label htmlFor="subject" className="block text-xs font-bold text-slate-700 uppercase tracking-widest mb-2">Subject</label>
-                      <input type="text" id="subject" className="w-full px-4 py-3 bg-white border border-slate-300 rounded-[6px] focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 text-slate-900 transition-colors" placeholder="How can we help?" required />
+                      <input
+                        type="text"
+                        id="subject"
+                        value={subject}
+                        onChange={(e) => setSubject(e.target.value)}
+                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-[6px] focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 text-slate-900 transition-colors"
+                        placeholder="How can we help?"
+                        required
+                      />
                     </div>
                   </div>
                   <div>
                     <label htmlFor="message" className="block text-xs font-bold text-slate-700 uppercase tracking-widest mb-2">Message</label>
-                    <textarea id="message" rows={5} className="w-full px-4 py-3 bg-white border border-slate-300 rounded-[6px] focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 text-slate-900 transition-colors resize-none" placeholder="Write your message here..." required></textarea>
+                    <textarea
+                      id="message"
+                      rows={5}
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      className="w-full px-4 py-3 bg-white border border-slate-300 rounded-[6px] focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 text-slate-900 transition-colors resize-none"
+                      placeholder="Write your message here..."
+                      required
+                    ></textarea>
                   </div>
-                  <button type="submit" className="inline-flex items-center justify-center px-8 py-4 bg-emerald-600 text-white font-bold text-sm tracking-widest uppercase hover:bg-emerald-700 transition-colors rounded-[6px] w-full sm:w-auto">
-                    Send Message <Send className="ml-2 h-4 w-4" />
-                  </button>
+                  <p className="text-xs text-slate-500">When you submit, your email client will open with the message addressed to {contactEmail}. If your local email client does not open, use the server fallback button.</p>
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                    <button type="submit" className="inline-flex items-center justify-center px-8 py-4 bg-emerald-600 text-white font-bold text-sm tracking-widest uppercase hover:bg-emerald-700 transition-colors rounded-[6px] w-full sm:w-auto">
+                      Send Message <Send className="ml-2 h-4 w-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleServerSubmit}
+                      disabled={isServerSubmitting}
+                      className="inline-flex items-center justify-center px-8 py-4 bg-slate-900 text-white font-bold text-sm tracking-widest uppercase hover:bg-slate-800 transition-colors rounded-[6px] w-full sm:w-auto disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {isServerSubmitting ? 'Sending...' : 'Send via Server'}
+                    </button>
+                  </div>
+                  {showFallbackHint ? (
+                    <div className="mt-3 rounded-2xl border border-amber-300/80 bg-amber-50/80 p-3 text-sm text-amber-900">
+                      Your local email client didn&apos;t open? Click <span className="font-semibold">Send via Server</span> to submit using the fallback path.
+                    </div>
+                  ) : null}
+                  {serverStatus ? (
+                    <p className="mt-3 text-sm text-slate-700">{serverStatus}</p>
+                  ) : null}
                 </form>
               </div>
             </motion.div>
