@@ -1,0 +1,6 @@
+{
+  "name": "NACETEM Official Website",
+  "description": "Official website for the National Centre for Technology Management (NACETEM) with an admin panel.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
