@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, MapPin, Phone, Mail, Clock, Send, Handshake, BookOpen, Headphones, Facebook, Linkedin, Twitter, Youtube, Instagram } from 'lucide-react';
+import { ArrowRight, MapPin, Phone, Mail, Clock, Send, Handshake, BookOpen, Headphones, Facebook, Linkedin, Twitter, Youtube, Instagram, Plus, Minus } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { divIcon, type Map as LeafletMap } from 'leaflet';
 import { assets } from '../assets';
 
 const fadeInUp = {
@@ -20,60 +22,79 @@ const officeLocations = [
     address: 'National Centre for Technology Management (NACETEM), P.M.B. 012, Obafemi Awolowo University, Ile-Ife, Osun State, Nigeria.',
     lat: 7.520767,
     lng: 4.530315,
-    position: { top: '60%', left: '19%' },
   },
   {
     zone: 'North Central',
     address: 'NACETEM North Operational office Office, 4th Floor, Federal Secretariat Complex, Phase II, Central Business District, Abuja, FCT.',
     lat: 9.062472,
     lng: 7.498484,
-    position: { top: '43%', left: '43%' },
   },
   {
     zone: 'North Central',
     address: 'NACETEM North Central Training Office, No. 3 Dunukofia Street, Opposite NNPC Staff Quarters/JSS, Area 11, Garki, Abuja, FCT.',
     lat: 9.041927,
     lng: 7.500756,
-    position: { top: '43%', left: '43%' },
+    positionClass: 'top-[43%] left-[43%]',
   },
   {
     zone: 'North West',
     address: 'NACETEM North West Office, Federal Secretariat Complex, No. 1 Katsina Road, Kano, Kano State.',
     lat: 12.02382,
     lng: 8.51435,
-    position: { top: '17%', left: '52%' },
+    positionClass: 'top-[17%] left-[52%]',
   },
   {
     zone: 'North East',
     address: 'NACETEM North East Office, Former Pre-Degree Block, Modibbo Adama University, Yola, Adamawa State.',
     lat: 9.3489,
     lng: 12.5032,
-    position: { top: '40%', left: '84%' },
+    positionClass: 'top-[40%] left-[84%]',
   },
   {
     zone: 'South South',
     address: 'NACETEM South South Office, Niger Delta University, Wilberforce Island, Amassoma, Bayelsa State.',
     lat: 4.974712,
     lng: 6.104635,
-    position: { top: '82%', left: '32%' },
+    positionClass: 'top-[82%] left-[32%]',
   },
   {
     zone: 'South East',
     address: 'NACETEM South East Office, No. 3 Presidential Road, Opposite Presidential Hotel (PRODA Premises), Independence Layout, Enugu, Enugu State.',
     lat: 6.44113,
     lng: 7.510119,
-    position: { top: '68%', left: '45%' },
+    positionClass: 'top-[68%] left-[45%]',
   },
   {
     zone: 'South West',
     address: 'NACETEM South West/Lagos Office, House 10, Subuola Abu Street, Greenland Estate, Lagos State.',
     lat: 6.479288,
     lng: 3.608023,
-    position: { top: '68%', left: '10%' },
   },
 ];
 
+const mapCenter: [number, number] = [8.5, 7.3];
+
+const markerIcon = divIcon({
+  className: '',
+  html: `<div style="width:32px;height:32px;border-radius:9999px;background:#10b981;border:4px solid white;box-shadow:0 12px 20px rgba(15,23,42,0.24);display:flex;align-items:center;justify-content:center;">` +
+    `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.134 2 5 5.134 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.866-3.134-7-7-7z" fill="white"/><path d="M12 12.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7z" fill="#10b981"/></svg>` +
+  `</div>`,
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32],
+});
+
 export default function Contact() {
+  const [mapZoom, setMapZoom] = useState(6);
+  const [map, setMap] = useState<LeafletMap | null>(null);
+  const minZoom = 4;
+  const maxZoom = 12;
+
+  useEffect(() => {
+    if (map) {
+      map.setZoom(mapZoom);
+    }
+  }, [map, mapZoom]);
+
   return (
     <div className="bg-slate-50 min-h-screen font-sans overflow-hidden">
       {/* 1. Hero Section */}
@@ -257,49 +278,72 @@ export default function Contact() {
               <p className="text-slate-600 mb-8 leading-relaxed">
                 Visit our headquarters or zonal offices for inquiries, meetings, partnerships, and official engagements.
               </p>
-              <div className="w-full overflow-hidden rounded-2xl border border-slate-300 bg-slate-100 shadow-sm">
+              <div className="w-full overflow-hidden rounded-3xl border border-slate-200/80 bg-white/80 shadow-[0_30px_80px_-40px_rgba(15,23,42,0.35)] backdrop-blur-xl">
                 <div className="relative aspect-[16/12] sm:aspect-[21/10] overflow-hidden">
-                  <iframe
-                    title="NACETEM offices across Nigeria"
-                    src="https://maps.google.com/maps?q=Nigeria&z=6&output=embed"
-                    className="absolute inset-0 h-full w-full border-0"
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  />
-                  <div className="absolute inset-0 bg-white/10 pointer-events-none"></div>
-                  {officeLocations.map((office) => (
-                    <a
-                      key={office.zone}
-                      href={`https://www.google.com/maps/search/?api=1&query=${office.lat},${office.lng}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label={`Open ${office.zone} office on Google Maps`}
-                      className="absolute z-10 -translate-x-1/2 -translate-y-full group"
-                      style={{ top: office.position.top, left: office.position.left }}
-                    >
-                      <span className="flex h-9 w-9 items-center justify-center rounded-full border-4 border-white bg-emerald-600 text-white shadow-[0_10px_22px_rgba(0,0,0,0.28)] transition-transform group-hover:-translate-y-1">
-                        <MapPin className="h-5 w-5" />
-                      </span>
-                      <span className="absolute left-1/2 top-10 hidden w-36 -translate-x-1/2 rounded-[6px] bg-slate-900 px-3 py-2 text-center text-[10px] font-bold uppercase tracking-wider text-white shadow-xl group-hover:block">
-                        {office.zone}
-                      </span>
-                    </a>
-                  ))}
+                  <MapContainer
+                    center={mapCenter}
+                    zoom={mapZoom}
+                    whenCreated={setMap}
+                    scrollWheelZoom={true}
+                    zoomControl={false}
+                    className="h-full w-full"
+                  >
+                    <TileLayer
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    />
+                    {officeLocations.map((office) => (
+                      <Marker key={office.zone} position={[office.lat, office.lng]} icon={markerIcon}>
+                        <Popup>
+                          <div className="max-w-xs">
+                            <h3 className="text-sm font-bold text-slate-900">{office.zone}</h3>
+                            <p className="text-xs text-slate-600 mt-1">{office.address}</p>
+                          </div>
+                        </Popup>
+                      </Marker>
+                    ))}
+                  </MapContainer>
+
+                  <div className="absolute top-4 right-4 z-20 flex flex-col items-end gap-2">
+                    <div className="rounded-2xl bg-white/95 border border-slate-200/80 shadow-xl p-2 flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setMapZoom((current) => Math.max(minZoom, current - 1))}
+                        className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-slate-950 text-white hover:bg-slate-900 transition"
+                        aria-label="Zoom out"
+                      >
+                        <Minus className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setMapZoom((current) => Math.min(maxZoom, current + 1))}
+                        className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-slate-950 text-white hover:bg-slate-900 transition"
+                        aria-label="Zoom in"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <div className="rounded-2xl bg-slate-900/90 px-3 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-slate-100 shadow-lg">
+                      Zoom {mapZoom}
+                    </div>
+                  </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-200 bg-white p-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-200 bg-slate-50 p-5">
                   {officeLocations.map((office) => (
                     <a
                       key={office.zone}
                       href={`https://www.google.com/maps/search/?api=1&query=${office.lat},${office.lng}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="group rounded-[8px] border border-slate-200 p-4 transition-colors hover:border-emerald-300 hover:bg-emerald-50/50"
+                      className="group rounded-[16px] border border-slate-200/80 bg-white p-5 shadow-sm transition-all hover:-translate-y-1 hover:border-emerald-300 hover:shadow-md"
                     >
-                      <div className="mb-2 flex items-center justify-between gap-3">
-                        <h3 className="text-xs font-bold uppercase tracking-widest text-emerald-700">{office.zone}</h3>
+                      <div className="mb-3 flex items-center justify-between gap-3">
+                        <span className="rounded-full bg-emerald-600/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-700">
+                          {office.zone}
+                        </span>
                         <ArrowRight className="h-4 w-4 shrink-0 text-slate-400 transition-transform group-hover:translate-x-1 group-hover:text-emerald-700" />
                       </div>
-                      <p className="text-xs leading-6 text-slate-600">{office.address}</p>
+                      <p className="text-sm leading-6 text-slate-600">{office.address}</p>
                     </a>
                   ))}
                 </div>
