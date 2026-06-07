@@ -1,6 +1,5 @@
-import React from 'react';
 import { cn } from '../lib/utils';
-import nacetemLogo from '../download.png';
+import nacetemLogo from '../nacetem-logo-full.png';
 
 interface NacetemLogoProps {
   className?: string;
@@ -9,28 +8,23 @@ interface NacetemLogoProps {
 
 export function NacetemLogo({ className, variant = 'dark' }: NacetemLogoProps) {
   const isLight = variant === 'light';
-  
-  return (
-    <div className={cn("flex items-center gap-3 min-w-0", className)}>
-      <div className={cn(
-        "relative flex h-14 w-16 shrink-0 items-center justify-center rounded-sm p-1.5",
-        isLight ? "bg-white shadow-sm" : "bg-white"
-      )}>
-        <img src={nacetemLogo} alt="NACETEM logo" className="h-full w-full object-contain" />
-      </div>
 
-      <div className="flex min-w-0 flex-col justify-center">
-        <span className={cn(
-          "text-[14px] sm:text-[17px] font-bold leading-tight font-sans",
-          isLight ? "text-white" : "text-[#0b1a45]"
-        )}>
-          National Centre for
-        </span>
-        <div className="flex flex-wrap gap-x-1.5 text-[14px] sm:text-[17px] font-bold leading-tight font-sans">
-          <span className={isLight ? "text-emerald-100" : "text-[#a14a4c]"}>Technology</span>
-          <span className={isLight ? "text-white" : "text-[#0b1a45]"}>Management</span>
-        </div>
-      </div>
+  return (
+    <div
+      className={cn(
+        "relative isolate flex min-w-0 items-center overflow-hidden rounded-xl border bg-white p-1.5",
+        "transition-all duration-300",
+        isLight
+          ? "border-white/25 shadow-[0_16px_40px_rgba(0,0,0,0.18)] ring-1 ring-black/5"
+          : "border-slate-200/80 shadow-[0_8px_24px_rgba(15,23,42,0.07)]",
+        className
+      )}
+    >
+      <img
+        src={nacetemLogo}
+        alt="National Centre for Technology Management"
+        className="h-auto w-[190px] max-w-full shrink-0 rounded-lg object-contain sm:w-[220px] lg:w-[240px]"
+      />
     </div>
   );
 }
