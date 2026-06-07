@@ -1,20 +1,37 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# NACETEM Website Project
 
-# Run and deploy your AI Studio app
+This repository contains the official website project for the National Centre for Technology Management (NACETEM).
 
-This contains everything you need to run your app locally.
+The purpose of this repository is to provide a central and well-organized codebase where approved developers and collaborators can work on different parts of the website, submit changes for review, and merge only approved updates into the main project.
 
-View your app in AI Studio: https://ai.studio/apps/1052a6c6-7041-4268-a750-67c25845e96c
+---
 
-## Run Locally
+## Project Name
 
-**Prerequisites:**  Node.js
+**NACETEM Website Project**
 
+---
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Project Description
+
+The NACETEM Website Project is designed to present the Centre’s mandate, programmes, initiatives, news, services, research activities, partnerships, and public information in a modern, accessible, responsive, and user-friendly manner.
+
+The project supports collaborative development through GitHub, allowing different contributors to work on separate sections of the website while maintaining a stable and approved version on the `main` branch.
+
+---
+
+## Repository Structure
+
+The project may contain files and folders such as:
+
+```text
+NACETEM-Web/
+│
+├── public/
+├── src/
+├── assets/
+├── components/
+├── pages/
+├── package.json
+├── README.md
+└── .gitignore
