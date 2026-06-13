@@ -146,36 +146,170 @@ const totalAttempts = analyticsData.reduce((total, item) => total + item.visitor
 const averageSuccessRate = analyticsData.reduce((total, item) => total + item.successRate, 0) / analyticsData.length;
 const difficultChapters = [...analyticsData].sort((a, b) => a.successRate - b.successRate).slice(0, 5);
 
-const BarChart = ({
-  data,
-  dataKey,
-  color,
-  label
-}: {
-  data: typeof analyticsData;
-  dataKey: "successRate" | "visitors";
-  color: string;
-  label: string;
-}) => {
-  const maxValue = Math.max(...data.map(d => typeof d[dataKey] === 'number' ? d[dataKey] : 0));
+const ScoreTrendChart = ({ data }: { data: typeof scoreTrend }) => {
+  const width = 600;
+  const height = 240;
+  const paddingX = 42;
+  const paddingY = 28;
+  const minScore = 50;
+  const maxScore = 100;
+  const plotWidth = width - paddingX * 2;
+  const plotHeight = height - paddingY * 2;
+  const points = data.map((item, index) => ({
+    ...item,
+    x: paddingX + (index / (data.length - 1)) * plotWidth,
+    y: paddingY + ((maxScore - item.score) / (maxScore - minScore)) * plotHeight
+  }));
 
   return (
-    <div className="overflow-x-auto pb-2" role="img" aria-label={label}>
-      <div className="flex items-end gap-3 h-64 min-w-[720px] px-2">
-        {data.map((item) => (
-          <div key={item.chapter} className="flex flex-1 flex-col items-center justify-end gap-2 h-full">
-            <span className="text-[10px] font-bold text-slate-700">{item[dataKey]}</span>
-            <div className="flex h-[200px] items-end">
-              <div
-                className={`w-5 ${color} rounded-t transition-opacity hover:opacity-80`}
-                style={{ height: `${(item[dataKey] / maxValue) * 200}px` }}
-              />
+    <figure>
+      <div className="grid grid-cols-2 gap-3 sm:hidden">
+        {data.map((item, index) => (
+          <div key={item.attempt} className="rounded-lg border border-slate-200 bg-emerald-50/60 p-3">
+            <p className="text-xs text-slate-600">{item.attempt}</p>
+            <div className="flex items-end justify-between gap-2 mt-2">
+              <span className="text-xl font-bold text-slate-900">{item.score}%</span>
+              {index > 0 && (
+                <span className={`text-xs font-bold ${item.score >= data[index - 1].score ? "text-emerald-600" : "text-gold"}`}>
+                  {item.score >= data[index - 1].score ? "+" : ""}{item.score - data[index - 1].score}
+                </span>
+              )}
             </div>
-            <span className="text-[10px] font-medium text-slate-600 whitespace-nowrap">{item.chapter}</span>
           </div>
         ))}
       </div>
-    </div>
+
+      <div className="hidden sm:block rounded-xl border border-slate-200 bg-gradient-to-b from-emerald-50/60 to-white p-5">
+        <svg
+          viewBox={`0 0 ${width} ${height}`}
+          className="w-full h-auto"
+          role="img"
+          aria-labelledby="score-trend-title score-trend-description"
+        >
+          <title id="score-trend-title">Score trend across six sample attempts</title>
+          <desc id="score-trend-description">
+            Scores rise from 68 percent on attempt one to 81 percent on the latest attempt.
+          </desc>
+          <defs>
+            <linearGradient id="scoreTrendFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#006633" stopOpacity="0.22" />
+              <stop offset="100%" stopColor="#006633" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+
+          {[60, 70, 80, 90, 100].map((tick) => {
+            const y = paddingY + ((maxScore - tick) / (maxScore - minScore)) * plotHeight;
+            return (
+              <g key={tick} aria-hidden="true">
+                <line x1={paddingX} x2={width - paddingX} y1={y} y2={y} stroke="rgba(26,26,26,0.1)" />
+                <text x={paddingX - 10} y={y + 4} textAnchor="end" fontSize="11" fill="rgba(26,26,26,0.65)">
+                  {tick}%
+                </text>
+              </g>
+            );
+          })}
+
+          <path
+            d={`M ${points[0].x} ${height - paddingY} ${points.map(point => `L ${point.x} ${point.y}`).join(" ")} L ${points.at(-1)!.x} ${height - paddingY} Z`}
+            fill="url(#scoreTrendFill)"
+            aria-hidden="true"
+          />
+          <polyline
+            points={points.map(point => `${point.x},${point.y}`).join(" ")}
+            fill="none"
+            stroke="#006633"
+            strokeWidth="4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          />
+
+          {points.map((point) => (
+            <g
+              key={point.attempt}
+              tabIndex={0}
+              role="graphics-symbol"
+              aria-label={`${point.attempt}: ${point.score} percent`}
+              className="outline-none"
+            >
+              <circle cx={point.x} cy={point.y} r="9" fill="white" stroke="#006633" strokeWidth="4" />
+              <text x={point.x} y={point.y - 16} textAnchor="middle" fontSize="12" fontWeight="700" fill="#1A1A1A">
+                {point.score}%
+              </text>
+              <text x={point.x} y={height - 7} textAnchor="middle" fontSize="11" fill="rgba(26,26,26,0.72)">
+                {point.attempt === "Latest" ? "Latest" : point.attempt.replace("Attempt ", "A")}
+              </text>
+            </g>
+          ))}
+        </svg>
+      </div>
+
+      <figcaption className="mt-4 flex flex-wrap items-center justify-between gap-2 text-sm">
+        <span className="text-slate-600">Overall improvement</span>
+        <span className="font-bold text-emerald-600">+{data.at(-1)!.score - data[0].score} percentage points</span>
+      </figcaption>
+
+      <table className="sr-only">
+        <caption>Score trend data</caption>
+        <thead>
+          <tr><th>Attempt</th><th>Score</th></tr>
+        </thead>
+        <tbody>
+          {data.map((item) => (
+            <tr key={item.attempt}><td>{item.attempt}</td><td>{item.score}%</td></tr>
+          ))}
+        </tbody>
+      </table>
+    </figure>
+  );
+};
+
+const AttemptsChart = ({ data }: { data: typeof analyticsData }) => {
+  const maxValue = Math.max(...data.map(item => item.visitors));
+
+  return (
+    <figure>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3" role="list" aria-label="Sample test attempts by chapter">
+        {data.map((item) => (
+          <div
+            key={item.chapter}
+            className="rounded-lg p-2 focus-within:ring-2 focus-within:ring-blue-500"
+            role="listitem"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-xs mb-2">
+              <span className="font-bold text-slate-900">{item.chapter}</span>
+              <span className="font-bold text-blue-600">{item.visitors.toLocaleString()}</span>
+            </div>
+            <div
+              className="h-2.5 bg-slate-100 rounded-full overflow-hidden"
+              role="progressbar"
+              tabIndex={0}
+              aria-label={`${item.chapter}: ${item.visitors} sample attempts`}
+              aria-valuemin={0}
+              aria-valuemax={maxValue}
+              aria-valuenow={item.visitors}
+            >
+              <div
+                className="h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full"
+                style={{ width: `${(item.visitors / maxValue) * 100}%` }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <table className="sr-only">
+        <caption>Sample attempts by chapter</caption>
+        <thead>
+          <tr><th>Chapter</th><th>Attempts</th></tr>
+        </thead>
+        <tbody>
+          {data.map((item) => (
+            <tr key={item.chapter}><td>{item.chapter}</td><td>{item.visitors}</td></tr>
+          ))}
+        </tbody>
+      </table>
+    </figure>
   );
 };
 
@@ -218,7 +352,8 @@ export default function PsrTest() {
             src={assets.psrImage} 
             alt="PSR Test Portal" 
             className="w-full h-full object-cover opacity-30 mix-blend-overlay"
-            loading="lazy"
+            loading="eager"
+            fetchPriority="high"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent"></div>
         </div>
@@ -334,8 +469,8 @@ export default function PsrTest() {
               variants={fadeInUp}
               className="lg:col-span-2 bg-white rounded-[11px] border border-slate-200 p-6 sm:p-8 shadow-sm"
             >
-              <div className="flex items-center gap-3 mb-10">
-                <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
+              <div className="flex items-start gap-3 mb-8 sm:mb-10">
+                <div className="w-10 h-10 shrink-0 bg-emerald-100 rounded-lg flex items-center justify-center">
                   <TrendingUp className="w-5 h-5 text-emerald-600" />
                 </div>
                 <div>
@@ -344,24 +479,7 @@ export default function PsrTest() {
                 </div>
               </div>
 
-              <div
-                className="flex items-end gap-3 sm:gap-5 h-64"
-                role="img"
-                aria-label="Sample scores improve from 68 percent on attempt 1 to 81 percent on the latest attempt"
-              >
-                {scoreTrend.map((item) => (
-                  <div key={item.attempt} className="flex flex-1 h-full flex-col items-center justify-end gap-2">
-                    <span className="text-xs font-bold text-slate-900">{item.score}%</span>
-                    <div className="flex h-[190px] w-full items-end justify-center bg-slate-50 rounded-t">
-                      <div
-                        className="w-full max-w-12 bg-emerald-500 rounded-t"
-                        style={{ height: `${item.score}%` }}
-                      />
-                    </div>
-                    <span className="text-[10px] sm:text-xs text-center text-slate-600">{item.attempt}</span>
-                  </div>
-                ))}
-              </div>
+              <ScoreTrendChart data={scoreTrend} />
             </motion.div>
 
             <motion.div
@@ -441,8 +559,8 @@ export default function PsrTest() {
               variants={fadeInUp}
               className="bg-white rounded-[11px] border border-slate-200 p-6 sm:p-8 shadow-sm"
             >
-              <div className="flex items-center gap-3 mb-8">
-                <div className="w-10 h-10 bg-gold/10 rounded-lg flex items-center justify-center">
+              <div className="flex items-start gap-3 mb-8">
+                <div className="w-10 h-10 shrink-0 bg-gold/10 rounded-lg flex items-center justify-center">
                   <BarChart3 className="w-5 h-5 text-gold" />
                 </div>
                 <div>
@@ -454,11 +572,19 @@ export default function PsrTest() {
               <div className="space-y-5">
                 {difficultChapters.map((item) => (
                   <div key={item.chapter}>
-                    <div className="flex items-center justify-between text-sm mb-2">
+                    <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-sm mb-2">
                       <span className="font-bold text-slate-900">{item.chapter}</span>
                       <span className="text-slate-600">{item.successRate}% success</span>
                     </div>
-                    <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-2 bg-slate-100 rounded-full overflow-hidden focus:ring-2 focus:ring-gold focus:ring-offset-2 outline-none"
+                      role="progressbar"
+                      tabIndex={0}
+                      aria-label={`${item.chapter}: ${item.successRate} percent sample success rate`}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                      aria-valuenow={item.successRate}
+                    >
                       <div
                         className="h-full bg-gold rounded-full"
                         style={{ width: `${item.successRate}%` }}
@@ -476,8 +602,8 @@ export default function PsrTest() {
               variants={fadeInUp}
               className="bg-white rounded-[11px] border border-slate-200 p-6 sm:p-8 shadow-sm"
             >
-              <div className="flex items-center gap-3 mb-8">
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+              <div className="flex items-start gap-3 mb-8">
+                <div className="w-10 h-10 shrink-0 bg-blue-100 rounded-lg flex items-center justify-center">
                   <Users className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
@@ -485,13 +611,8 @@ export default function PsrTest() {
                   <p className="text-sm text-slate-600">Illustrative engagement across all tests</p>
                 </div>
               </div>
-              <BarChart
-                data={analyticsData}
-                dataKey="visitors"
-                color="bg-blue-500"
-                label="Sample test attempts by chapter"
-              />
-              <div className="mt-6 flex items-center justify-between gap-4 text-sm">
+              <AttemptsChart data={analyticsData} />
+              <div className="mt-6 flex flex-wrap items-center justify-between gap-2 text-sm">
                 <span className="text-slate-600">Sample Total Attempts:</span>
                 <span className="font-bold text-blue-600">{totalAttempts.toLocaleString()}</span>
               </div>
