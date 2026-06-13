@@ -1,6 +1,16 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FileText, BookOpen, TrendingUp, Users } from 'lucide-react';
+import {
+  ArrowRight,
+  Award,
+  BarChart3,
+  BookOpen,
+  CheckCircle2,
+  FileText,
+  Target,
+  TrendingUp,
+  Users
+} from 'lucide-react';
 import { assets } from '../assets';
 
 const fadeInUp = {
@@ -116,27 +126,87 @@ const analyticsData = [
   { chapter: "Ch. 17", successRate: 81, visitors: 198 }
 ];
 
-const BarChart = ({ data, dataKey, color }: { data: typeof analyticsData; dataKey: keyof typeof analyticsData[0]; color: string }) => {
+const scoreTrend = [
+  { attempt: "Attempt 1", score: 68 },
+  { attempt: "Attempt 2", score: 72 },
+  { attempt: "Attempt 3", score: 75 },
+  { attempt: "Attempt 4", score: 74 },
+  { attempt: "Attempt 5", score: 78 },
+  { attempt: "Latest", score: 81 }
+];
+
+const completedChapters = 12;
+const sampleAverageScore = 78;
+const sampleReadiness = 73;
+const strongestChapter = { chapter: "Chapter 5", title: "Performance Management System", score: 91 };
+const weakestChapter = { chapter: "Chapter 3", title: "Prescribed Examination for Confirmation", score: 62 };
+const recommendedChapter = chapters[12];
+
+const totalAttempts = analyticsData.reduce((total, item) => total + item.visitors, 0);
+const averageSuccessRate = analyticsData.reduce((total, item) => total + item.successRate, 0) / analyticsData.length;
+const difficultChapters = [...analyticsData].sort((a, b) => a.successRate - b.successRate).slice(0, 5);
+
+const BarChart = ({
+  data,
+  dataKey,
+  color,
+  label
+}: {
+  data: typeof analyticsData;
+  dataKey: "successRate" | "visitors";
+  color: string;
+  label: string;
+}) => {
   const maxValue = Math.max(...data.map(d => typeof d[dataKey] === 'number' ? d[dataKey] : 0));
 
   return (
-    <div className="flex items-end gap-1 h-64 justify-center">
-      {data.map((item, idx) => (
-        <div key={idx} className="flex flex-col items-center gap-2">
-          <div
-            className={`w-3 ${color} rounded-t transition-all hover:opacity-80`}
-            style={{ height: `${(item[dataKey] as number / maxValue) * 200}px` }}
-          >
-            <div className="text-[10px] text-slate-700 text-center pt-1 opacity-0 hover:opacity-100">
-              {item[dataKey]}
+    <div className="overflow-x-auto pb-2" role="img" aria-label={label}>
+      <div className="flex items-end gap-3 h-64 min-w-[720px] px-2">
+        {data.map((item) => (
+          <div key={item.chapter} className="flex flex-1 flex-col items-center justify-end gap-2 h-full">
+            <span className="text-[10px] font-bold text-slate-700">{item[dataKey]}</span>
+            <div className="flex h-[200px] items-end">
+              <div
+                className={`w-5 ${color} rounded-t transition-opacity hover:opacity-80`}
+                style={{ height: `${(item[dataKey] / maxValue) * 200}px` }}
+              />
             </div>
+            <span className="text-[10px] font-medium text-slate-600 whitespace-nowrap">{item.chapter}</span>
           </div>
-          <span className="text-[10px] font-medium text-slate-600">{item.chapter}</span>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };
+
+const MetricCard = ({
+  icon: Icon,
+  value,
+  label,
+  detail,
+  color
+}: {
+  icon: React.ElementType;
+  value: string;
+  label: string;
+  detail: string;
+  color: string;
+}) => (
+  <motion.div
+    initial="hidden"
+    whileInView="visible"
+    viewport={{ once: true }}
+    variants={fadeInUp}
+    className="bg-white rounded-[11px] border border-slate-200 p-6 shadow-sm"
+  >
+    <div className={`w-11 h-11 ${color} rounded-lg flex items-center justify-center mb-5`}>
+      <Icon className="w-5 h-5" aria-hidden="true" />
+    </div>
+    <div className="text-3xl font-bold text-slate-900 mb-1">{value}</div>
+    <p className="font-bold text-sm text-slate-900">{label}</p>
+    <p className="text-sm text-slate-600 mt-2">{detail}</p>
+  </motion.div>
+);
 
 export default function PsrTest() {
   return (
@@ -162,7 +232,7 @@ export default function PsrTest() {
               PSR Test
             </h1>
             <p className="text-xl text-slate-100/90 mb-10 leading-relaxed font-light mx-auto max-w-3xl">
-              Bridging the Gap Between Technology, Innovation, and Policy for Nigeria’s Sustainable Development.
+              Prepare confidently for civil service promotion examinations with chapter-by-chapter practice tests based on the Public Service Rules.
             </p>
           </motion.div>
         </div>
@@ -215,9 +285,11 @@ export default function PsrTest() {
       <section className="py-24 bg-slate-50 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-20">
-            <h2 className="text-xs font-bold text-gold uppercase tracking-widest mb-4">Performance Insights</h2>
-            <h3 className="text-3xl sm:text-4xl font-serif text-slate-900">Test Analytics & Engagement</h3>
-            <p className="text-slate-600 mt-4 font-light">Track your performance across all chapters</p>
+            <h2 className="text-xs font-bold text-gold uppercase tracking-widest mb-4">Sample Insights</h2>
+            <h3 className="text-3xl sm:text-4xl font-serif text-slate-900">Illustrative Test Analytics</h3>
+            <p className="text-slate-600 mt-4 font-light">
+              Sample data demonstrating the performance insights planned for the PSR Exam Prep Tool.
+            </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -234,13 +306,13 @@ export default function PsrTest() {
                   <TrendingUp className="w-5 h-5 text-emerald-600" />
                 </div>
                 <div>
-                  <h4 className="text-lg font-serif text-slate-900">Success Rate by Chapter</h4>
-                  <p className="text-sm text-slate-600">Percentage of passing grades</p>
+                  <h4 className="text-lg font-serif text-slate-900">Sample Success Rate by Chapter</h4>
+                  <p className="text-sm text-slate-600">Illustrative percentage of passing grades</p>
                 </div>
               </div>
               <BarChart data={analyticsData} dataKey="successRate" color="bg-emerald-500" />
               <div className="mt-6 flex items-center justify-between text-sm">
-                <span className="text-slate-600">Average Success Rate:</span>
+                <span className="text-slate-600">Sample Average Success Rate:</span>
                 <span className="font-bold text-emerald-600">79.4%</span>
               </div>
             </motion.div>
@@ -258,13 +330,13 @@ export default function PsrTest() {
                   <Users className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
-                  <h4 className="text-lg font-serif text-slate-900">Total Visitors by Chapter</h4>
-                  <p className="text-sm text-slate-600">Number of test attempts</p>
+                  <h4 className="text-lg font-serif text-slate-900">Sample Attempts by Chapter</h4>
+                  <p className="text-sm text-slate-600">Illustrative number of test attempts</p>
                 </div>
               </div>
               <BarChart data={analyticsData} dataKey="visitors" color="bg-blue-500" />
               <div className="mt-6 flex items-center justify-between text-sm">
-                <span className="text-slate-600">Total Attempts:</span>
+                <span className="text-slate-600">Sample Total Attempts:</span>
                 <span className="font-bold text-blue-600">3,742</span>
               </div>
             </motion.div>
@@ -280,7 +352,7 @@ export default function PsrTest() {
               className="bg-white rounded-[11px] border border-slate-200 p-6 text-center"
             >
               <div className="text-4xl font-bold text-gold mb-2">3,742</div>
-              <p className="text-slate-600 text-sm">Total Test Attempts</p>
+              <p className="text-slate-600 text-sm">Sample Test Attempts</p>
             </motion.div>
 
             <motion.div
@@ -291,7 +363,7 @@ export default function PsrTest() {
               className="bg-white rounded-[11px] border border-slate-200 p-6 text-center"
             >
               <div className="text-4xl font-bold text-emerald-600 mb-2">79.4%</div>
-              <p className="text-slate-600 text-sm">Average Success Rate</p>
+              <p className="text-slate-600 text-sm">Sample Average Success Rate</p>
             </motion.div>
 
             <motion.div
