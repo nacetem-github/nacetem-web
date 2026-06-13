@@ -145,10 +145,11 @@ export default function SeminarSeries() {
               Research
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-7xl font-serif text-white leading-tight mb-8">
-              Seminar Series
+              Research Seminars
             </h1>
             <p className="text-xl text-slate-100/90 mb-10 leading-relaxed font-light mx-auto max-w-3xl">
-              Bridging the Gap Between Technology, Innovation, and Policy for Nigeria's Sustainable Development.
+              Sharing research findings, emerging ideas, and practical insights across science, technology,
+              innovation, and public policy.
             </p>
           </motion.div>
         </div>
