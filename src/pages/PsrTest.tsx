@@ -284,46 +284,197 @@ export default function PsrTest() {
       {/* Analytics Section */}
       <section className="py-24 bg-slate-50 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-20">
-            <h2 className="text-xs font-bold text-gold uppercase tracking-widest mb-4">Sample Insights</h2>
-            <h3 className="text-3xl sm:text-4xl font-serif text-slate-900">Illustrative Test Analytics</h3>
+          <div className="text-center max-w-3xl mx-auto mb-14">
+            <h2 className="text-xs font-bold text-gold uppercase tracking-widest mb-4">Learner Dashboard Preview</h2>
+            <h3 className="text-3xl sm:text-4xl font-serif text-slate-900">Your PSR Preparation Insights</h3>
             <p className="text-slate-600 mt-4 font-light">
-              Sample data demonstrating the performance insights planned for the PSR Exam Prep Tool.
+              Illustrative data showing how the PSR Exam Prep Tool can guide preparation when learner results are connected.
             </p>
+            <span className="inline-flex mt-5 px-3 py-1 rounded-full bg-gold/10 text-gold text-xs font-bold uppercase tracking-wider">
+              Preview Data
+            </span>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Success Rate Chart */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+            <MetricCard
+              icon={Target}
+              value={`${sampleReadiness}%`}
+              label="Exam Readiness"
+              detail="Based on chapter coverage, average score, and recent consistency."
+              color="bg-gold/10 text-gold"
+            />
+            <MetricCard
+              icon={CheckCircle2}
+              value={`${completedChapters}/${chapters.length}`}
+              label="Chapters Completed"
+              detail={`${chapters.length - completedChapters} chapters remain in this sample learning path.`}
+              color="bg-emerald-100 text-emerald-600"
+            />
+            <MetricCard
+              icon={BarChart3}
+              value={`${sampleAverageScore}%`}
+              label="Average Score"
+              detail="A good foundation, with targeted revision still recommended."
+              color="bg-blue-100 text-blue-600"
+            />
+            <MetricCard
+              icon={TrendingUp}
+              value={`${scoreTrend.at(-1)?.score}%`}
+              label="Latest Score"
+              detail={`Up ${scoreTrend.at(-1)!.score - scoreTrend[0].score} points from the first sample attempt.`}
+              color="bg-emerald-100 text-emerald-600"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
             <motion.div
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
               variants={fadeInUp}
-              className="bg-white rounded-[11px] border border-slate-200 p-8 shadow-sm"
+              className="lg:col-span-2 bg-white rounded-[11px] border border-slate-200 p-6 sm:p-8 shadow-sm"
             >
-              <div className="flex items-center gap-3 mb-8">
+              <div className="flex items-center gap-3 mb-10">
                 <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
                   <TrendingUp className="w-5 h-5 text-emerald-600" />
                 </div>
                 <div>
-                  <h4 className="text-lg font-serif text-slate-900">Sample Success Rate by Chapter</h4>
-                  <p className="text-sm text-slate-600">Illustrative percentage of passing grades</p>
+                  <h4 className="text-lg font-serif text-slate-900">Score Trend</h4>
+                  <p className="text-sm text-slate-600">Progress across six sample attempts</p>
                 </div>
               </div>
-              <BarChart data={analyticsData} dataKey="successRate" color="bg-emerald-500" />
-              <div className="mt-6 flex items-center justify-between text-sm">
-                <span className="text-slate-600">Sample Average Success Rate:</span>
-                <span className="font-bold text-emerald-600">79.4%</span>
+
+              <div
+                className="flex items-end gap-3 sm:gap-5 h-64"
+                role="img"
+                aria-label="Sample scores improve from 68 percent on attempt 1 to 81 percent on the latest attempt"
+              >
+                {scoreTrend.map((item) => (
+                  <div key={item.attempt} className="flex flex-1 h-full flex-col items-center justify-end gap-2">
+                    <span className="text-xs font-bold text-slate-900">{item.score}%</span>
+                    <div className="flex h-[190px] w-full items-end justify-center bg-slate-50 rounded-t">
+                      <div
+                        className="w-full max-w-12 bg-emerald-500 rounded-t"
+                        style={{ height: `${item.score}%` }}
+                      />
+                    </div>
+                    <span className="text-[10px] sm:text-xs text-center text-slate-600">{item.attempt}</span>
+                  </div>
+                ))}
               </div>
             </motion.div>
 
-            {/* Visitors Chart */}
             <motion.div
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
               variants={fadeInUp}
-              className="bg-white rounded-[11px] border border-slate-200 p-8 shadow-sm"
+              className="bg-slate-900 text-white rounded-[11px] border border-slate-900 p-6 sm:p-8 shadow-sm"
+            >
+              <div className="w-11 h-11 bg-white/10 rounded-lg flex items-center justify-center mb-6">
+                <ArrowRight className="w-5 h-5 text-gold" />
+              </div>
+              <p className="text-xs font-bold text-gold uppercase tracking-widest mb-3">Recommended Next Step</p>
+              <h4 className="text-2xl font-serif mb-3">{recommendedChapter.chapter}</h4>
+              <p className="text-white font-bold mb-3">{recommendedChapter.title}</p>
+              <p className="text-slate-300 text-sm leading-relaxed mb-8">
+                Continue with the next incomplete chapter to improve coverage and raise the sample readiness score.
+              </p>
+              <a
+                href={recommendedChapter.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center w-full px-4 py-3 bg-gold text-slate-900 font-bold text-xs tracking-widest uppercase hover:bg-white transition-colors rounded-[6px]"
+              >
+                Take Recommended Test <ArrowRight className="w-4 h-4 ml-2" />
+              </a>
+            </motion.div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeInUp}
+              className="bg-white rounded-[11px] border border-slate-200 p-6 sm:p-8"
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-11 h-11 shrink-0 bg-emerald-100 rounded-lg flex items-center justify-center">
+                  <Award className="w-5 h-5 text-emerald-600" />
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-2">Strongest Chapter</p>
+                  <h4 className="text-xl font-serif text-slate-900">{strongestChapter.chapter}</h4>
+                  <p className="text-slate-600 mt-1">{strongestChapter.title}</p>
+                  <p className="text-3xl font-bold text-emerald-600 mt-5">{strongestChapter.score}%</p>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeInUp}
+              className="bg-white rounded-[11px] border border-slate-200 p-6 sm:p-8"
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-11 h-11 shrink-0 bg-gold/10 rounded-lg flex items-center justify-center">
+                  <Target className="w-5 h-5 text-gold" />
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-gold uppercase tracking-widest mb-2">Revision Priority</p>
+                  <h4 className="text-xl font-serif text-slate-900">{weakestChapter.chapter}</h4>
+                  <p className="text-slate-600 mt-1">{weakestChapter.title}</p>
+                  <p className="text-3xl font-bold text-gold mt-5">{weakestChapter.score}%</p>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeInUp}
+              className="bg-white rounded-[11px] border border-slate-200 p-6 sm:p-8 shadow-sm"
+            >
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-10 h-10 bg-gold/10 rounded-lg flex items-center justify-center">
+                  <BarChart3 className="w-5 h-5 text-gold" />
+                </div>
+                <div>
+                  <h4 className="text-lg font-serif text-slate-900">Chapters Needing More Revision</h4>
+                  <p className="text-sm text-slate-600">Lowest sample success rates</p>
+                </div>
+              </div>
+
+              <div className="space-y-5">
+                {difficultChapters.map((item) => (
+                  <div key={item.chapter}>
+                    <div className="flex items-center justify-between text-sm mb-2">
+                      <span className="font-bold text-slate-900">{item.chapter}</span>
+                      <span className="text-slate-600">{item.successRate}% success</span>
+                    </div>
+                    <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gold rounded-full"
+                        style={{ width: `${item.successRate}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeInUp}
+              className="bg-white rounded-[11px] border border-slate-200 p-6 sm:p-8 shadow-sm"
             >
               <div className="flex items-center gap-3 mb-8">
                 <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -331,51 +482,35 @@ export default function PsrTest() {
                 </div>
                 <div>
                   <h4 className="text-lg font-serif text-slate-900">Sample Attempts by Chapter</h4>
-                  <p className="text-sm text-slate-600">Illustrative number of test attempts</p>
+                  <p className="text-sm text-slate-600">Illustrative engagement across all tests</p>
                 </div>
               </div>
-              <BarChart data={analyticsData} dataKey="visitors" color="bg-blue-500" />
-              <div className="mt-6 flex items-center justify-between text-sm">
+              <BarChart
+                data={analyticsData}
+                dataKey="visitors"
+                color="bg-blue-500"
+                label="Sample test attempts by chapter"
+              />
+              <div className="mt-6 flex items-center justify-between gap-4 text-sm">
                 <span className="text-slate-600">Sample Total Attempts:</span>
-                <span className="font-bold text-blue-600">3,742</span>
+                <span className="font-bold text-blue-600">{totalAttempts.toLocaleString()}</span>
               </div>
             </motion.div>
           </div>
 
-          {/* Summary Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={fadeInUp}
-              className="bg-white rounded-[11px] border border-slate-200 p-6 text-center"
-            >
-              <div className="text-4xl font-bold text-gold mb-2">3,742</div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-6">
+            <div className="bg-white rounded-[11px] border border-slate-200 p-6 text-center">
+              <div className="text-3xl font-bold text-gold mb-2">{totalAttempts.toLocaleString()}</div>
               <p className="text-slate-600 text-sm">Sample Test Attempts</p>
-            </motion.div>
-
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={fadeInUp}
-              className="bg-white rounded-[11px] border border-slate-200 p-6 text-center"
-            >
-              <div className="text-4xl font-bold text-emerald-600 mb-2">79.4%</div>
-              <p className="text-slate-600 text-sm">Sample Average Success Rate</p>
-            </motion.div>
-
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={fadeInUp}
-              className="bg-white rounded-[11px] border border-slate-200 p-6 text-center"
-            >
-              <div className="text-4xl font-bold text-blue-600 mb-2">17</div>
-              <p className="text-slate-600 text-sm">Active Test Chapters</p>
-            </motion.div>
+            </div>
+            <div className="bg-white rounded-[11px] border border-slate-200 p-6 text-center">
+              <div className="text-3xl font-bold text-emerald-600 mb-2">{averageSuccessRate.toFixed(1)}%</div>
+              <p className="text-slate-600 text-sm">Sample Success Rate</p>
+            </div>
+            <div className="bg-white rounded-[11px] border border-slate-200 p-6 text-center">
+              <div className="text-3xl font-bold text-blue-600 mb-2">{chapters.length}</div>
+              <p className="text-slate-600 text-sm">Available Test Chapters</p>
+            </div>
           </div>
         </div>
       </section>
