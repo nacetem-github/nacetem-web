@@ -226,11 +226,16 @@ export default function Layout() {
             <div>
               <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-5 opacity-70">Research & Capacity</h3>
               <ul className="space-y-3 font-medium text-sm">
-                {['Research', 'Capacity Building', 'STI Indicator Dashboard', 'PSR Test'].map((item) => (
-                  <li key={item}>
-                    <Link to={`/${item.toLowerCase().replace(/ /g, '-')}`} className="hover:text-emerald-200 flex items-center transition-colors">
+                {[
+                  { name: 'Research', href: '/research' },
+                  { name: 'Capacity Building', href: '/capacity-building' },
+                  { name: 'STI Indicator Dashboard', href: '/initiatives' },
+                  { name: 'PSR Test', href: '/psr-test' },
+                ].map((item) => (
+                  <li key={item.name}>
+                    <Link to={item.href} className="hover:text-emerald-200 flex items-center transition-colors">
                       <ChevronRight className="h-4 w-4 mr-1 opacity-70" />
-                      {item}
+                      {item.name}
                     </Link>
                   </li>
                 ))}
