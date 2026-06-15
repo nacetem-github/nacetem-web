@@ -190,3 +190,7 @@ button {
     letter-spacing: 0.05em;
   }
 }
+body {
+  filter: invert(100%);
+  background-color: black;
+}
