@@ -35,3 +35,7 @@ NACETEM-Web/
 ├── package.json
 ├── README.md
 └── .gitignore
+
+## Collaboration Notice
+
+All contributors should work through branches and submit Pull Requests before updates are merged into the main project.
