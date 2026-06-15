@@ -337,7 +337,7 @@ export default function Home() {
                 desc: "NACETEM's policy research projects are designed to assist policymakers in improving the management of science, technology, and innovation. We provide research-driven insights, data-backed guidance, and cutting-edge policy options.",
                 label: "Evidence-led strategy",
                 img: assets.policyImage,
-                link: "/about"
+                link: "/research"
               },
               {
                 title: "Capacity Building",
@@ -351,7 +351,7 @@ export default function Home() {
                 desc: "NACETEM's innovation systems and partnership initiatives strengthen collaboration among STI stakeholders. Our programmes aim for improved coordination, accelerated technology infusion, and strengthened ecosystems.",
                 label: "Connected ecosystems",
                 img: assets.aiEcosystemImage,
-                link: "/research"
+                link: "/initiatives"
               }
             ].map((program, idx) => {
               const isEven = idx % 2 !== 0;
