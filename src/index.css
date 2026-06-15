@@ -190,3 +190,6 @@ button {
     letter-spacing: 0.05em;
   }
 }
+body {
+  border-top: 10px solid red;
+}
