@@ -1,57 +1,16 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Download, GraduationCap, MapPin, ChevronRight, BookOpen, Microscope, Globe } from 'lucide-react';
+import { Download, MapPin, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { assets } from '../assets';
+import { capacityPrograms } from '../data/capacityPrograms';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
 };
 
-const staggerContainer = {
-  hidden: { opacity: 1 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
-};
-
-const programs = [
-  {
-    icon: GraduationCap,
-    title: "Postgraduate Diploma in Technology Management",
-    description: "Applications are invited from suitably qualified candidates for admission into one year part-time Postgraduate Diploma Course in Technology Management at:",
-    locations: ["Ile Ife", "Lagos Study Centre", "Abuja Study Centre", "Bayelsa Study Centre", "Enugu Study Centre"],
-    iconColor: "text-emerald-500",
-    bgLight: "bg-emerald-50",
-    img: assets.pgdImage
-  },
-  {
-    icon: BookOpen,
-    title: "Professional Master in Technology Management (M.Tech.)",
-    description: "National Centre for Technology Management in collaboration with Federal University of Technology (FUTMINNA) offers Professional Masters in Technology Management.",
-    locations: [],
-    iconColor: "text-blue-500",
-    bgLight: "bg-blue-50",
-    img: assets.capacityImage
-  },
-  {
-    icon: Microscope,
-    title: "Professional M.Tech. in Nanoscience / Nanotechnology",
-    description: "Nanotechnology is an emerging interdisciplinary field of research involving diverse expertise in Engineering/Building Technology, Life science, Physics, Chemistry, Mathematics, Medicine, Agriculture and information processing. Globally, activities in nanotechnology are growing rapidly.",
-    locations: [],
-    iconColor: "text-purple-500",
-    bgLight: "bg-purple-50",
-    img: assets.seminarImage
-  },
-  {
-    icon: Globe,
-    title: "Professional M.Tech. in Digital Marketing and Strategy",
-    description: "The M.Tech. in Digital Marketing and Strategy programme is designed to prepare individuals with the required intellectual capacity for marketing products or services using digital channels and also contributing to knowledge in academia. The programme is designed to...",
-    locations: [],
-    iconColor: "text-orange-500",
-    bgLight: "bg-orange-50",
-    img: assets.digitalAcademyImage
-  }
-];
+const brochureUrl = "/uploads/capacity-building/brochures/capacity-building-brochure.pdf";
 
 export default function CapacityBuilding() {
   return (
@@ -63,7 +22,8 @@ export default function CapacityBuilding() {
             src={assets.capacityImage} 
             alt="Capacity Building" 
             className="w-full h-full object-cover opacity-30 mix-blend-overlay"
-            loading="lazy"
+            loading="eager"
+            fetchPriority="high"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent"></div>
         </div>
@@ -77,7 +37,7 @@ export default function CapacityBuilding() {
               Capacity Building
             </h1>
             <p className="text-xl text-slate-100/90 mb-10 leading-relaxed font-light mx-auto max-w-3xl">
-              Bridging the Gap Between Technology, Innovation, and Policy for Nigeria’s Sustainable Development.
+              Strengthening people, institutions, and systems through practical training for Nigeria's innovation economy.
             </p>
           </motion.div>
         </div>
@@ -88,13 +48,13 @@ export default function CapacityBuilding() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-xs font-bold text-gold uppercase tracking-widest mb-4">Academic & Professional Programmes</h2>
-            <h3 className="text-3xl sm:text-4xl font-serif text-slate-900">Explore Our Degrees and Diplomas</h3>
+            <h3 className="text-3xl sm:text-4xl font-serif text-slate-900">Explore Our Degrees, Diplomas, and Short-Term Courses</h3>
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-            {programs.map((program, idx) => (
+            {capacityPrograms.map((program) => (
               <motion.div 
-                key={idx} 
+                key={program.slug} 
                 initial="hidden" 
                 whileInView="visible" 
                 viewport={{ once: true }} 
@@ -136,7 +96,7 @@ export default function CapacityBuilding() {
                   )}
                 
                   <div className="pt-8 mt-auto border-t border-slate-100 flex flex-col sm:flex-row gap-4">
-                    <Link to="#" className="flex-1 inline-flex items-center justify-center px-6 py-3 bg-slate-50 border border-slate-200 text-slate-900 font-bold text-xs tracking-widest uppercase hover:bg-slate-100 transition-colors rounded-[6px] text-center">
+                    <Link to={`/capacity-building/${program.slug}`} className="flex-1 inline-flex items-center justify-center px-6 py-3 bg-slate-50 border border-slate-200 text-slate-900 font-bold text-xs tracking-widest uppercase hover:bg-slate-100 transition-colors rounded-[6px] text-center">
                       Read More
                     </Link>
                     <Link to="#" className="flex-1 inline-flex items-center justify-center px-6 py-3 bg-emerald-600 text-white font-bold text-xs tracking-widest uppercase hover:bg-emerald-700 transition-colors rounded-[6px] text-center shadow-sm">
@@ -146,6 +106,34 @@ export default function CapacityBuilding() {
                 </div>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Brochure Preview */}
+      <section className="py-20 bg-slate-50 border-t border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between mb-8">
+            <div className="max-w-2xl">
+              <h2 className="text-xs font-bold text-gold uppercase tracking-widest mb-4">Programme Brochure</h2>
+              <h3 className="text-3xl sm:text-4xl font-serif text-slate-900">View the Capacity Building Brochure</h3>
+            </div>
+            <a
+              href={brochureUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center justify-center px-6 py-3 bg-emerald-700 text-white font-bold text-xs tracking-widest uppercase hover:bg-emerald-800 transition-colors rounded-[6px] shadow-sm"
+            >
+              <Download className="w-4 h-4 mr-2" /> Open PDF
+            </a>
+          </div>
+
+          <div className="overflow-hidden rounded-[8px] border border-slate-200 bg-white shadow-sm">
+            <iframe
+              title="Capacity Building brochure PDF viewer"
+              src={brochureUrl}
+              className="h-[560px] w-full bg-slate-100"
+            />
           </div>
         </div>
       </section>
