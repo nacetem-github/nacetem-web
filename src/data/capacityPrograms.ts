@@ -12,6 +12,8 @@ export type CapacityProgram = {
   audience: string[];
   highlights: string[];
   outcomes: string[];
+  curriculum?: string[];
+  careerOpportunities?: string[];
   locations: string[];
   duration: string;
   format: string;
@@ -26,28 +28,51 @@ export const capacityPrograms: CapacityProgram[] = [
     title: 'Postgraduate Diploma in Technology Management',
     category: 'Diploma Programme',
     description:
-      'Applications are invited from suitably qualified candidates for admission into a one-year part-time Postgraduate Diploma Course in Technology Management.',
+      'A specialized programme that equips graduates and professionals to manage technological innovation, resources, and technology-driven organizations.',
     overview:
-      'This programme introduces participants to the principles and practice of technology management, with emphasis on innovation systems, policy awareness, organizational capability, and practical decision-making in science, technology, and innovation environments.',
+      'The Postgraduate Diploma in Technology Management is designed to equip graduates and professionals with the knowledge and skills required to effectively manage technological innovation, technological resources, and technology-driven organizations. The programme bridges the gap between technical expertise and managerial competence, enabling participants to make informed decisions in today\'s rapidly evolving technological environment.',
     audience: [
-      'Public servants and institutional officers',
-      'Graduates seeking specialist technology management knowledge',
-      'Professionals supporting innovation, planning, or research administration',
+      'Graduates from science, engineering, technology, business, and related disciplines',
+      'Professionals seeking to enhance their managerial capabilities',
+      'Individuals aiming to advance their careers in technology-oriented industries',
+      'Candidates seeking a pathway to further postgraduate studies in Technology Management and related fields',
     ],
     highlights: [
-      'Technology management foundations',
-      'Innovation systems and policy context',
-      'Institutional planning and decision support',
-      'Part-time learning structure for working professionals',
+      'Bridges technical expertise with managerial competence',
+      'Focuses on managing innovation, technological resources, and technology-driven organizations',
+      'Addresses contemporary issues in digital transformation and technology development',
+      'Supports progression into Master\'s degree programmes in Technology Management and related fields',
     ],
     outcomes: [
-      'Understand core concepts in technology and innovation management',
-      'Apply STI knowledge to institutional and national development priorities',
-      'Strengthen planning, coordination, and implementation capacity',
+      'Apply management principles to technology-based organizations',
+      'Analyze and evaluate technological innovations and their business implications',
+      'Plan, implement, and manage technology projects effectively',
+      'Develop strategies for technology adoption and organizational growth',
+      'Demonstrate leadership and decision-making skills in technology-driven environments',
+      'Understand emerging trends in information technology, innovation, and entrepreneurship',
+    ],
+    curriculum: [
+      'Principles of management',
+      'Innovation and entrepreneurship',
+      'Information systems',
+      'Project management',
+      'Strategic technology planning',
+      'Research and development management',
+      'Technology policy',
+      'Organizational leadership',
+    ],
+    careerOpportunities: [
+      'Technology consulting',
+      'Project management',
+      'Innovation management',
+      'Information systems management',
+      'Research and development administration',
+      'Operations management',
+      'Entrepreneurship across public and private sectors',
     ],
     locations: ['Ile Ife', 'Lagos Study Centre', 'Abuja Study Centre', 'Bayelsa Study Centre', 'Enugu Study Centre'],
     duration: 'One year',
-    format: 'Part-time',
+    format: 'Hybrid',
     iconColor: 'text-emerald-500',
     img: assets.pgdImage,
   },
