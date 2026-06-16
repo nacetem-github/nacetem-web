@@ -86,6 +86,15 @@ export default function CapacityBuildingDetail() {
                   ))}
                 </div>
               </motion.div>
+
+              {(program.curriculum || program.careerOpportunities) && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
+                  {program.curriculum && <InfoPanel title="Curriculum Focus" items={program.curriculum} icon={BookOpen} />}
+                  {program.careerOpportunities && (
+                    <InfoPanel title="Career Opportunities" items={program.careerOpportunities} icon={Users} />
+                  )}
+                </div>
+              )}
             </main>
 
             <aside className="lg:sticky lg:top-28 self-start">
