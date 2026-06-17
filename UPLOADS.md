@@ -69,10 +69,19 @@ Upload event flyers, forms, and media here:
 
 Use:
 
+- `flyers/<year>/<event-slug>/`
+- `source-documents/<year>/<event-slug>/`
 - `images/`
 - `gallery/<event-slug>/`
 - `registration-forms/`
 - `videos/`
+
+For upcoming events, upload:
+
+- Flyer: `public/uploads/events/flyers/<year>/<event-slug>/`
+- Details and links document: `public/uploads/events/source-documents/<year>/<event-slug>/`
+
+The source document should include title, date/time, location or virtual platform, registration/meeting link where applicable, short description, and contact information where applicable.
 
 Current gallery folders used by the News & Gallery page:
 
