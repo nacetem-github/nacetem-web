@@ -70,8 +70,17 @@ Upload event flyers, forms, and media here:
 Use:
 
 - `images/`
+- `gallery/<event-slug>/`
 - `registration-forms/`
 - `videos/`
+
+Current gallery folders used by the News & Gallery page:
+
+- `public/uploads/events/gallery/sti-policy-dialogue-2026/`
+- `public/uploads/events/gallery/digital-skills-workshop-2026/`
+- `public/uploads/events/gallery/innovation-management-conference-2026/`
+
+After adding gallery images, add the public image URLs to the `galleryEvents` array in `src/pages/News.tsx`.
 
 ## News
 

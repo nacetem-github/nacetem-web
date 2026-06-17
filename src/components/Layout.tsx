@@ -67,7 +67,15 @@ export default function Layout() {
     },
     { name: 'Capacity Building', href: '/capacity-building' },
     { name: 'PSR Test', href: '/psr-test' },
-    { name: 'News', href: '/news' },
+    {
+      name: 'News & Gallery',
+      href: '/news',
+      children: [
+        { name: 'Upcoming Events', href: '/news#upcoming-events' },
+        { name: 'Featured Stories', href: '/news#featured-stories' },
+        { name: 'Event Gallery', href: '/news#event-gallery' },
+      ],
+    },
     {
       name: 'Publications',
       href: '/publications',
@@ -229,13 +237,17 @@ export default function Layout() {
                 ))}
               </ul>
               
-              <h3 className="text-xs font-bold text-white uppercase tracking-wider mt-8 mb-5 opacity-70">News & Events</h3>
+              <h3 className="text-xs font-bold text-white uppercase tracking-wider mt-8 mb-5 opacity-70">News & Gallery</h3>
               <ul className="space-y-3 font-medium text-sm">
-                {['Latest News', 'Upcoming Events', 'Past Events'].map((item) => (
-                  <li key={item}>
-                    <Link to="/news" className="hover:text-emerald-200 flex items-center transition-colors">
+                {[
+                  { name: 'Upcoming Events', href: '/news#upcoming-events' },
+                  { name: 'Featured Stories', href: '/news#featured-stories' },
+                  { name: 'Event Gallery', href: '/news#event-gallery' },
+                ].map((item) => (
+                  <li key={item.name}>
+                    <Link to={item.href} className="hover:text-emerald-200 flex items-center transition-colors">
                       <ChevronRight className="h-4 w-4 mr-1 opacity-70" />
-                      {item}
+                      {item.name}
                     </Link>
                   </li>
                 ))}
