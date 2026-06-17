@@ -10,8 +10,10 @@ import NewsDetail from './pages/NewsDetail';
 import Events from './pages/Events';
 import Publications from './pages/Publications';
 import CapacityBuilding from './pages/CapacityBuilding';
+import CapacityBuildingDetail from './pages/CapacityBuildingDetail';
 import PsrTest from './pages/PsrTest';
 import SeminarSeries from './pages/SeminarSeries';
+import Research from './pages/Research';
 import PlaceholderPage from './pages/PlaceholderPage';
 import { Login, AdminDashboard } from './pages/Admin';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -33,9 +35,10 @@ export default function App() {
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
               <Route path="about" element={<About />} />
-              <Route path="research" element={<PlaceholderPage title="Research" description="Our ongoing research initiatives." />} />
+              <Route path="research" element={<Research />} />
               <Route path="research/seminar-series" element={<SeminarSeries />} />
               <Route path="capacity-building" element={<CapacityBuilding />} />
+              <Route path="capacity-building/:slug" element={<CapacityBuildingDetail />} />
               <Route path="gallery" element={<PlaceholderPage title="Gallery" description="Visual highlights from our events and programs." />} />
               <Route path="events" element={<Events />} />
               <Route path="psr-test" element={<PsrTest />} />

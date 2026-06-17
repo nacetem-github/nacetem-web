@@ -65,17 +65,21 @@ export default function Layout() {
   return (
     <div className="min-h-screen flex flex-col font-sans text-slate-900 bg-slate-50">
       {/* Main Header */}
-      <header className="bg-slate-50/90 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200/80 relative">
+      <header className="sticky top-0 z-50 relative border-b border-slate-200/70 bg-white/85 shadow-[0_8px_30px_rgba(15,23,42,0.04)] backdrop-blur-xl">
         {/* Scroll Progress Bar */}
         <div 
           className="absolute bottom-0 left-0 h-[2px] bg-gold transition-all duration-75 z-50"
           style={{ width: `${scrollProgress}%` }}
         />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-20 items-center">
+          <div className="flex h-24 items-center justify-between sm:h-28">
             {/* Logo */}
-            <Link to="/" className="hover:opacity-90 transition-opacity pb-1 block">
-              <NacetemLogo />
+            <Link
+              to="/"
+              aria-label="NACETEM home"
+              className="group block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-4"
+            >
+              <NacetemLogo className="group-hover:-translate-y-0.5 group-hover:border-emerald-600/25 group-hover:shadow-[0_12px_30px_rgba(0,102,51,0.12)]" />
             </Link>
 
             {/* Desktop Navigation */}
@@ -121,7 +125,8 @@ export default function Layout() {
             <div className="md:hidden flex items-center">
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="inline-flex items-center justify-center p-2 rounded-md text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 transition"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-emerald-600/25 hover:bg-emerald-50 hover:text-emerald-700"
+                aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
               >
                 {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </button>
@@ -177,12 +182,14 @@ export default function Layout() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-emerald-600 text-white font-sans border-t border-slate-200">
+      <footer className="relative overflow-hidden border-t-4 border-gold bg-[linear-gradient(135deg,#004d26_0%,#006633_55%,#075c35_100%)] font-sans text-white">
+        <div className="pointer-events-none absolute -right-32 -top-40 h-96 w-96 rounded-full border-[72px] border-white/[0.035]" />
+        <div className="pointer-events-none absolute -bottom-48 left-1/4 h-96 w-96 rounded-full bg-black/10 blur-3xl" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
+          <div className="relative grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4 lg:gap-8">
             {/* Logo space */}
             <div className="space-y-6">
-              <NacetemLogo variant="light" />
+              <NacetemLogo variant="light" className="w-fit" />
               <p className="text-sm text-emerald-50 max-w-xs leading-relaxed opacity-90">
                 NACETEM is a national institution advancing science, technology and innovation for evidence-based development.
               </p>
@@ -219,11 +226,16 @@ export default function Layout() {
             <div>
               <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-5 opacity-70">Research & Capacity</h3>
               <ul className="space-y-3 font-medium text-sm">
-                {['Research', 'Capacity Building', 'STI Indicator Dashboard', 'PSR Test'].map((item) => (
-                  <li key={item}>
-                    <Link to={`/${item.toLowerCase().replace(/ /g, '-')}`} className="hover:text-emerald-200 flex items-center transition-colors">
+                {[
+                  { name: 'Research', href: '/research' },
+                  { name: 'Capacity Building', href: '/capacity-building' },
+                  { name: 'STI Indicator Dashboard', href: '/initiatives' },
+                  { name: 'PSR Test', href: '/psr-test' },
+                ].map((item) => (
+                  <li key={item.name}>
+                    <Link to={item.href} className="hover:text-emerald-200 flex items-center transition-colors">
                       <ChevronRight className="h-4 w-4 mr-1 opacity-70" />
-                      {item}
+                      {item.name}
                     </Link>
                   </li>
                 ))}
@@ -246,15 +258,15 @@ export default function Layout() {
             <div>
               <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-5 opacity-70">Connect With Us</h3>
               <div className="flex space-x-4 mb-8">
-                <a href="#" className="text-emerald-50 hover:text-white p-2 border border-emerald-400/30 rounded-sm transition-colors">
+                <a href="#" className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-emerald-50 transition-all hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/20 hover:text-white">
                   <span className="sr-only">Email</span>
                   <Mail className="h-5 w-5" />
                 </a>
-                <a href="#" className="text-emerald-50 hover:text-white p-2 border border-emerald-400/30 rounded-sm transition-colors">
+                <a href="#" className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-emerald-50 transition-all hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/20 hover:text-white">
                   <span className="sr-only">Twitter</span>
                   <Twitter className="h-5 w-5" />
                 </a>
-                <a href="#" className="text-emerald-50 hover:text-white p-2 border border-emerald-400/30 rounded-sm transition-colors">
+                <a href="#" className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-emerald-50 transition-all hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/20 hover:text-white">
                   <span className="sr-only">Facebook</span>
                   <Facebook className="h-5 w-5" />
                 </a>
@@ -262,7 +274,7 @@ export default function Layout() {
             </div>
           </div>
           
-          <div className="mt-12 pt-8 border-t border-emerald-500 text-xs text-center sm:text-left flex flex-col sm:flex-row justify-between items-center text-emerald-100">
+          <div className="relative mt-12 flex flex-col items-center justify-between border-t border-white/15 pt-8 text-center text-xs text-emerald-100 sm:flex-row sm:text-left">
             <p>
               &copy; {new Date().getFullYear()} NACETEM. All rights reserved.
             </p>

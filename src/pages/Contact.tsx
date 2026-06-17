@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, MapPin, Phone, Mail, Clock, Send, Handshake, BookOpen, Headphones, Facebook, Linkedin, Twitter, Youtube, Instagram } from 'lucide-react';
+import { ArrowRight, MapPin, Phone, Mail, Clock, Send, Handshake, BookOpen, Headphones, Facebook, Linkedin, Twitter, Youtube, Instagram, Plus, Minus } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { divIcon, type Map as LeafletMap } from 'leaflet';
 import { assets } from '../assets';
 
 const fadeInUp = {
@@ -20,60 +22,132 @@ const officeLocations = [
     address: 'National Centre for Technology Management (NACETEM), P.M.B. 012, Obafemi Awolowo University, Ile-Ife, Osun State, Nigeria.',
     lat: 7.520767,
     lng: 4.530315,
-    position: { top: '60%', left: '19%' },
   },
   {
     zone: 'North Central',
     address: 'NACETEM North Operational office Office, 4th Floor, Federal Secretariat Complex, Phase II, Central Business District, Abuja, FCT.',
     lat: 9.062472,
     lng: 7.498484,
-    position: { top: '43%', left: '43%' },
   },
   {
     zone: 'North Central',
     address: 'NACETEM North Central Training Office, No. 3 Dunukofia Street, Opposite NNPC Staff Quarters/JSS, Area 11, Garki, Abuja, FCT.',
     lat: 9.041927,
     lng: 7.500756,
-    position: { top: '43%', left: '43%' },
+    positionClass: 'top-[43%] left-[43%]',
   },
   {
     zone: 'North West',
     address: 'NACETEM North West Office, Federal Secretariat Complex, No. 1 Katsina Road, Kano, Kano State.',
     lat: 12.02382,
     lng: 8.51435,
-    position: { top: '17%', left: '52%' },
+    positionClass: 'top-[17%] left-[52%]',
   },
   {
     zone: 'North East',
     address: 'NACETEM North East Office, Former Pre-Degree Block, Modibbo Adama University, Yola, Adamawa State.',
     lat: 9.3489,
     lng: 12.5032,
-    position: { top: '40%', left: '84%' },
+    positionClass: 'top-[40%] left-[84%]',
   },
   {
     zone: 'South South',
     address: 'NACETEM South South Office, Niger Delta University, Wilberforce Island, Amassoma, Bayelsa State.',
     lat: 4.974712,
     lng: 6.104635,
-    position: { top: '82%', left: '32%' },
+    positionClass: 'top-[82%] left-[32%]',
   },
   {
     zone: 'South East',
     address: 'NACETEM South East Office, No. 3 Presidential Road, Opposite Presidential Hotel (PRODA Premises), Independence Layout, Enugu, Enugu State.',
     lat: 6.44113,
     lng: 7.510119,
-    position: { top: '68%', left: '45%' },
+    positionClass: 'top-[68%] left-[45%]',
   },
   {
     zone: 'South West',
     address: 'NACETEM South West/Lagos Office, House 10, Subuola Abu Street, Greenland Estate, Lagos State.',
     lat: 6.479288,
     lng: 3.608023,
-    position: { top: '68%', left: '10%' },
   },
 ];
 
+const mapCenter: [number, number] = [8.5, 7.3];
+
+const markerIcon = divIcon({
+  className: '',
+  html: `<div style="width:32px;height:32px;border-radius:9999px;background:#10b981;border:4px solid white;box-shadow:0 12px 20px rgba(15,23,42,0.24);display:flex;align-items:center;justify-content:center;">` +
+    `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.134 2 5 5.134 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.866-3.134-7-7-7z" fill="white"/><path d="M12 12.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7z" fill="#10b981"/></svg>` +
+  `</div>`,
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32],
+});
+
+const contactEmail = 'info@nacetem.gov.ng';
+
 export default function Contact() {
+  const [mapZoom, setMapZoom] = useState(6);
+  const [map, setMap] = useState<LeafletMap | null>(null);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [subject, setSubject] = useState('');
+  const [message, setMessage] = useState('');
+  const [serverStatus, setServerStatus] = useState<string | null>(null);
+  const [showFallbackHint, setShowFallbackHint] = useState(false);
+  const [isServerSubmitting, setIsServerSubmitting] = useState(false);
+  const minZoom = 4;
+  const maxZoom = 12;
+
+  useEffect(() => {
+    if (map) {
+      map.setZoom(mapZoom);
+    }
+  }, [map, mapZoom]);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const mailSubject = `NACETEM Contact Form: ${subject || 'General Inquiry'}`;
+    const mailBody = `Name: ${name}%0D%0AEmail: ${email}%0D%0APhone: ${phone || 'N/A'}%0D%0A%0D%0AMessage:%0D%0A${message}`;
+    window.location.href = `mailto:${contactEmail}?subject=${encodeURIComponent(mailSubject)}&body=${mailBody}`;
+    setShowFallbackHint(true);
+  };
+
+  const handleServerSubmit = async () => {
+    setServerStatus(null);
+    setIsServerSubmitting(true);
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, phone, subject, message }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data?.error || 'Unable to send message via server.');
+      }
+
+      setServerStatus('Message sent successfully via server fallback.');
+      setName('');
+      setEmail('');
+      setPhone('');
+      setSubject('');
+      setMessage('');
+      setShowFallbackHint(false);
+    } catch (error) {
+      setServerStatus(
+        `Server fallback failed: ${error instanceof Error ? error.message : 'please try again later.'}`,
+      );
+    } finally {
+      setIsServerSubmitting(false);
+    }
+  };
+
   return (
     <div className="bg-slate-50 min-h-screen font-sans overflow-hidden">
       {/* 1. Hero Section */}
@@ -163,34 +237,92 @@ export default function Contact() {
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="lg:w-2/3">
               <div className="bg-slate-50 border-[2.11px] border-slate-200 rounded-[11px] p-8 md:p-12">
                 <h2 className="text-3xl font-serif text-slate-900 mb-8">Send Us a Message</h2>
-                <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+                <form className="space-y-6" onSubmit={handleSubmit}>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label htmlFor="name" className="block text-xs font-bold text-slate-700 uppercase tracking-widest mb-2">Full Name</label>
-                      <input type="text" id="name" className="w-full px-4 py-3 bg-white border border-slate-300 rounded-[6px] focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 text-slate-900 transition-colors" placeholder="Your full name" required />
+                      <input
+                        type="text"
+                        id="name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-[6px] focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 text-slate-900 transition-colors"
+                        placeholder="Your full name"
+                        required
+                      />
                     </div>
                     <div>
                       <label htmlFor="email" className="block text-xs font-bold text-slate-700 uppercase tracking-widest mb-2">Email Address</label>
-                      <input type="email" id="email" className="w-full px-4 py-3 bg-white border border-slate-300 rounded-[6px] focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 text-slate-900 transition-colors" placeholder="your.email@example.com" required />
+                      <input
+                        type="email"
+                        id="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-[6px] focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 text-slate-900 transition-colors"
+                        placeholder="your.email@example.com"
+                        required
+                      />
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label htmlFor="phone" className="block text-xs font-bold text-slate-700 uppercase tracking-widest mb-2">Phone Number</label>
-                      <input type="tel" id="phone" className="w-full px-4 py-3 bg-white border border-slate-300 rounded-[6px] focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 text-slate-900 transition-colors" placeholder="+234 XXX XXX XXXX" />
+                      <input
+                        type="tel"
+                        id="phone"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-[6px] focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 text-slate-900 transition-colors"
+                        placeholder="+234 XXX XXX XXXX"
+                      />
                     </div>
                     <div>
                       <label htmlFor="subject" className="block text-xs font-bold text-slate-700 uppercase tracking-widest mb-2">Subject</label>
-                      <input type="text" id="subject" className="w-full px-4 py-3 bg-white border border-slate-300 rounded-[6px] focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 text-slate-900 transition-colors" placeholder="How can we help?" required />
+                      <input
+                        type="text"
+                        id="subject"
+                        value={subject}
+                        onChange={(e) => setSubject(e.target.value)}
+                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-[6px] focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 text-slate-900 transition-colors"
+                        placeholder="How can we help?"
+                        required
+                      />
                     </div>
                   </div>
                   <div>
                     <label htmlFor="message" className="block text-xs font-bold text-slate-700 uppercase tracking-widest mb-2">Message</label>
-                    <textarea id="message" rows={5} className="w-full px-4 py-3 bg-white border border-slate-300 rounded-[6px] focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 text-slate-900 transition-colors resize-none" placeholder="Write your message here..." required></textarea>
+                    <textarea
+                      id="message"
+                      rows={5}
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      className="w-full px-4 py-3 bg-white border border-slate-300 rounded-[6px] focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 text-slate-900 transition-colors resize-none"
+                      placeholder="Write your message here..."
+                      required
+                    ></textarea>
                   </div>
-                  <button type="submit" className="inline-flex items-center justify-center px-8 py-4 bg-emerald-600 text-white font-bold text-sm tracking-widest uppercase hover:bg-emerald-700 transition-colors rounded-[6px] w-full sm:w-auto">
-                    Send Message <Send className="ml-2 h-4 w-4" />
-                  </button>
+                  <p className="text-xs text-slate-500">When you submit, your email client will open with the message addressed to {contactEmail}. If your local email client does not open, use the server fallback button.</p>
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                    <button type="submit" className="inline-flex items-center justify-center px-8 py-4 bg-emerald-600 text-white font-bold text-sm tracking-widest uppercase hover:bg-emerald-700 transition-colors rounded-[6px] w-full sm:w-auto">
+                      Send Message <Send className="ml-2 h-4 w-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleServerSubmit}
+                      disabled={isServerSubmitting}
+                      className="inline-flex items-center justify-center px-8 py-4 bg-slate-900 text-white font-bold text-sm tracking-widest uppercase hover:bg-slate-800 transition-colors rounded-[6px] w-full sm:w-auto disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {isServerSubmitting ? 'Sending...' : 'Send via Server'}
+                    </button>
+                  </div>
+                  {showFallbackHint ? (
+                    <div className="mt-3 rounded-2xl border border-amber-300/80 bg-amber-50/80 p-3 text-sm text-amber-900">
+                      Your local email client didn&apos;t open? Click <span className="font-semibold">Send via Server</span> to submit using the fallback path.
+                    </div>
+                  ) : null}
+                  {serverStatus ? (
+                    <p className="mt-3 text-sm text-slate-700">{serverStatus}</p>
+                  ) : null}
                 </form>
               </div>
             </motion.div>
@@ -257,49 +389,72 @@ export default function Contact() {
               <p className="text-slate-600 mb-8 leading-relaxed">
                 Visit our headquarters or zonal offices for inquiries, meetings, partnerships, and official engagements.
               </p>
-              <div className="w-full overflow-hidden rounded-2xl border border-slate-300 bg-slate-100 shadow-sm">
+              <div className="w-full overflow-hidden rounded-3xl border border-slate-200/80 bg-white/80 shadow-[0_30px_80px_-40px_rgba(15,23,42,0.35)] backdrop-blur-xl">
                 <div className="relative aspect-[16/12] sm:aspect-[21/10] overflow-hidden">
-                  <iframe
-                    title="NACETEM offices across Nigeria"
-                    src="https://maps.google.com/maps?q=Nigeria&z=6&output=embed"
-                    className="absolute inset-0 h-full w-full border-0"
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  />
-                  <div className="absolute inset-0 bg-white/10 pointer-events-none"></div>
-                  {officeLocations.map((office) => (
-                    <a
-                      key={office.zone}
-                      href={`https://www.google.com/maps/search/?api=1&query=${office.lat},${office.lng}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label={`Open ${office.zone} office on Google Maps`}
-                      className="absolute z-10 -translate-x-1/2 -translate-y-full group"
-                      style={{ top: office.position.top, left: office.position.left }}
-                    >
-                      <span className="flex h-9 w-9 items-center justify-center rounded-full border-4 border-white bg-emerald-600 text-white shadow-[0_10px_22px_rgba(0,0,0,0.28)] transition-transform group-hover:-translate-y-1">
-                        <MapPin className="h-5 w-5" />
-                      </span>
-                      <span className="absolute left-1/2 top-10 hidden w-36 -translate-x-1/2 rounded-[6px] bg-slate-900 px-3 py-2 text-center text-[10px] font-bold uppercase tracking-wider text-white shadow-xl group-hover:block">
-                        {office.zone}
-                      </span>
-                    </a>
-                  ))}
+                  <MapContainer
+                    center={mapCenter}
+                    zoom={mapZoom}
+                    whenCreated={setMap}
+                    scrollWheelZoom={true}
+                    zoomControl={false}
+                    className="h-full w-full"
+                  >
+                    <TileLayer
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    />
+                    {officeLocations.map((office) => (
+                      <Marker key={office.zone} position={[office.lat, office.lng]} icon={markerIcon}>
+                        <Popup>
+                          <div className="max-w-xs">
+                            <h3 className="text-sm font-bold text-slate-900">{office.zone}</h3>
+                            <p className="text-xs text-slate-600 mt-1">{office.address}</p>
+                          </div>
+                        </Popup>
+                      </Marker>
+                    ))}
+                  </MapContainer>
+
+                  <div className="absolute top-4 right-4 z-20 flex flex-col items-end gap-2">
+                    <div className="rounded-2xl bg-white/95 border border-slate-200/80 shadow-xl p-2 flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setMapZoom((current) => Math.max(minZoom, current - 1))}
+                        className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-slate-950 text-white hover:bg-slate-900 transition"
+                        aria-label="Zoom out"
+                      >
+                        <Minus className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setMapZoom((current) => Math.min(maxZoom, current + 1))}
+                        className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-slate-950 text-white hover:bg-slate-900 transition"
+                        aria-label="Zoom in"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <div className="rounded-2xl bg-slate-900/90 px-3 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-slate-100 shadow-lg">
+                      Zoom {mapZoom}
+                    </div>
+                  </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-200 bg-white p-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-200 bg-slate-50 p-5">
                   {officeLocations.map((office) => (
                     <a
                       key={office.zone}
                       href={`https://www.google.com/maps/search/?api=1&query=${office.lat},${office.lng}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="group rounded-[8px] border border-slate-200 p-4 transition-colors hover:border-emerald-300 hover:bg-emerald-50/50"
+                      className="group rounded-[16px] border border-slate-200/80 bg-white p-5 shadow-sm transition-all hover:-translate-y-1 hover:border-emerald-300 hover:shadow-md"
                     >
-                      <div className="mb-2 flex items-center justify-between gap-3">
-                        <h3 className="text-xs font-bold uppercase tracking-widest text-emerald-700">{office.zone}</h3>
+                      <div className="mb-3 flex items-center justify-between gap-3">
+                        <span className="rounded-full bg-emerald-600/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-700">
+                          {office.zone}
+                        </span>
                         <ArrowRight className="h-4 w-4 shrink-0 text-slate-400 transition-transform group-hover:translate-x-1 group-hover:text-emerald-700" />
                       </div>
-                      <p className="text-xs leading-6 text-slate-600">{office.address}</p>
+                      <p className="text-sm leading-6 text-slate-600">{office.address}</p>
                     </a>
                   ))}
                 </div>
