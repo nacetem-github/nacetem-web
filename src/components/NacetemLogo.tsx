@@ -1,5 +1,5 @@
 import { cn } from '../lib/utils';
-import nacetemLogo from '../nacetem-logo-full.png';
+import nacetemLogo from '../assets/images/logos/nacetem-logo-full.png';
 
 interface NacetemLogoProps {
   className?: string;

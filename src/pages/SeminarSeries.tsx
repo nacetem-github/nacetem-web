@@ -10,6 +10,94 @@ const fadeInUp = {
 
 const seminars = [
   {
+    title: "FACTORS INFLUENCING THE ADOPTION OF GREEN SUPPLY CHAIN MANAGEMENT TECHNOLOGIES AND PRACTICES IN SELECTED PHARMACEUTICAL AND TEXTILE FIRMS IN SOUTHWESTERN NIGERIA",
+    presenter: "Grace OJO-EMMANUEL",
+    date: "21st August, 2025",
+    year: 2025,
+    presentationUrl: "/uploads/research/seminar-series/2025/presentations/green-supply-chain-management-technologies-grace-ojo-emmanuel.pptx",
+    videoUrl: null,
+  },
+  {
+    title: "ICT Integration in Improving Agility of Petroleum Distribution in Nigeria",
+    presenter: "Dr. Obiageli Nneka Nze",
+    date: "2025",
+    year: 2025,
+    presentationUrl: "/uploads/research/seminar-series/2025/presentations/ict-integration-petroleum-distribution-obiageli-nze.pptx",
+    videoUrl: null,
+  },
+  {
+    title: "Modeling the Nigerian Education System: A system dynamics approach",
+    presenter: "Victor O. Sobanke (PhD)",
+    date: "2025",
+    year: 2025,
+    presentationUrl: "/uploads/research/seminar-series/2025/presentations/modeling-nigerian-education-system-victor-sobanke.pptx",
+    videoUrl: null,
+  },
+  {
+    title: "Development and Optimization of Super-hydrophobic Biochar-infused Coating for Corrosion Protection of Carbon Steel Pipelines in Oil and Gas Facilities",
+    presenter: "Engr. AYUBA, David Mshelia",
+    date: "2025",
+    year: 2025,
+    presentationUrl: "/uploads/research/seminar-series/2025/presentations/biochar-coating-corrosion-protection-david-mshelia.pptx",
+    videoUrl: null,
+  },
+  {
+    title: "Application of RSM in Analyzing Weld Metal Viscosity in Mild Steel Welds",
+    presenter: "Engr. Seigha Gumus, FNIMechE",
+    date: "2025",
+    year: 2025,
+    presentationUrl: "/uploads/research/seminar-series/2025/presentations/rsm-weld-metal-viscosity-seigha-gumus.pptx",
+    videoUrl: null,
+  },
+  {
+    title: "Green Project Management in Nigeria: Challenges and Prospects",
+    presenter: "Osita Ben Agbatah",
+    date: "2025",
+    year: 2025,
+    presentationUrl: "/uploads/research/seminar-series/2025/presentations/green-project-management-nigeria-osita-agbatah.pdf",
+    videoUrl: null,
+  },
+  {
+    title: "Metering as a Tool for Minimizing Non-Technical Losses in Yola Electricity Distribution Company",
+    presenter: "Engr. AMOS, Chinda",
+    date: "March 2025",
+    year: 2025,
+    presentationUrl: "/uploads/research/seminar-series/2025/presentations/metering-non-technical-losses-yola-electricity-amos-chinda.pptx",
+    videoUrl: null,
+  },
+  {
+    title: "MATHEMATICAL MODELLING APPROACH TO GIVE INSIGHT TO THE STUDY OF SINGLE VARIANT FOOD-BORNE NIPAH VIRUS DISEASE TRANSMISSION DYNAMICS",
+    presenter: "ABANG SUNDAY IGWE SCOTT (Ph.D, Nigeria)",
+    date: "2025",
+    year: 2025,
+    presentationUrl: "/uploads/research/seminar-series/2025/presentations/nipah-virus-transmission-dynamics-abang-scott.pdf",
+    videoUrl: null,
+  },
+  {
+    title: "The Adoption of Internet-based Technological Innovations in Latecomer Industrial Settings",
+    presenter: "OLOMU, MICHAEL O. PhD",
+    date: "2025",
+    year: 2025,
+    presentationUrl: "/uploads/research/seminar-series/2025/presentations/internet-based-technological-innovations-michael-olomu.pptx",
+    videoUrl: null,
+  },
+  {
+    title: "ASSESSMENT OF THE SURFACE WATER AND GROUNDWATER INTERACTION WITHIN THE OPA DRAINAGE BASIN, SOUTH-WESTERN NIGERIA",
+    presenter: "OKPURU Ogbonna Aguta",
+    date: "2025",
+    year: 2025,
+    presentationUrl: "/uploads/research/seminar-series/2025/presentations/surface-water-groundwater-interaction-opa-basin-okpuru-aguta.pptx",
+    videoUrl: null,
+  },
+  {
+    title: "PRESIDENTIAL PRIORITIES AND MINISTERIAL DELIVERABLES (PP&MD): THE ROLE OF NACETEM.",
+    presenter: "EMEKA JOSEPH",
+    date: "2025",
+    year: 2025,
+    presentationUrl: "/uploads/research/seminar-series/2025/presentations/presidential-priorities-ministerial-deliverables-emeka-joseph.pptx",
+    videoUrl: null,
+  },
+  {
     title: "Investigating the Tribological Properties of Mahogany Seed Oil",
     presenter: "Mr Ayuba David Mshelia",
     date: "8th April, 2024",
@@ -156,7 +244,7 @@ export default function SeminarSeries() {
       </section>
 
       <section className="py-24 bg-white relative">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-4">NACETEM RESEARCHERS' SEMINAR SERIES</h2>
             <h3 className="text-3xl sm:text-4xl font-serif text-slate-900">Latest Presentations</h3>
@@ -212,7 +300,7 @@ export default function SeminarSeries() {
           </div>
 
           {visibleSeminars.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
               {visibleSeminars.map((seminar) => (
                 <motion.div
                   key={`${seminar.title}-${seminar.presenter}`}
