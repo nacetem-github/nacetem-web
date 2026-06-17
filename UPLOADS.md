@@ -45,9 +45,21 @@ For large videos, use YouTube or another video host and paste the external link 
 
 ## Publications
 
-Upload reports, briefs, and research publications here:
+Publication uploads are split by type:
 
-`public/uploads/publications/reports/`
+- Newsletters: `public/uploads/publications/newsletters/<year>/`
+- Policy briefs: `public/uploads/publications/policy-briefs/`
+- Technical reports: `public/uploads/publications/technical-reports/`
+
+Current newsletter PDF used by the publications page:
+
+`public/uploads/publications/newsletters/2026/nacetem-newsletter-2026.pdf`
+
+Browser URL:
+
+`/uploads/publications/newsletters/2026/nacetem-newsletter-2026.pdf`
+
+After adding another newsletter edition, add it to the `newsletters` array in `src/pages/Publications.tsx` so it appears as a selectable edition.
 
 ## Events
 

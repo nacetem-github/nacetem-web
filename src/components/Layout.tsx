@@ -28,6 +28,18 @@ export default function Layout() {
   }, [location.pathname]);
 
   useEffect(() => {
+    if (!location.hash) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    window.setTimeout(() => {
+      const target = document.querySelector(location.hash);
+      target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 0);
+  }, [location.pathname, location.hash]);
+
+  useEffect(() => {
     const hasSeenNewsletter = window.sessionStorage.getItem('nacetem-newsletter-popup');
     if (hasSeenNewsletter) return;
 
@@ -56,7 +68,15 @@ export default function Layout() {
     { name: 'Capacity Building', href: '/capacity-building' },
     { name: 'PSR Test', href: '/psr-test' },
     { name: 'News', href: '/news' },
-    { name: 'Publications', href: '/publications' },
+    {
+      name: 'Publications',
+      href: '/publications',
+      children: [
+        { name: 'Policy Brief', href: '/publications#policy-briefs' },
+        { name: 'Technical Report', href: '/publications#technical-reports' },
+        { name: 'Newsletter', href: '/publications#newsletter' },
+      ],
+    },
     { name: 'Contact', href: '/contact' },
   ];
 
@@ -91,7 +111,7 @@ export default function Layout() {
                     className={cn(
                       'text-xs font-bold uppercase tracking-wider transition-colors inline-flex items-center',
                       'py-2 border-b-2',
-                      isActive(item.href) && !item.children
+                      isActive(item.href)
                         ? 'border-emerald-600 text-slate-900 opacity-100'
                         : 'border-transparent text-slate-900 opacity-70 hover:opacity-100 hover:border-slate-300'
                     )}
@@ -147,7 +167,7 @@ export default function Layout() {
                     }}
                     className={cn(
                       'flex items-center justify-between px-3 py-2 rounded-md text-base font-medium',
-                      isActive(item.href) && !item.children
+                      isActive(item.href)
                         ? 'bg-emerald-50 text-emerald-800'
                         : 'text-slate-600 hover:text-emerald-700 hover:bg-slate-50'
                     )}
@@ -243,11 +263,15 @@ export default function Layout() {
 
               <h3 className="text-xs font-bold text-white uppercase tracking-wider mt-8 mb-5 opacity-70">Publications</h3>
               <ul className="space-y-3 font-medium text-sm">
-                {['Policy Brief', 'Technical Report', 'Newsletter'].map((item) => (
-                  <li key={item}>
-                    <Link to="/publications" className="hover:text-emerald-200 flex items-center transition-colors">
+                {[
+                  { name: 'Policy Brief', href: '/publications#policy-briefs' },
+                  { name: 'Technical Report', href: '/publications#technical-reports' },
+                  { name: 'Newsletter', href: '/publications#newsletter' },
+                ].map((item) => (
+                  <li key={item.name}>
+                    <Link to={item.href} className="hover:text-emerald-200 flex items-center transition-colors">
                       <ChevronRight className="h-4 w-4 mr-1 opacity-70" />
-                      {item}
+                      {item.name}
                     </Link>
                   </li>
                 ))}
