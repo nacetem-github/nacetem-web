@@ -10,6 +10,7 @@ coverage/
 # Uploaded website media should stay out of Git unless intentionally curated.
 # Keep README files tracked so the folder structure is preserved.
 public/uploads/**/*.pdf
+!public/uploads/research/seminar-series/**/presentations/*.pdf
 public/uploads/**/*.mp4
 public/uploads/**/*.mov
 public/uploads/**/*.avi
