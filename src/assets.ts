@@ -15,7 +15,8 @@ import weldingImage from './assets/images/pages/welding.jpg';
 import dashboardImage from './assets/images/pages/dashboard.jpg';
 import bayelsaNewsImage from './assets/images/news/bayelsa-news.jpeg';
 import ntaImage from './assets/images/pages/nta.png';
-import pgdImage from './assets/images/pages/pgd.png';
+
+const pgdImage = '/uploads/capacity-building/pgd.jpeg';
 
 export const assets = {
   apodissiLogo,
