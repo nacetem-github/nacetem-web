@@ -12,8 +12,15 @@ export interface EventItem {
   id: string;
   title: string;
   date: string;
+  time?: string;
   description: string;
   location: string;
+  flyerUrl?: string;
+  fee?: string;
+  contactPhones?: string[];
+  contactEmail?: string;
+  actionUrl?: string;
+  actionLabel?: string;
 }
 
 interface DataContextType {
@@ -36,6 +43,19 @@ const defaultGallery: GalleryImage[] = [
 ];
 
 const defaultEvents: EventItem[] = [
+  {
+    id: 'entrepreneurship-innovation-driving-organisation-change',
+    title: 'Training Workshop on Entrepreneurship & Innovation: Driving Organisation Change from Within',
+    date: 'June 22 - 26, 2026',
+    time: '9:00am - 3:00pm',
+    description:
+      'A NACETEM training workshop for managers, team leaders, strategy and business development professionals, change management and HR professionals, aspiring entrepreneurs, and innovation champions across functions.',
+    location: 'NACETEM South-West Office, 9 Kofo Abayomi Street, V.I. Lagos',
+    flyerUrl: '/uploads/events/flyers/2026/entrepreneurship-innovation-driving-organisation-change/flyer.jpeg',
+    fee: 'N300,000',
+    contactPhones: ['07033091950', '08033640647'],
+    contactEmail: 'nacetemsouthwest@gmail.com',
+  },
   { id: '1', title: 'National Innovation Summit', date: 'August 15, 2026', description: 'Annual gathering of STI stakeholders across the nation to discuss technology management and policy implementation.', location: 'Abuja, Nigeria' },
   { id: '2', title: 'Capacity Building Workshop', date: 'September 10, 2026', description: 'Training public servants on technology management, systems thinking, and data-driven decision making.', location: 'Lagos, Nigeria' },
 ];
@@ -59,7 +79,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
           const { data: eData, error: eError } = await supabase.from('events').select('*').order('created_at', { ascending: false });
           if (!eError && eData && eData.length > 0) {
-            setEvents(eData);
+            const remoteIds = new Set(eData.map((event) => event.id));
+            setEvents([...eData, ...defaultEvents.filter((event) => !remoteIds.has(event.id))]);
           }
         } catch (error) {
           console.error("Error fetching from Supabase:", error);

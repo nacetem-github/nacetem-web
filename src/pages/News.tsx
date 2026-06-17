@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, Calendar, Camera, ChevronLeft, ChevronRight, Images, MapPin, X } from 'lucide-react';
+import { ArrowRight, Calendar, Camera, ChevronLeft, ChevronRight, Clock, Images, Mail, MapPin, Phone, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { assets } from '../assets';
 import { useData } from '../contexts/DataContext';
@@ -124,22 +124,56 @@ export default function News() {
                   whileInView="visible"
                   viewport={{ once: true }}
                   variants={fadeInUp}
-                  className="bg-slate-50 border border-slate-200 rounded-[11px] p-8 hover:border-emerald-500 transition-colors group relative overflow-hidden"
+                  className="bg-slate-50 border border-slate-200 rounded-[11px] overflow-hidden hover:border-emerald-500 transition-colors group relative"
                 >
-                  <div className="absolute top-0 left-0 w-1 h-full bg-emerald-600 transform scale-y-0 origin-top group-hover:scale-y-100 transition-transform duration-500 ease-in-out"></div>
-                  <div className="inline-flex items-center gap-3 mb-6 bg-white px-3 py-2 border border-slate-100 rounded-[6px]">
-                    <Calendar className="h-5 w-5 text-emerald-600 shrink-0" />
-                    <span className="text-xs font-bold uppercase tracking-widest text-emerald-900">{event.date}</span>
+                  {event.flyerUrl && (
+                    <div className="h-64 overflow-hidden bg-slate-900">
+                      <img
+                        src={event.flyerUrl}
+                        alt={`${event.title} flyer`}
+                        className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
+                      />
+                    </div>
+                  )}
+                  <div className="p-8">
+                    <div className="absolute top-0 left-0 w-1 h-full bg-emerald-600 transform scale-y-0 origin-top group-hover:scale-y-100 transition-transform duration-500 ease-in-out"></div>
+                    <div className="flex flex-wrap gap-3 mb-6">
+                      <span className="inline-flex items-center gap-2 bg-white px-3 py-2 border border-slate-100 rounded-[6px] text-xs font-bold uppercase tracking-widest text-emerald-900">
+                        <Calendar className="h-4 w-4 text-emerald-600 shrink-0" />
+                        {event.date}
+                      </span>
+                      {event.time && (
+                        <span className="inline-flex items-center gap-2 bg-white px-3 py-2 border border-slate-100 rounded-[6px] text-xs font-bold uppercase tracking-widest text-slate-600">
+                          <Clock className="h-4 w-4 text-slate-400 shrink-0" />
+                          {event.time}
+                        </span>
+                      )}
+                    </div>
+                    <h4 className="text-xl font-serif text-slate-900 mb-4 pr-4 leading-tight">{event.title}</h4>
+                    <div className="flex items-start text-sm font-bold text-slate-500 mb-4">
+                      <MapPin className="h-4 w-4 mr-2 mt-0.5 text-slate-400 shrink-0" />
+                      {event.location}
+                    </div>
+                    <p className="text-sm text-slate-600 leading-relaxed mb-6 line-clamp-3">{event.description}</p>
+                    <div className="mb-6 space-y-2 text-sm text-slate-600">
+                      {event.fee && <p className="font-bold text-slate-800">Fee: {event.fee}</p>}
+                      {event.contactPhones && (
+                        <p className="flex items-center">
+                          <Phone className="mr-2 h-4 w-4 text-emerald-700" />
+                          {event.contactPhones.join(', ')}
+                        </p>
+                      )}
+                      {event.contactEmail && (
+                        <p className="flex items-center">
+                          <Mail className="mr-2 h-4 w-4 text-emerald-700" />
+                          {event.contactEmail}
+                        </p>
+                      )}
+                    </div>
+                    <Link to="/events" className="inline-flex items-center text-xs font-bold uppercase tracking-widest text-emerald-700 underline underline-offset-4 decoration-emerald-200 hover:decoration-emerald-700 transition-colors">
+                      View Details <ArrowRight className="h-3 w-3 ml-1" />
+                    </Link>
                   </div>
-                  <h4 className="text-xl font-serif text-slate-900 mb-4 pr-4 leading-tight">{event.title}</h4>
-                  <div className="flex items-center text-sm font-bold text-slate-500 mb-6">
-                    <MapPin className="h-4 w-4 mr-2 text-slate-400" />
-                    {event.location}
-                  </div>
-                  <p className="text-sm text-slate-600 leading-relaxed mb-6 line-clamp-3">{event.description}</p>
-                  <Link to="/events" className="inline-flex items-center text-xs font-bold uppercase tracking-widest text-emerald-700 underline underline-offset-4 decoration-emerald-200 hover:decoration-emerald-700 transition-colors">
-                    View Details <ArrowRight className="h-3 w-3 ml-1" />
-                  </Link>
                 </motion.article>
               ))}
             </div>

@@ -1,4 +1,4 @@
-import { Calendar, Clock, MapPin, Video } from 'lucide-react';
+import { Calendar, Clock, Mail, MapPin, Phone, Video } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { assets } from '../assets';
 import { useData } from '../contexts/DataContext';
@@ -88,9 +88,9 @@ export default function Events() {
                 <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] h-full">
                   <div className="h-56 md:h-full min-h-[220px] overflow-hidden bg-slate-900">
                     <img
-                      src={idx === 0 ? assets.dashboardImage : assets.capacityImage}
+                      src={event.flyerUrl ?? (idx === 0 ? assets.dashboardImage : assets.capacityImage)}
                       alt={event.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
                     />
                   </div>
                   <div className="p-6 sm:p-8 flex flex-col">
@@ -98,6 +98,11 @@ export default function Events() {
                       <span className="inline-flex items-center bg-white border border-slate-200 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-emerald-800">
                         <Calendar className="w-3.5 h-3.5 mr-2" /> {event.date}
                       </span>
+                      {event.time && (
+                        <span className="inline-flex items-center bg-white border border-slate-200 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-slate-600">
+                          <Clock className="w-3.5 h-3.5 mr-2" /> {event.time}
+                        </span>
+                      )}
                       <span className="inline-flex items-center bg-white border border-slate-200 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-slate-600">
                         <MapPin className="w-3.5 h-3.5 mr-2" /> {event.location}
                       </span>
@@ -106,14 +111,29 @@ export default function Events() {
                       {event.title}
                     </h4>
                     <p className="text-sm text-slate-600 leading-relaxed flex-1">{event.description}</p>
-                    {event.description.includes('https://') && (
+                    <div className="mt-5 space-y-2 text-sm text-slate-600">
+                      {event.fee && <p className="font-bold text-slate-800">Fee: {event.fee}</p>}
+                      {event.contactPhones && (
+                        <p className="flex items-center">
+                          <Phone className="mr-2 h-4 w-4 text-emerald-700" />
+                          {event.contactPhones.join(', ')}
+                        </p>
+                      )}
+                      {event.contactEmail && (
+                        <p className="flex items-center">
+                          <Mail className="mr-2 h-4 w-4 text-emerald-700" />
+                          {event.contactEmail}
+                        </p>
+                      )}
+                    </div>
+                    {event.actionUrl && (
                       <a
-                        href="https://us06web.zoom.us/j/86234028398?pwd=4fVFWkMacIsRcHVA4qrmlgOsy5GMJM.1"
+                        href={event.actionUrl}
                         target="_blank"
                         rel="noreferrer"
                         className="mt-6 inline-flex items-center justify-center self-start px-5 py-3 bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider rounded-[6px] hover:bg-emerald-700 transition-colors"
                       >
-                        <Video className="w-4 h-4 mr-2" /> Join Zoom
+                        <Video className="w-4 h-4 mr-2" /> {event.actionLabel ?? 'Open Event Link'}
                       </a>
                     )}
                   </div>
