@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Calendar, Tag } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Calendar, Tag, UserRound } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { getNewsArticleBySlug, newsArticles } from '../data/news';
 
@@ -64,6 +64,11 @@ export default function NewsDetail() {
               <span className="inline-flex items-center text-slate-200 text-xs font-bold uppercase tracking-widest">
                 <Calendar className="h-4 w-4 mr-2 text-gold" /> {article.date}
               </span>
+              {article.author && (
+                <span className="inline-flex items-center text-slate-200 text-xs font-bold uppercase tracking-widest">
+                  <UserRound className="h-4 w-4 mr-2 text-gold" /> By {article.author}
+                </span>
+              )}
             </div>
 
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif text-white leading-tight max-w-4xl">
@@ -81,6 +86,11 @@ export default function NewsDetail() {
             </div>
 
             <article className="max-w-3xl mx-auto">
+              {article.author && (
+                <p className="mb-5 text-xs font-bold uppercase tracking-widest text-emerald-700">
+                  Written by {article.author}
+                </p>
+              )}
               <p className="text-xl text-slate-700 leading-relaxed mb-10 font-serif border-l-4 border-gold pl-6">
                 {article.summary}
               </p>

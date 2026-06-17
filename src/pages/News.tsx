@@ -180,6 +180,11 @@ export default function News() {
                     </div>
                     <div className="p-6 flex-1 flex flex-col">
                       <div className="text-xs text-slate-500 mb-3 font-bold tracking-widest uppercase">{article.date}</div>
+                      {article.author && (
+                        <div className="mb-3 text-[11px] font-bold uppercase tracking-widest text-emerald-700">
+                          By {article.author}
+                        </div>
+                      )}
                       <h4 className="text-xl font-serif text-slate-900 mb-3 leading-snug group-hover:text-emerald-700 transition-colors">{article.title}</h4>
                       <p className="text-slate-600 text-sm leading-relaxed mb-6 line-clamp-3 flex-1">{article.summary}</p>
                       <span className="inline-flex items-center text-xs font-bold uppercase tracking-widest text-emerald-700 mt-auto">
