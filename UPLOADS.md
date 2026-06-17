@@ -84,6 +84,13 @@ After adding gallery images, add the public image URLs to the `galleryEvents` ar
 
 ## News
 
-Upload news article images here:
+Upload news source documents and images here:
 
-`public/uploads/news/images/`
+- Source Word documents: `public/uploads/news/source-documents/<year>/<article-slug>/`
+- Article images: `public/uploads/news/images/<year>/<article-slug>/`
+
+Example:
+
+`public/uploads/news/source-documents/2026/nacetem-example-news/story.docx`
+
+`public/uploads/news/images/2026/nacetem-example-news/cover.jpg`
