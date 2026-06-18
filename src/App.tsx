@@ -8,6 +8,7 @@ import Contact from './pages/Contact';
 import News from './pages/News';
 import NewsDetail from './pages/NewsDetail';
 import Events from './pages/Events';
+import EventDetail from './pages/EventDetail';
 import Publications from './pages/Publications';
 import CapacityBuilding from './pages/CapacityBuilding';
 import CapacityBuildingDetail from './pages/CapacityBuildingDetail';
@@ -41,6 +42,7 @@ export default function App() {
               <Route path="capacity-building/:slug" element={<CapacityBuildingDetail />} />
               <Route path="gallery" element={<PlaceholderPage title="Gallery" description="Visual highlights from our events and programs." />} />
               <Route path="events" element={<Events />} />
+              <Route path="events/:slug" element={<EventDetail />} />
               <Route path="psr-test" element={<PsrTest />} />
               <Route path="initiatives" element={<Initiatives />} />
               <Route path="news" element={<News />} />

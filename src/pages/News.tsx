@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, Calendar, Camera, ChevronLeft, ChevronRight, Clock, Images, Mail, MapPin, Phone, X } from 'lucide-react';
+import { ArrowRight, Calendar, Camera, ChevronLeft, ChevronRight, Clock, Images, Mail, MapPin, Phone, Video, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { assets } from '../assets';
 import { useData } from '../contexts/DataContext';
 import { newsArticles } from '../data/news';
+import { archivedPastEvents } from '../data/pastEvents';
+import { eventFallbackImages, getEventSlug, splitEventsByStatus } from '../utils/eventUtils';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -53,9 +55,11 @@ export default function News() {
   const [activeGalleryId, setActiveGalleryId] = useState(galleryEvents[0].id);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [lightboxImageIndex, setLightboxImageIndex] = useState<number | null>(null);
+  const storiesCarouselRef = useRef<HTMLDivElement | null>(null);
 
   const currentArticles = newsArticles.slice(0, visibleArticles);
   const hasMoreArticles = visibleArticles < newsArticles.length;
+  const { upcomingEvents, pastEvents } = splitEventsByStatus(events);
   const activeGallery = galleryEvents.find((event) => event.id === activeGalleryId) ?? galleryEvents[0];
   const activeImage = activeGallery.images[activeImageIndex] ?? activeGallery.images[0];
 
@@ -75,6 +79,16 @@ export default function News() {
 
   const showNextImage = () => {
     setActiveImageIndex((current) => (current === activeGallery.images.length - 1 ? 0 : current + 1));
+  };
+
+  const scrollStories = (direction: 'previous' | 'next') => {
+    const carousel = storiesCarouselRef.current;
+    if (!carousel) return;
+
+    carousel.scrollBy({
+      left: direction === 'next' ? carousel.clientWidth * 0.9 : -carousel.clientWidth * 0.9,
+      behavior: 'smooth',
+    });
   };
 
   return (
@@ -115,27 +129,50 @@ export default function News() {
             <p className="mt-4 text-slate-600">Join our workshops, stakeholder engagements, and conferences.</p>
           </div>
 
-          {events.length > 0 ? (
+          <div className="mb-10 flex justify-center">
+            <a
+              href="#past-events"
+              className="inline-flex items-center justify-center gap-2 rounded-[6px] border border-emerald-700 px-5 py-3 text-xs font-bold uppercase tracking-widest text-emerald-800 transition-colors hover:bg-emerald-50"
+            >
+              See Past Events <ChevronRight className="h-4 w-4" />
+            </a>
+          </div>
+
+          {upcomingEvents.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {events.map((event) => (
+              {upcomingEvents.map((event, idx) => (
                 <motion.article
                   key={event.id}
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true }}
                   variants={fadeInUp}
-                  className="bg-slate-50 border border-slate-200 rounded-[11px] overflow-hidden hover:border-emerald-500 transition-colors group relative"
+                  className="bg-slate-50 border border-slate-200 rounded-[11px] overflow-hidden hover:border-emerald-500 transition-colors group relative flex flex-col"
                 >
-                  {event.flyerUrl && (
-                    <div className="h-64 overflow-hidden bg-slate-900">
+                  <div className="aspect-[4/3] overflow-hidden bg-slate-900 relative">
+                    {event.flyerUrl ? (
                       <img
                         src={event.flyerUrl}
                         alt={`${event.title} flyer`}
                         className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
                       />
-                    </div>
-                  )}
-                  <div className="p-8">
+                    ) : (
+                      <>
+                        <img
+                          src={eventFallbackImages[idx % eventFallbackImages.length]}
+                          alt=""
+                          className="h-full w-full object-cover opacity-20"
+                          aria-hidden="true"
+                        />
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-emerald-950/70 px-8 text-center text-white">
+                          <Calendar className="mb-4 h-10 w-10 text-gold" />
+                          <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-gold">NACETEM Event</p>
+                          <p className="mt-3 text-xl font-serif leading-tight">Flyer Coming Soon</p>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                  <div className="p-8 flex flex-1 flex-col">
                     <div className="absolute top-0 left-0 w-1 h-full bg-emerald-600 transform scale-y-0 origin-top group-hover:scale-y-100 transition-transform duration-500 ease-in-out"></div>
                     <div className="flex flex-wrap gap-3 mb-6">
                       <span className="inline-flex items-center gap-2 bg-white px-3 py-2 border border-slate-100 rounded-[6px] text-xs font-bold uppercase tracking-widest text-emerald-900">
@@ -148,6 +185,10 @@ export default function News() {
                           {event.time}
                         </span>
                       )}
+                      <span className="inline-flex items-center gap-2 bg-white px-3 py-2 border border-slate-100 rounded-[6px] text-xs font-bold uppercase tracking-widest text-slate-600">
+                        <Video className="h-4 w-4 text-slate-400 shrink-0" />
+                        {event.format ?? 'Hybrid'}
+                      </span>
                     </div>
                     <h4 className="text-xl font-serif text-slate-900 mb-4 pr-4 leading-tight">{event.title}</h4>
                     <div className="flex items-start text-sm font-bold text-slate-500 mb-4">
@@ -170,9 +211,21 @@ export default function News() {
                         </p>
                       )}
                     </div>
-                    <Link to="/events" className="inline-flex items-center text-xs font-bold uppercase tracking-widest text-emerald-700 underline underline-offset-4 decoration-emerald-200 hover:decoration-emerald-700 transition-colors">
-                      View Details <ArrowRight className="h-3 w-3 ml-1" />
-                    </Link>
+                    <div className="mt-auto flex flex-wrap items-center gap-3">
+                      <Link to={`/events/${getEventSlug(event)}`} className="inline-flex items-center justify-center rounded-[6px] border border-emerald-700 px-4 py-3 text-xs font-bold uppercase tracking-widest text-emerald-800 transition-colors hover:bg-emerald-50">
+                        View Details <ArrowRight className="h-3 w-3 ml-1" />
+                      </Link>
+                      {event.actionUrl && (
+                        <a
+                          href={event.actionUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center justify-center rounded-[6px] bg-emerald-700 px-4 py-3 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-emerald-800"
+                        >
+                          <Video className="mr-2 h-4 w-4" /> {event.actionLabel ?? 'Register / Join'}
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </motion.article>
               ))}
@@ -187,6 +240,76 @@ export default function News() {
         </div>
       </section>
 
+      <section id="past-events" className="py-20 bg-slate-50 border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-12">
+            <div className="max-w-3xl">
+              <h2 className="text-xs font-bold text-gold uppercase tracking-widest mb-4">Past Events</h2>
+              <h3 className="text-3xl sm:text-4xl font-serif text-slate-900">Previous Programmes</h3>
+              <p className="mt-4 text-slate-600">
+                Events automatically remain above for one week after their date, then appear here as past programmes.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+            {pastEvents.map((event, idx) => (
+              <motion.article
+                key={event.id}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeInUp}
+                className="bg-white border border-slate-200 rounded-[11px] overflow-hidden group hover:border-emerald-500 transition-colors flex flex-col"
+              >
+                <div className="aspect-[4/3] overflow-hidden bg-slate-900">
+                  <img
+                    src={event.flyerUrl ?? eventFallbackImages[idx % eventFallbackImages.length]}
+                    alt={event.title}
+                    className="h-full w-full object-cover object-top opacity-90 group-hover:scale-105 transition-transform duration-700"
+                  />
+                </div>
+                <div className="p-6 flex flex-1 flex-col">
+                  <span className="mb-4 inline-flex self-start rounded-sm bg-slate-100 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                    Past Event
+                  </span>
+                  <h4 className="text-lg font-serif text-slate-900 leading-tight mb-4 group-hover:text-emerald-700 transition-colors">{event.title}</h4>
+                  <div className="mt-auto space-y-3 border-t border-slate-100 pt-4 text-sm font-bold text-slate-600">
+                    <p className="flex items-center"><Calendar className="mr-2 h-4 w-4 text-gold" /> {event.date}</p>
+                    <p className="flex items-start"><MapPin className="mr-2 mt-0.5 h-4 w-4 shrink-0 text-emerald-700" /> {event.location}</p>
+                  </div>
+                </div>
+              </motion.article>
+            ))}
+
+            {archivedPastEvents.map((event) => (
+              <motion.article
+                key={event.title}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeInUp}
+                className="bg-white border border-slate-200 rounded-[11px] overflow-hidden group hover:border-emerald-500 transition-colors flex flex-col"
+              >
+                <div className="aspect-[4/3] overflow-hidden bg-slate-900">
+                  <img src={event.image} alt={event.title} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                </div>
+                <div className="p-6 flex flex-1 flex-col">
+                  <span className="mb-4 inline-flex self-start rounded-sm bg-slate-100 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                    Past Event
+                  </span>
+                  <h4 className="text-lg font-serif text-slate-900 leading-tight mb-4 group-hover:text-emerald-700 transition-colors">{event.title}</h4>
+                  <div className="mt-auto space-y-3 border-t border-slate-100 pt-4 text-sm font-bold text-slate-600">
+                    <p className="flex items-center"><Calendar className="mr-2 h-4 w-4 text-gold" /> {event.date}</p>
+                    <p className="flex items-start"><MapPin className="mr-2 mt-0.5 h-4 w-4 shrink-0 text-emerald-700" /> {event.location}</p>
+                  </div>
+                </div>
+              </motion.article>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section id="featured-stories" className="py-24 bg-slate-50 relative border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-end mb-12">
@@ -194,9 +317,30 @@ export default function News() {
               <h2 className="text-xs font-bold text-gold uppercase tracking-widest mb-4">Newsroom</h2>
               <h3 className="text-3xl sm:text-4xl font-serif text-slate-900">Featured Stories</h3>
             </div>
+            <div className="mt-6 flex items-center gap-3 md:mt-0">
+              <button
+                type="button"
+                onClick={() => scrollStories('previous')}
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 transition-colors hover:border-emerald-600 hover:text-emerald-700"
+                aria-label="Previous featured stories"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollStories('next')}
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 transition-colors hover:border-emerald-600 hover:text-emerald-700"
+                aria-label="Next featured stories"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div
+            ref={storiesCarouselRef}
+            className="flex snap-x snap-mandatory gap-8 overflow-x-auto scroll-smooth pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
             <AnimatePresence mode="popLayout">
               {currentArticles.map((article, idx) => (
                 <motion.div
@@ -205,7 +349,7 @@ export default function News() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.5, delay: idx * 0.1 }}
-                  className="group border border-slate-200 rounded-[11px] overflow-hidden bg-white hover:border-emerald-500 transition-colors flex flex-col h-full"
+                  className="group border border-slate-200 rounded-[11px] overflow-hidden bg-white hover:border-emerald-500 transition-colors flex h-auto min-w-[86%] snap-start flex-col sm:min-w-[calc(50%_-_1rem)] lg:min-w-[calc(33.333%_-_1.34rem)]"
                 >
                   <Link to={`/news/${article.slug}`} className="flex flex-col h-full">
                     <div className="h-48 sm:h-56 overflow-hidden relative shrink-0">

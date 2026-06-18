@@ -15,6 +15,7 @@ export interface EventItem {
   time?: string;
   description: string;
   location: string;
+  format?: string;
   flyerUrl?: string;
   fee?: string;
   contactPhones?: string[];
@@ -51,6 +52,7 @@ const featuredEvents: EventItem[] = [
     description:
       'A NACETEM training workshop for managers, team leaders, strategy and business development professionals, change management and HR professionals, aspiring entrepreneurs, and innovation champions across functions.',
     location: 'NACETEM South-West Office, 9 Kofo Abayomi Street, V.I. Lagos',
+    format: 'Hybrid',
     flyerUrl: '/uploads/events/flyers/2026/entrepreneurship-innovation-driving-organisation-change/flyer.jpeg',
     fee: 'N300,000',
     contactPhones: ['07033091950', '08033640647'],
@@ -59,8 +61,8 @@ const featuredEvents: EventItem[] = [
 ];
 
 const sampleEvents: EventItem[] = [
-  { id: '1', title: 'National Innovation Summit', date: 'August 15, 2026', description: 'Annual gathering of STI stakeholders across the nation to discuss technology management and policy implementation.', location: 'Abuja, Nigeria' },
-  { id: '2', title: 'Capacity Building Workshop', date: 'September 10, 2026', description: 'Training public servants on technology management, systems thinking, and data-driven decision making.', location: 'Lagos, Nigeria' },
+  { id: '1', title: 'National Innovation Summit', date: 'August 15, 2026', description: 'Annual gathering of STI stakeholders across the nation to discuss technology management and policy implementation.', location: 'Abuja, Nigeria', format: 'Hybrid' },
+  { id: '2', title: 'Capacity Building Workshop', date: 'September 10, 2026', description: 'Training public servants on technology management, systems thinking, and data-driven decision making.', location: 'Lagos, Nigeria', format: 'Hybrid' },
 ];
 
 const defaultEvents: EventItem[] = [...featuredEvents, ...sampleEvents];

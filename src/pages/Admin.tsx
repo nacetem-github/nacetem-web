@@ -83,7 +83,15 @@ export function AdminDashboard() {
 
   const [newEventTitle, setNewEventTitle] = useState('');
   const [newEventDate, setNewEventDate] = useState('');
+  const [newEventTime, setNewEventTime] = useState('');
   const [newEventLocation, setNewEventLocation] = useState('');
+  const [newEventFormat, setNewEventFormat] = useState('Hybrid');
+  const [newEventFlyerUrl, setNewEventFlyerUrl] = useState('');
+  const [newEventFee, setNewEventFee] = useState('');
+  const [newEventContactPhones, setNewEventContactPhones] = useState('');
+  const [newEventContactEmail, setNewEventContactEmail] = useState('');
+  const [newEventActionUrl, setNewEventActionUrl] = useState('');
+  const [newEventActionLabel, setNewEventActionLabel] = useState('Register / Join Event');
   const [newEventDescription, setNewEventDescription] = useState('');
 
   const handleLogout = () => {
@@ -145,12 +153,28 @@ export function AdminDashboard() {
         id: Date.now().toString(),
         title: newEventTitle,
         date: newEventDate,
+        time: newEventTime || undefined,
         location: newEventLocation,
+        format: newEventFormat || 'Hybrid',
+        flyerUrl: newEventFlyerUrl || undefined,
+        fee: newEventFee || undefined,
+        contactPhones: newEventContactPhones ? newEventContactPhones.split(',').map((phone) => phone.trim()).filter(Boolean) : undefined,
+        contactEmail: newEventContactEmail || undefined,
+        actionUrl: newEventActionUrl || undefined,
+        actionLabel: newEventActionLabel || undefined,
         description: newEventDescription,
       });
       setNewEventTitle('');
       setNewEventDate('');
+      setNewEventTime('');
       setNewEventLocation('');
+      setNewEventFormat('Hybrid');
+      setNewEventFlyerUrl('');
+      setNewEventFee('');
+      setNewEventContactPhones('');
+      setNewEventContactEmail('');
+      setNewEventActionUrl('');
+      setNewEventActionLabel('Register / Join Event');
       setNewEventDescription('');
     }
   };
@@ -385,6 +409,15 @@ export function AdminDashboard() {
                     <div className="flex-1">
                       <input 
                         type="text" 
+                        placeholder="Event Time (e.g., 10:00am - 2:00pm)"
+                        value={newEventTime}
+                        onChange={(e) => setNewEventTime(e.target.value)}
+                        className="w-full px-4 py-3 border border-slate-300 text-sm focus:outline-none focus:border-emerald-700"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <input 
+                        type="text" 
                         placeholder="Event Location (e.g., Abuja, Nigeria)"
                         value={newEventLocation}
                         onChange={(e) => setNewEventLocation(e.target.value)}
@@ -392,6 +425,59 @@ export function AdminDashboard() {
                         required
                       />
                     </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <input 
+                      type="text" 
+                      placeholder="Format (e.g., Hybrid)"
+                      value={newEventFormat}
+                      onChange={(e) => setNewEventFormat(e.target.value)}
+                      className="w-full px-4 py-3 border border-slate-300 text-sm focus:outline-none focus:border-emerald-700"
+                    />
+                    <input 
+                      type="text" 
+                      placeholder="Fee (optional)"
+                      value={newEventFee}
+                      onChange={(e) => setNewEventFee(e.target.value)}
+                      className="w-full px-4 py-3 border border-slate-300 text-sm focus:outline-none focus:border-emerald-700"
+                    />
+                    <input 
+                      type="email" 
+                      placeholder="Contact Email (optional)"
+                      value={newEventContactEmail}
+                      onChange={(e) => setNewEventContactEmail(e.target.value)}
+                      className="w-full px-4 py-3 border border-slate-300 text-sm focus:outline-none focus:border-emerald-700"
+                    />
+                    <input 
+                      type="text" 
+                      placeholder="Contact Phones, comma separated"
+                      value={newEventContactPhones}
+                      onChange={(e) => setNewEventContactPhones(e.target.value)}
+                      className="w-full px-4 py-3 border border-slate-300 text-sm focus:outline-none focus:border-emerald-700"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <input 
+                      type="url" 
+                      placeholder="Flyer URL (optional)"
+                      value={newEventFlyerUrl}
+                      onChange={(e) => setNewEventFlyerUrl(e.target.value)}
+                      className="w-full px-4 py-3 border border-slate-300 text-sm focus:outline-none focus:border-emerald-700"
+                    />
+                    <input 
+                      type="url" 
+                      placeholder="Zoom register/join link (optional)"
+                      value={newEventActionUrl}
+                      onChange={(e) => setNewEventActionUrl(e.target.value)}
+                      className="w-full px-4 py-3 border border-slate-300 text-sm focus:outline-none focus:border-emerald-700"
+                    />
+                    <input 
+                      type="text" 
+                      placeholder="Action label"
+                      value={newEventActionLabel}
+                      onChange={(e) => setNewEventActionLabel(e.target.value)}
+                      className="w-full px-4 py-3 border border-slate-300 text-sm focus:outline-none focus:border-emerald-700"
+                    />
                   </div>
                   <div className="flex flex-col sm:flex-row gap-4 items-start">
                     <textarea
