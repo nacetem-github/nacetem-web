@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useData } from '../contexts/DataContext';
 import { assets } from '../assets';
 import { latestNewsArticles } from '../data/news';
+import { NewsletterSubscribe } from '../components/NewsletterSubscribe';
 
 const heroSlides = [
   {
@@ -473,15 +474,25 @@ export default function Home() {
           >
             {events.slice(0, 2).map((event) => (
               <div key={event.id} className="bg-white border border-slate-200 p-8 hover:border-emerald-600 transition-all group flex flex-col md:flex-row gap-6">
-                <div className="flex flex-col items-center justify-center bg-slate-50 border border-slate-100 p-4 shrink-0 min-w-24">
-                  <CalendarIcon className="h-6 w-6 text-emerald-600 mb-2" />
-                  <span className="text-xs font-bold uppercase tracking-widest text-gold text-center">{event.date.split(' ')[0]}</span>
-                  <span className="text-2xl font-serif text-slate-900 leading-none mt-1">{event.date.split(' ')[1]?.replace(',', '') || ''}</span>
-                </div>
+                {event.flyerUrl ? (
+                  <div className="h-40 md:h-auto md:w-32 overflow-hidden bg-slate-900 border border-slate-100 shrink-0">
+                    <img src={event.flyerUrl} alt={`${event.title} flyer`} className="h-full w-full object-cover object-top group-hover:scale-105 transition-transform duration-700" />
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center bg-slate-50 border border-slate-100 p-4 shrink-0 min-w-24">
+                    <CalendarIcon className="h-6 w-6 text-emerald-600 mb-2" />
+                    <span className="text-xs font-bold uppercase tracking-widest text-gold text-center">{event.date.split(' ')[0]}</span>
+                    <span className="text-2xl font-serif text-slate-900 leading-none mt-1">{event.date.split(' ')[1]?.replace(',', '') || ''}</span>
+                  </div>
+                )}
                 <div className="flex flex-col flex-1 justify-center">
+                  <div className="mb-3 inline-flex items-center self-start bg-slate-100 px-2 py-1 text-[10px] uppercase tracking-widest font-bold text-emerald-700">
+                    <CalendarIcon className="h-3 w-3 mr-1" /> {event.date}{event.time ? ` | ${event.time}` : ''}
+                  </div>
                   <h3 className="text-xl font-serif text-slate-900 mb-2 group-hover:text-emerald-700 transition-colors">{event.title}</h3>
                   <div className="flex items-center text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-3 gap-2 flex-wrap">
                     <span className="flex items-center bg-slate-100 px-2 py-1"><MapPin className="h-3 w-3 mr-1" /> {event.location}</span>
+                    {event.fee && <span className="flex items-center bg-slate-100 px-2 py-1">Fee: {event.fee}</span>}
                   </div>
                   <p className="text-xs text-slate-600 leading-relaxed mb-4">{event.description}</p>
                   <Link to="/events" className="inline-flex items-center text-[10px] font-bold uppercase tracking-widest text-slate-900 hover:text-emerald-700 mt-auto border-b border-transparent hover:border-emerald-700 pb-1 self-start">
@@ -590,6 +601,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <NewsletterSubscribe />
 
       {/* Call to Action Section */}
       <section className="py-24 bg-emerald-900 relative overflow-hidden text-center text-white">

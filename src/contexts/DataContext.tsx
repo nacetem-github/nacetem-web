@@ -42,7 +42,7 @@ const defaultGallery: GalleryImage[] = [
   { id: '6', url: assets.ntaImage, title: 'Media Engagement' },
 ];
 
-const defaultEvents: EventItem[] = [
+const featuredEvents: EventItem[] = [
   {
     id: 'entrepreneurship-innovation-driving-organisation-change',
     title: 'Training Workshop on Entrepreneurship & Innovation: Driving Organisation Change from Within',
@@ -56,9 +56,25 @@ const defaultEvents: EventItem[] = [
     contactPhones: ['07033091950', '08033640647'],
     contactEmail: 'nacetemsouthwest@gmail.com',
   },
+];
+
+const sampleEvents: EventItem[] = [
   { id: '1', title: 'National Innovation Summit', date: 'August 15, 2026', description: 'Annual gathering of STI stakeholders across the nation to discuss technology management and policy implementation.', location: 'Abuja, Nigeria' },
   { id: '2', title: 'Capacity Building Workshop', date: 'September 10, 2026', description: 'Training public servants on technology management, systems thinking, and data-driven decision making.', location: 'Lagos, Nigeria' },
 ];
+
+const defaultEvents: EventItem[] = [...featuredEvents, ...sampleEvents];
+
+function mergeEvents(remoteEvents: EventItem[]) {
+  const featuredIds = new Set(featuredEvents.map((event) => event.id));
+  const remoteIds = new Set(remoteEvents.map((event) => event.id));
+
+  return [
+    ...featuredEvents,
+    ...remoteEvents.filter((event) => !featuredIds.has(event.id)),
+    ...sampleEvents.filter((event) => !featuredIds.has(event.id) && !remoteIds.has(event.id)),
+  ];
+}
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
@@ -79,8 +95,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
           const { data: eData, error: eError } = await supabase.from('events').select('*').order('created_at', { ascending: false });
           if (!eError && eData && eData.length > 0) {
-            const remoteIds = new Set(eData.map((event) => event.id));
-            setEvents([...eData, ...defaultEvents.filter((event) => !remoteIds.has(event.id))]);
+            setEvents(mergeEvents(eData));
           }
         } catch (error) {
           console.error("Error fetching from Supabase:", error);
