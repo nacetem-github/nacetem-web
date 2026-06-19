@@ -174,7 +174,7 @@ export default function Home() {
           </div>
           <div className="flex flex-col p-6">
             <div className="text-emerald-600 mb-4"><GraduationCap className="h-7 w-7" /></div>
-            <h3 className="font-serif text-lg text-slate-900 mb-2">Capacity Development.</h3>
+            <h3 className="font-serif text-lg text-slate-900 mb-2">Capacity Development</h3>
             <p className="text-xs text-slate-500 leading-relaxed">Training public and private sector stakeholders for institutional growth.</p>
           </div>
           <div className="flex flex-col p-6">
