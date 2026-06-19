@@ -4,8 +4,8 @@ import { motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { useData } from '../contexts/DataContext';
 import { assets } from '../assets';
-import { latestNewsArticles } from '../data/news';
 import { NewsletterSubscribe } from '../components/NewsletterSubscribe';
+import { getEventSlug, splitEventsByStatus } from '../utils/eventUtils';
 
 const heroSlides = [
   {
@@ -32,13 +32,19 @@ const galleryFallbacks = [
 ];
 
 export default function Home() {
-  const { gallery, events } = useData();
+  const { gallery, events, news } = useData();
   const [activeHeroIndex, setActiveHeroIndex] = useState(0);
+  const [activeStoryIndex, setActiveStoryIndex] = useState(0);
   const activeHero = heroSlides[activeHeroIndex];
   const displayedGallery = [
-    ...gallery,
+    ...gallery.filter((item) => item.status === 'published'),
     ...galleryFallbacks.filter((fallback) => !gallery.some((img) => img.url === fallback.url)),
   ].slice(0, 6);
+  const featuredStories = news.filter((article) => article.status === 'published' && article.featured);
+  const storyPool = featuredStories.length ? featuredStories : news.filter((article) => article.status === 'published');
+  const displayedStories = Array.from({ length: Math.min(3, storyPool.length) }, (_, index) => storyPool[(activeStoryIndex + index) % storyPool.length]);
+  const homepageEvents = splitEventsByStatus(events.filter((event) => event.status === 'published')).upcomingEvents
+    .sort((a, b) => a.startDate.localeCompare(b.startDate)).slice(0, 2);
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -472,7 +478,7 @@ export default function Home() {
             transition={{ duration: 0.7, delay: 0.1, ease: "easeOut" }}
             className="grid grid-cols-1 md:grid-cols-2 gap-6"
           >
-            {events.slice(0, 2).map((event) => (
+            {homepageEvents.map((event) => (
               <div key={event.id} className="bg-white border border-slate-200 p-8 hover:border-emerald-600 transition-all group flex flex-col md:flex-row gap-6">
                 {event.flyerUrl ? (
                   <div className="h-40 md:h-auto md:w-32 overflow-hidden bg-slate-900 border border-slate-100 shrink-0">
@@ -495,7 +501,7 @@ export default function Home() {
                     {event.fee && <span className="flex items-center bg-slate-100 px-2 py-1">Fee: {event.fee}</span>}
                   </div>
                   <p className="text-xs text-slate-600 leading-relaxed mb-4">{event.description}</p>
-                  <Link to="/events" className="inline-flex items-center text-[10px] font-bold uppercase tracking-widest text-slate-900 hover:text-emerald-700 mt-auto border-b border-transparent hover:border-emerald-700 pb-1 self-start">
+                  <Link to={`/events/${getEventSlug(event)}`} className="inline-flex items-center text-[10px] font-bold uppercase tracking-widest text-slate-900 hover:text-emerald-700 mt-auto border-b border-transparent hover:border-emerald-700 pb-1 self-start">
                     Event Details <ArrowRight className="ml-1 h-3 w-3" />
                   </Link>
                 </div>
@@ -534,7 +540,7 @@ export default function Home() {
             transition={{ duration: 0.7, delay: 0.1, ease: "easeOut" }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch"
           >
-            {latestNewsArticles.map((article) => (
+            {displayedStories.map((article) => (
               <Link
                 key={article.id}
                 to={`/news/${article.slug}`}
@@ -551,6 +557,13 @@ export default function Home() {
               </Link>
             ))}
           </motion.div>
+          {storyPool.length > 3 && (
+            <div className="mt-8 flex items-center justify-center gap-3" aria-label="Featured story slider controls">
+              <button type="button" onClick={() => setActiveStoryIndex((current) => (current - 1 + storyPool.length) % storyPool.length)} className="rounded-full border border-slate-300 px-4 py-2 text-xs font-bold uppercase tracking-wider hover:border-emerald-600">Previous</button>
+              <span className="text-xs text-slate-500">{activeStoryIndex + 1} / {storyPool.length}</span>
+              <button type="button" onClick={() => setActiveStoryIndex((current) => (current + 1) % storyPool.length)} className="rounded-full border border-slate-300 px-4 py-2 text-xs font-bold uppercase tracking-wider hover:border-emerald-600">Next</button>
+            </div>
+          )}
           
           <div className="mt-10 text-center">
             <Link to="/news" className="inline-flex items-center justify-center px-6 py-3 border border-emerald-600 text-emerald-700 text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-emerald-50 transition-colors w-full sm:w-auto">

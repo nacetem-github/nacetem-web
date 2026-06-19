@@ -4,7 +4,6 @@ import { ArrowRight, Calendar, Camera, ChevronLeft, ChevronRight, Clock, FileTex
 import { Link } from 'react-router-dom';
 import { assets } from '../assets';
 import { useData } from '../contexts/DataContext';
-import { newsArticles } from '../data/news';
 import { archivedPastEvents } from '../data/pastEvents';
 import { getArchivedEventReportByTitle } from '../data/eventReports';
 import { eventFallbackImages, getEventSlug, splitEventsByStatus } from '../utils/eventUtils';
@@ -49,17 +48,20 @@ const galleryEvents = [
     ],
   },
 ];
+type GalleryAlbum = (typeof galleryEvents)[number];
 
 export default function News() {
-  const { events } = useData();
+  const { events, news, gallery } = useData();
+  const newsArticles = news.filter((article) => article.status === 'published');
   const [visibleArticles, setVisibleArticles] = useState(3);
   const [featuredArticleIndex, setFeaturedArticleIndex] = useState(0);
-  const [activeGalleryId, setActiveGalleryId] = useState(galleryEvents[0].id);
+  const [activeGalleryId, setActiveGalleryId] = useState('');
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [lightboxImageIndex, setLightboxImageIndex] = useState<number | null>(null);
 
   const currentArticles = newsArticles.slice(0, visibleArticles);
-  const carouselArticles = newsArticles;
+  const featuredArticles = newsArticles.filter((article) => article.featured);
+  const carouselArticles = featuredArticles.length ? featuredArticles : newsArticles;
   const featuredCardCount = Math.min(3, carouselArticles.length);
   const displayedFeaturedArticles = Array.from(
     { length: featuredCardCount },
@@ -67,8 +69,15 @@ export default function News() {
   );
   const loadedAdditionalArticles = currentArticles.slice(3);
   const hasMoreArticles = visibleArticles < newsArticles.length;
-  const { upcomingEvents, pastEvents } = splitEventsByStatus(events);
-  const activeGallery = galleryEvents.find((event) => event.id === activeGalleryId) ?? galleryEvents[0];
+  const { upcomingEvents, pastEvents } = splitEventsByStatus(events.filter((event) => event.status === 'published'));
+  const managedGalleryEvents = Object.values(gallery.filter((item) => item.status === 'published').reduce<Record<string, GalleryAlbum>>((albums, item) => {
+    const id = item.album.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    if (!albums[id]) albums[id] = { id, title: item.album, meta: [item.location, item.eventDate?.slice(0, 4)].filter(Boolean).join(' | '), folder: '', images: [] };
+    albums[id].images.push({ src: item.imageUrl, alt: item.imageAlt });
+    return albums;
+  }, {})) as GalleryAlbum[];
+  const availableGalleries = managedGalleryEvents.length ? managedGalleryEvents : galleryEvents;
+  const activeGallery = availableGalleries.find((event) => event.id === activeGalleryId) ?? availableGalleries[0];
   const activeImage = activeGallery.images[activeImageIndex] ?? activeGallery.images[0];
 
   const handleLoadMore = () => {
@@ -449,7 +458,7 @@ export default function News() {
 
           <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8 items-start">
             <div className="space-y-3">
-              {galleryEvents.map((event) => {
+              {availableGalleries.map((event) => {
                 const isActive = event.id === activeGallery.id;
 
                 return (

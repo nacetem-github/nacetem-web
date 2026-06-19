@@ -1,4 +1,4 @@
-import { ArrowLeft, Calendar, Clock, Mail, MapPin, Phone, Video } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, Download, Mail, MapPin, Phone, Video } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useData } from '../contexts/DataContext';
@@ -88,6 +88,11 @@ export default function EventDetail() {
             </div>
 
             <div className="mt-8 flex flex-wrap gap-3">
+              {event.sourceFileUrl && (
+                <a href={event.sourceFileUrl} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center rounded-[6px] border border-emerald-700 px-6 py-4 text-xs font-bold uppercase tracking-widest text-emerald-800">
+                  <Download className="mr-2 h-4 w-4" /> Download Event File
+                </a>
+              )}
               {actionUrl ? (
                 <a
                   href={actionUrl}

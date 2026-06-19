@@ -50,6 +50,12 @@ export function getEventEndDate(eventDate: string) {
   return null;
 }
 
+function parseIsoDate(value?: string) {
+  if (!value) return null;
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return match ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3])) : null;
+}
+
 export function getEventExpiryDate(eventDate: string) {
   const endDate = getEventEndDate(eventDate);
   if (!endDate) return null;
@@ -60,10 +66,10 @@ export function getEventExpiryDate(eventDate: string) {
 }
 
 export function isEventVisibleAsUpcoming(event: EventItem, referenceDate = new Date()) {
-  const expiryDate = getEventExpiryDate(event.date);
+  const managedEndDate = parseIsoDate(event.endDate || event.startDate);
+  const expiryDate = managedEndDate ?? getEventExpiryDate(event.date);
   if (!expiryDate) return true;
-
-  return expiryDate >= getStartOfDay(referenceDate);
+  return getStartOfDay(expiryDate) >= getStartOfDay(referenceDate);
 }
 
 export function splitEventsByStatus(events: EventItem[], referenceDate = new Date()) {

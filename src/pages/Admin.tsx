@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useData, type EventItem } from '../contexts/DataContext';
 import { useNavigate } from 'react-router-dom';
-import { Lock, FileText, Users, Settings, LogOut, LayoutDashboard, Search, Bell, Image as ImageIcon, Calendar, Plus, Trash2, Menu, X, Save, Video } from 'lucide-react';
+import { FileText, Settings, LogOut, LayoutDashboard, Search, Bell, Image as ImageIcon, Calendar, Plus, Trash2, Menu, X, Save, Video, Presentation, Library } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { CmsManager } from '../components/CmsManager';
 
 export function Login() {
   const [email, setEmail] = useState('');
@@ -12,10 +13,11 @@ export function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleAuth = (e: React.FormEvent) => {
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (login(email, password)) {
-      navigate('/admin');
+    if (await login(email, password)) {
+      if (supabase) window.location.assign('/admin');
+      else navigate('/admin');
     } else {
       setError('Invalid email or password access denied.');
     }
@@ -94,8 +96,8 @@ export function AdminDashboard() {
   const [newEventActionLabel, setNewEventActionLabel] = useState('Register / Join Event');
   const [newEventDescription, setNewEventDescription] = useState('');
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate('/admin/login');
   };
 
@@ -184,6 +186,8 @@ export function AdminDashboard() {
     { icon: ImageIcon, label: 'Gallery Manager' },
     { icon: Calendar, label: 'Events Manager' },
     { icon: FileText, label: 'News Manager' },
+    { icon: Presentation, label: 'Seminar Series Manager' },
+    { icon: Library, label: 'Publications Manager' },
     { icon: Settings, label: 'System Settings' },
   ];
 
@@ -321,7 +325,7 @@ export function AdminDashboard() {
             </>
           )}
 
-          {activeTab === 'Gallery Manager' && (
+          {false && activeTab === 'Gallery Manager' && (
             <div className="space-y-8">
               <div className="bg-white border border-slate-200 p-6">
                 <h2 className="text-lg font-serif text-slate-900 mb-4">Add New Image</h2>
@@ -380,7 +384,7 @@ export function AdminDashboard() {
             </div>
           )}
 
-          {activeTab === 'Events Manager' && (
+          {false && activeTab === 'Events Manager' && (
             <div className="space-y-8">
               <div className="bg-white border border-slate-200 p-6">
                 <h2 className="text-lg font-serif text-slate-900 mb-4">Add New Event</h2>
@@ -512,15 +516,13 @@ export function AdminDashboard() {
             </div>
           )}
 
-          {activeTab === 'News Manager' && (
-            <div className="bg-white border border-slate-200 p-16 text-center rounded-[11px]">
-              <FileText className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-              <h2 className="text-xl font-serif text-slate-900 mb-2">News Content Manager</h2>
-              <p className="text-sm text-slate-500 max-w-md mx-auto">This module is being set up to allow adding, editing, and managing news articles and publications.</p>
-            </div>
-          )}
+          {activeTab === 'Gallery Manager' && <CmsManager type="gallery" />}
+          {activeTab === 'Events Manager' && <CmsManager type="event" />}
+          {activeTab === 'News Manager' && <CmsManager type="news" />}
+          {activeTab === 'Seminar Series Manager' && <CmsManager type="seminar" />}
+          {activeTab === 'Publications Manager' && <CmsManager type="publication" />}
 
-          {activeTab !== 'Overview' && activeTab !== 'Gallery Manager' && activeTab !== 'Events Manager' && activeTab !== 'News Manager' && (
+          {activeTab !== 'Overview' && activeTab !== 'Gallery Manager' && activeTab !== 'Events Manager' && activeTab !== 'News Manager' && activeTab !== 'Seminar Series Manager' && activeTab !== 'Publications Manager' && (
             <div className="bg-white border border-slate-200 p-12 text-center text-slate-500">
               <p className="text-sm">Module <strong className="text-slate-900 font-serif">{activeTab}</strong> is currently being developed according to the latest administrative directives.</p>
             </div>

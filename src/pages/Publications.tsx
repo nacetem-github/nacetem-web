@@ -1,14 +1,15 @@
 import { ArrowRight, BookOpen, Download, FileText, Layers, Newspaper } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { assets } from '../assets';
+import { useData } from '../contexts/DataContext';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
 };
 
-const policyBriefs = [
+const seededPolicyBriefs = [
   {
     title: 'How Innovative Are Enterprises in the Nigerian Informal Sector?',
     meta: 'Year 2020 Number 1',
@@ -23,7 +24,7 @@ const policyBriefs = [
   },
 ];
 
-const technicalReports = [
+const seededTechnicalReports = [
   {
     title: 'Doing Research in Nigeria, Country Report: Assessing Social Science Research System in a Global Perspective',
     summary:
@@ -39,7 +40,7 @@ const technicalReports = [
   },
 ];
 
-const newsletters = [
+const seededNewsletters = [
   {
     year: '2026',
     title: 'NACETEM Newsletter 2026 Edition',
@@ -48,7 +49,16 @@ const newsletters = [
 ];
 
 export default function Publications() {
+  const { publications } = useData();
+  const published = publications.filter((item) => item.status === 'published');
+  const managedPolicyBriefs = published.filter((item) => item.type === 'policy-brief').map((item) => ({ ...item, meta: `Year ${item.year}` }));
+  const policyBriefs = managedPolicyBriefs.length ? managedPolicyBriefs : seededPolicyBriefs;
+  const managedTechnicalReports = published.filter((item) => item.type === 'technical-report').map((item) => ({ ...item, highlights: [] as string[], author: item.author ?? 'NACETEM' }));
+  const technicalReports = managedTechnicalReports.length ? managedTechnicalReports : seededTechnicalReports;
+  const managedNewsletters = published.filter((item) => item.type === 'newsletter' && item.fileUrl).map((item) => ({ year: String(item.year), title: item.title, fileUrl: item.fileUrl! }));
+  const newsletters = managedNewsletters.length ? managedNewsletters : seededNewsletters;
   const [selectedNewsletter, setSelectedNewsletter] = useState(newsletters[0]);
+  useEffect(() => { if (!newsletters.some((item) => item.fileUrl === selectedNewsletter.fileUrl)) setSelectedNewsletter(newsletters[0]); }, [newsletters, selectedNewsletter.fileUrl]);
 
   return (
     <div className="bg-slate-50 min-h-screen font-sans overflow-hidden">

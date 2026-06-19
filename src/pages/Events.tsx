@@ -13,7 +13,8 @@ const fadeInUp = {
 };
 
 export default function Events() {
-  const { events } = useData();
+  const { events: allEvents } = useData();
+  const events = allEvents.filter((event) => event.status === 'published');
   const { upcomingEvents, pastEvents } = splitEventsByStatus(events);
 
   return (

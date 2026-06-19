@@ -22,7 +22,8 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { DataProvider } from './contexts/DataContext';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
+  if (isLoading) return <div className="min-h-screen bg-slate-50" />;
   if (!isAuthenticated) return <Navigate to="/admin/login" replace />;
   return <>{children}</>;
 }
