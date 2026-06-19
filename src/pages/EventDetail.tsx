@@ -29,6 +29,10 @@ export default function EventDetail() {
   }
 
   const eventImage = event.flyerUrl ?? eventFallbackImages[0];
+  const storedActions = JSON.parse(window.localStorage.getItem('nacetem-event-actions') ?? '{}');
+  const storedAction = storedActions[event.id] as { actionUrl?: string; actionLabel?: string } | undefined;
+  const actionUrl = event.actionUrl ?? storedAction?.actionUrl;
+  const actionLabel = event.actionLabel ?? storedAction?.actionLabel ?? 'Register / Join Event';
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans">
@@ -84,14 +88,14 @@ export default function EventDetail() {
             </div>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              {event.actionUrl ? (
+              {actionUrl ? (
                 <a
-                  href={event.actionUrl}
+                  href={actionUrl}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center justify-center rounded-[6px] bg-emerald-700 px-6 py-4 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-emerald-800"
                 >
-                  <Video className="mr-2 h-4 w-4" /> {event.actionLabel ?? 'Register / Join Event'}
+                  <Video className="mr-2 h-4 w-4" /> {actionLabel}
                 </a>
               ) : (
                 <button

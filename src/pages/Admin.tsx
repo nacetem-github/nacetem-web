@@ -547,6 +547,23 @@ function EventAdminCard({ event, onSave, onRemove }: {
     setIsSaving(true);
     setSaveStatus('');
 
+    let storedActions: Record<string, { actionUrl: string; actionLabel: string }> = {};
+    try {
+      storedActions = JSON.parse(window.localStorage.getItem('nacetem-event-actions') ?? '{}');
+    } catch {
+      storedActions = {};
+    }
+
+    if (actionUrl.trim()) {
+      storedActions[event.id] = {
+        actionUrl: actionUrl.trim(),
+        actionLabel: actionLabel.trim() || 'Register / Join Event',
+      };
+    } else {
+      delete storedActions[event.id];
+    }
+    window.localStorage.setItem('nacetem-event-actions', JSON.stringify(storedActions));
+
     try {
       await onSave({
         ...event,
@@ -555,7 +572,9 @@ function EventAdminCard({ event, onSave, onRemove }: {
       });
       setSaveStatus(actionUrl.trim() ? 'Zoom link saved.' : 'Zoom link removed.');
     } catch {
-      setSaveStatus('Could not save the link.');
+      setSaveStatus(actionUrl.trim()
+        ? 'Link saved on this browser. Database sync is unavailable.'
+        : 'Link removed on this browser. Database sync is unavailable.');
     } finally {
       setIsSaving(false);
     }
