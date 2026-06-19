@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useData } from '../contexts/DataContext';
+import { useData, type EventItem } from '../contexts/DataContext';
 import { useNavigate } from 'react-router-dom';
-import { Lock, FileText, Users, Settings, LogOut, LayoutDashboard, Search, Bell, Image as ImageIcon, Calendar, Plus, Trash2, Menu, X } from 'lucide-react';
+import { Lock, FileText, Users, Settings, LogOut, LayoutDashboard, Search, Bell, Image as ImageIcon, Calendar, Plus, Trash2, Menu, X, Save, Video } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 export function Login() {
@@ -72,7 +72,7 @@ export function Login() {
 
 export function AdminDashboard() {
   const { logout } = useAuth();
-  const { gallery, addGalleryImage, removeGalleryImage, events, addEvent, removeEvent, isLoading } = useData();
+  const { gallery, addGalleryImage, removeGalleryImage, events, addEvent, updateEvent, removeEvent, isLoading } = useData();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('Overview');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -496,22 +496,12 @@ export function AdminDashboard() {
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {events.map((evt) => (
-                  <div key={evt.id} className="bg-white border border-slate-200 p-6 relative flex flex-col items-start group">
-                    <button 
-                      onClick={() => removeEvent(evt.id)}
-                      className="absolute top-4 right-4 text-slate-400 hover:text-red-600 transition-colors bg-white p-2 border border-slate-200 rounded-full opacity-0 group-hover:opacity-100"
-                      title="Remove event"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                    <div className="flex items-center gap-2 mb-3">
-                      <Calendar className="h-4 w-4 text-emerald-600" />
-                      <span className="text-xs font-bold uppercase tracking-widest text-gold">{evt.date}</span>
-                    </div>
-                    <h3 className="text-lg font-serif text-slate-900 mb-2 truncate w-full pr-8">{evt.title}</h3>
-                    <p className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">{evt.location}</p>
-                    <p className="text-sm text-slate-600 leading-relaxed line-clamp-3">{evt.description}</p>
-                  </div>
+                  <EventAdminCard
+                    key={evt.id}
+                    event={evt}
+                    onSave={updateEvent}
+                    onRemove={removeEvent}
+                  />
                 ))}
                 {events.length === 0 && (
                   <div className="col-span-full py-12 text-center text-slate-500 border border-dashed border-slate-300 bg-white">
@@ -537,6 +527,89 @@ export function AdminDashboard() {
           )}
         </div>
       </main>
+    </div>
+  );
+}
+
+function EventAdminCard({ event, onSave, onRemove }: {
+  key?: React.Key;
+  event: EventItem;
+  onSave: (event: EventItem) => Promise<void>;
+  onRemove: (id: string) => Promise<void>;
+}) {
+  const [actionUrl, setActionUrl] = useState(event.actionUrl ?? '');
+  const [actionLabel, setActionLabel] = useState(event.actionLabel ?? 'Register / Join Event');
+  const [saveStatus, setSaveStatus] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    setSaveStatus('');
+
+    try {
+      await onSave({
+        ...event,
+        actionUrl: actionUrl.trim() || undefined,
+        actionLabel: actionLabel.trim() || 'Register / Join Event',
+      });
+      setSaveStatus(actionUrl.trim() ? 'Zoom link saved.' : 'Zoom link removed.');
+    } catch {
+      setSaveStatus('Could not save the link.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div className="bg-white border border-slate-200 p-6 relative flex flex-col items-start group">
+      <button
+        type="button"
+        onClick={() => onRemove(event.id)}
+        className="absolute top-4 right-4 text-slate-400 hover:text-red-600 transition-colors bg-white p-2 border border-slate-200 rounded-full opacity-0 group-hover:opacity-100"
+        title="Remove event"
+      >
+        <Trash2 className="w-4 h-4" />
+      </button>
+      <div className="flex items-center gap-2 mb-3">
+        <Calendar className="h-4 w-4 text-emerald-600" />
+        <span className="text-xs font-bold uppercase tracking-widest text-gold">{event.date}</span>
+      </div>
+      <h3 className="text-lg font-serif text-slate-900 mb-2 w-full pr-8">{event.title}</h3>
+      <p className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">{event.location}</p>
+      <p className="text-sm text-slate-600 leading-relaxed line-clamp-3">{event.description}</p>
+
+      <form onSubmit={handleSave} className="mt-6 w-full border-t border-slate-100 pt-5">
+        <div className="mb-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-emerald-700">
+          <Video className="h-4 w-4" /> Manage Zoom Link
+        </div>
+        <div className="space-y-3">
+          <input
+            type="url"
+            value={actionUrl}
+            onChange={(e) => setActionUrl(e.target.value)}
+            placeholder="Paste Zoom registration or meeting link"
+            className="w-full rounded-[6px] border border-slate-300 px-4 py-3 text-sm outline-none focus:border-emerald-700"
+          />
+          <input
+            type="text"
+            value={actionLabel}
+            onChange={(e) => setActionLabel(e.target.value)}
+            placeholder="Button label"
+            className="w-full rounded-[6px] border border-slate-300 px-4 py-3 text-sm outline-none focus:border-emerald-700"
+          />
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <span className="text-xs text-slate-500">{saveStatus || 'Clear the URL and save to remove the link.'}</span>
+            <button
+              type="submit"
+              disabled={isSaving}
+              className="inline-flex items-center rounded-[6px] bg-emerald-700 px-4 py-2.5 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-emerald-800 disabled:cursor-wait disabled:opacity-60"
+            >
+              <Save className="mr-2 h-4 w-4" /> {isSaving ? 'Saving...' : 'Save Link'}
+            </button>
+          </div>
+        </div>
+      </form>
     </div>
   );
 }

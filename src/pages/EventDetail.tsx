@@ -84,7 +84,7 @@ export default function EventDetail() {
             </div>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              {event.actionUrl && (
+              {event.actionUrl ? (
                 <a
                   href={event.actionUrl}
                   target="_blank"
@@ -93,6 +93,14 @@ export default function EventDetail() {
                 >
                   <Video className="mr-2 h-4 w-4" /> {event.actionLabel ?? 'Register / Join Event'}
                 </a>
+              ) : (
+                <button
+                  type="button"
+                  disabled
+                  className="inline-flex cursor-not-allowed items-center justify-center rounded-[6px] bg-slate-200 px-6 py-4 text-xs font-bold uppercase tracking-widest text-slate-500"
+                >
+                  <Video className="mr-2 h-4 w-4" /> Registration Link Coming Soon
+                </button>
               )}
               <Link to="/news#past-events" className="inline-flex items-center justify-center rounded-[6px] border border-slate-300 px-6 py-4 text-xs font-bold uppercase tracking-widest text-slate-700 transition-colors hover:border-emerald-700 hover:text-emerald-700">
                 See Past Events

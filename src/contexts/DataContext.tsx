@@ -30,6 +30,7 @@ interface DataContextType {
   addGalleryImage: (image: GalleryImage) => Promise<void>;
   removeGalleryImage: (id: string) => Promise<void>;
   addEvent: (event: EventItem) => Promise<void>;
+  updateEvent: (event: EventItem) => Promise<void>;
   removeEvent: (id: string) => Promise<void>;
   isLoading: boolean;
 }
@@ -153,6 +154,22 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const updateEvent = async (event: EventItem) => {
+    const backup = [...events];
+    setEvents((current) => current.map((item) => item.id === event.id ? event : item));
+
+    if (supabase) {
+      const { id, ...updates } = event;
+      const { error } = await supabase.from('events').update(updates).eq('id', id);
+
+      if (error) {
+        console.error('Failed to update event', error);
+        setEvents(backup);
+        throw error;
+      }
+    }
+  };
+
   const removeEvent = async (id: string) => {
     const backup = [...events];
     setEvents(events.filter(evt => evt.id !== id));
@@ -166,7 +183,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <DataContext.Provider value={{ gallery, events, addGalleryImage, removeGalleryImage, addEvent, removeEvent, isLoading }}>
+    <DataContext.Provider value={{ gallery, events, addGalleryImage, removeGalleryImage, addEvent, updateEvent, removeEvent, isLoading }}>
       {children}
     </DataContext.Provider>
   );
