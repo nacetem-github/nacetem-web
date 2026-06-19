@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, Calendar, Camera, ChevronLeft, ChevronRight, Clock, Images, Mail, MapPin, Phone, Video, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -52,12 +52,19 @@ const galleryEvents = [
 export default function News() {
   const { events } = useData();
   const [visibleArticles, setVisibleArticles] = useState(3);
+  const [featuredArticleIndex, setFeaturedArticleIndex] = useState(0);
   const [activeGalleryId, setActiveGalleryId] = useState(galleryEvents[0].id);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [lightboxImageIndex, setLightboxImageIndex] = useState<number | null>(null);
-  const storiesCarouselRef = useRef<HTMLDivElement | null>(null);
 
   const currentArticles = newsArticles.slice(0, visibleArticles);
+  const carouselArticles = newsArticles;
+  const featuredCardCount = Math.min(3, carouselArticles.length);
+  const displayedFeaturedArticles = Array.from(
+    { length: featuredCardCount },
+    (_, index) => carouselArticles[(featuredArticleIndex + index) % carouselArticles.length]
+  );
+  const loadedAdditionalArticles = currentArticles.slice(3);
   const hasMoreArticles = visibleArticles < newsArticles.length;
   const { upcomingEvents, pastEvents } = splitEventsByStatus(events);
   const activeGallery = galleryEvents.find((event) => event.id === activeGalleryId) ?? galleryEvents[0];
@@ -82,12 +89,12 @@ export default function News() {
   };
 
   const scrollStories = (direction: 'previous' | 'next') => {
-    const carousel = storiesCarouselRef.current;
-    if (!carousel) return;
+    const articleCount = carouselArticles.length;
+    if (articleCount <= 1) return;
 
-    carousel.scrollBy({
-      left: direction === 'next' ? carousel.clientWidth * 0.9 : -carousel.clientWidth * 0.9,
-      behavior: 'smooth',
+    setFeaturedArticleIndex((current) => {
+      if (direction === 'next') return (current + 1) % articleCount;
+      return (current - 1 + articleCount) % articleCount;
     });
   };
 
@@ -337,19 +344,16 @@ export default function News() {
             </div>
           </div>
 
-          <div
-            ref={storiesCarouselRef}
-            className="flex snap-x snap-mandatory gap-8 overflow-x-auto scroll-smooth pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          >
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             <AnimatePresence mode="popLayout">
-              {currentArticles.map((article, idx) => (
+              {displayedFeaturedArticles.map((article, idx) => (
                 <motion.div
                   key={article.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.5, delay: idx * 0.1 }}
-                  className="group border border-slate-200 rounded-[11px] overflow-hidden bg-white hover:border-emerald-500 transition-colors flex h-auto min-w-[86%] snap-start flex-col sm:min-w-[calc(50%_-_1rem)] lg:min-w-[calc(33.333%_-_1.34rem)]"
+                  className="group border border-slate-200 rounded-[11px] overflow-hidden bg-white hover:border-emerald-500 transition-colors flex h-full flex-col"
                 >
                   <Link to={`/news/${article.slug}`} className="flex flex-col h-full">
                     <div className="h-48 sm:h-56 overflow-hidden relative shrink-0">
@@ -374,6 +378,33 @@ export default function News() {
               ))}
             </AnimatePresence>
           </div>
+
+          {loadedAdditionalArticles.length > 0 && (
+            <div className="mt-12 border-t border-slate-200 pt-10">
+              <div className="mb-6 flex items-center justify-between gap-4">
+                <h4 className="text-xl font-serif text-slate-900">More News Entries</h4>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                  {loadedAdditionalArticles.length} Loaded
+                </span>
+              </div>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {loadedAdditionalArticles.map((article) => (
+                  <Link
+                    key={`loaded-${article.id}`}
+                    to={`/news/${article.slug}`}
+                    className="group rounded-[10px] border border-slate-200 bg-white p-5 transition-colors hover:border-emerald-500"
+                  >
+                    <div className="mb-3 text-xs font-bold uppercase tracking-widest text-slate-500">{article.date}</div>
+                    <h5 className="text-lg font-serif leading-snug text-slate-900 transition-colors group-hover:text-emerald-700">{article.title}</h5>
+                    <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-slate-600">{article.summary}</p>
+                    <span className="mt-5 inline-flex items-center text-xs font-bold uppercase tracking-widest text-emerald-700">
+                      Read More <ArrowRight className="ml-1 h-4 w-4" />
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
 
           {hasMoreArticles && (
             <div className="mt-16 flex justify-center">
