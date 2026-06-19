@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { Menu, X, ChevronRight, ChevronDown, Mail, Twitter, Facebook, ArrowUp, User, Building2, Send, CheckCircle2, XCircle, MessageSquareWarning, ExternalLink } from 'lucide-react';
+import { Menu, X, ChevronRight, ChevronDown, Mail, ArrowUp, User, Building2, Send, CheckCircle2, XCircle, MessageSquareWarning, ExternalLink } from 'lucide-react';
 import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { cn } from '../lib/utils';
 import { NacetemLogo } from './NacetemLogo';
@@ -407,17 +407,17 @@ export default function Layout() {
             <div>
               <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-5 opacity-70">Connect With Us</h3>
               <div className="flex space-x-4 mb-8">
-                <a href="#" className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-emerald-50 transition-all hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/20 hover:text-white">
-                  <span className="sr-only">Email</span>
+                <a href="mailto:info@nacetem.gov.ng" className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-emerald-50 transition-all hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/20 hover:text-white">
+                  <span className="sr-only">Email NACETEM</span>
                   <Mail className="h-5 w-5" />
                 </a>
-                <a href="#" className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-emerald-50 transition-all hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/20 hover:text-white">
-                  <span className="sr-only">Twitter</span>
-                  <Twitter className="h-5 w-5" />
-                </a>
-                <a href="#" className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-emerald-50 transition-all hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/20 hover:text-white">
-                  <span className="sr-only">Facebook</span>
-                  <Facebook className="h-5 w-5" />
+                <Link to="/contact" className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-emerald-50 transition-all hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/20 hover:text-white">
+                  <span className="sr-only">Open the contact page</span>
+                  <Send className="h-5 w-5" />
+                </Link>
+                <a href="https://nacetem.gov.ng/nacetem_grm/" target="_blank" rel="noopener noreferrer" className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-emerald-50 transition-all hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/20 hover:text-white">
+                  <span className="sr-only">Open the Grievance Redress Management System</span>
+                  <MessageSquareWarning className="h-5 w-5" />
                 </a>
               </div>
             </div>

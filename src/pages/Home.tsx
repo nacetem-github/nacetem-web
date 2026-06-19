@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Search, Landmark, GraduationCap, Layers, MapPin, Calendar as CalendarIcon, Image as ImageIcon, Pause, Play } from 'lucide-react';
+import { ArrowRight, Search, Landmark, GraduationCap, Layers, MapPin, Calendar as CalendarIcon, Image as ImageIcon, Pause, Play, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, useReducedMotion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { useData } from '../contexts/DataContext';
@@ -31,12 +31,18 @@ const galleryFallbacks = [
   { id: 'fallback-6', url: assets.ntaImage, title: 'Media Engagement' },
 ];
 
+const impactVideos = [
+  { id: 'ca28dtNXL64', title: 'NACETEM impact across Nigeria' },
+  { id: 'GM0ETQvVHKI', title: 'NACETEM impact short video' },
+];
+
 export default function Home() {
   const { gallery, events, news } = useData();
   const [activeHeroIndex, setActiveHeroIndex] = useState(0);
   const [isHeroPaused, setIsHeroPaused] = useState(false);
   const prefersReducedMotion = useReducedMotion();
   const [activeStoryIndex, setActiveStoryIndex] = useState(0);
+  const [activeVideoIndex, setActiveVideoIndex] = useState(0);
   const activeHero = heroSlides[activeHeroIndex];
   const displayedGallery = [
     ...gallery.filter((item) => item.status === 'published'),
@@ -189,9 +195,9 @@ export default function Home() {
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="flex flex-col mb-16 max-w-3xl"
           >
-            <h2 className="text-xs font-bold text-gold uppercase tracking-widest mb-4">Featured Initiatives</h2>
-            <h3 className="text-3xl sm:text-4xl font-serif text-slate-900 mb-4 leading-tight">Flagship Programmes Driving Innovation and Capacity Development</h3>
-            <p className="text-sm text-slate-600 leading-relaxed">Explore NACETEM's key platforms and programmes supporting policy research, digital transformation, professional skills development, innovation systems, and evidence-based national planning.</p>
+            <h2 className="text-xs font-bold text-gold uppercase tracking-widest mb-4">Flagship Platforms</h2>
+            <h3 className="text-3xl sm:text-4xl font-serif text-slate-900 mb-4 leading-tight">Digital Tools and Strategic Initiatives</h3>
+            <p className="text-sm text-slate-600 leading-relaxed">Access NACETEM's specialised platforms for public-service learning, digital skills, AI collaboration, technical development, systems thinking, and STI intelligence.</p>
           </motion.div>
 
           <motion.div 
@@ -343,83 +349,66 @@ export default function Home() {
         </div>
       </section>
 
-      {/* What We Do */}
-      <section className="py-24 bg-white overflow-hidden text-center lg:text-left">
+      {/* Core Functions */}
+      <section className="py-20 bg-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6 }}
-            className="flex flex-col mb-20 max-w-3xl mx-auto lg:mx-0"
+            className="mb-12 max-w-3xl"
           >
-             <h2 className="text-3xl sm:text-5xl font-serif text-slate-900 mb-6 leading-tight">Programmes and Interventions</h2>
-             <p className="text-sm text-slate-600 max-w-2xl mx-auto lg:mx-0 leading-relaxed">Focused on capacity, research, and collaborative innovation systems.</p>
+             <p className="mb-4 text-xs font-bold uppercase tracking-widest text-gold">What We Do</p>
+             <h2 className="text-3xl sm:text-4xl font-serif text-slate-900 mb-5 leading-tight">NACETEM's Core Functions</h2>
+             <p className="text-sm text-slate-600 max-w-2xl leading-relaxed">Three connected areas define our institutional work and national contribution.</p>
           </motion.div>
 
           <div className="space-y-24">
             {[
               {
                 title: "Policy Research & Advisory",
-                desc: "NACETEM's policy research projects are designed to assist policymakers in improving the management of science, technology, and innovation. We provide research-driven insights, data-backed guidance, and cutting-edge policy options.",
+                desc: "Research-driven insights, STI evidence, and practical policy options for public institutions and national planning.",
                 label: "Evidence-led strategy",
+                icon: Search,
                 img: assets.policyImage,
                 link: "/research"
               },
               {
                 title: "Capacity Building",
-                desc: "NACETEM's capacity building programmes are designed to address knowledge gaps within the national innovation system. We deploy targeted training initiatives, practical workshops, and a continuous learning focus.",
+                desc: "Targeted courses, professional training, and practical workshops that strengthen institutional and individual capability.",
                 label: "Skills for institutions",
+                icon: GraduationCap,
                 img: assets.capacityImage,
                 link: "/capacity-building"
               },
               {
                 title: "Innovation Systems",
-                desc: "NACETEM's innovation systems and partnership initiatives strengthen collaboration among STI stakeholders. Our programmes aim for improved coordination, accelerated technology infusion, and strengthened ecosystems.",
+                desc: "Partnerships and platforms that connect researchers, government, industry, innovators, and development stakeholders.",
                 label: "Connected ecosystems",
+                icon: Layers,
                 img: assets.aiEcosystemImage,
                 link: "/initiatives"
               }
-            ].map((program, idx) => {
-              const isEven = idx % 2 !== 0;
+            ].map((program, index) => {
+              const reversed = index % 2 !== 0;
               return (
-                <div key={idx} className={`flex flex-col lg:flex-row gap-12 lg:gap-20 items-center ${isEven ? 'lg:flex-row-reverse' : ''}`}>
-                  <motion.div 
-                    initial={{ opacity: 0, x: isEven ? 50 : -50 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true, margin: "-100px" }}
-                    transition={{ duration: 0.7, ease: "easeOut" }}
-                    className="w-full lg:w-1/2"
-                  >
+                <div key={program.title} className={`flex flex-col items-center gap-12 lg:gap-20 ${reversed ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>
+                  <motion.div initial={{ opacity: 0, x: reversed ? 50 : -50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: '-100px' }} transition={{ duration: 0.7, ease: 'easeOut' }} className="w-full lg:w-1/2">
                     <div className="relative rounded-[28px] border border-gold/40 bg-white p-2 shadow-xl shadow-slate-900/5">
-                      <div className="absolute -inset-3 rounded-[34px] border border-emerald-600/10 pointer-events-none"></div>
+                      <div className="pointer-events-none absolute -inset-3 rounded-[34px] border border-emerald-600/10"></div>
                       <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[20px] border border-white ring-1 ring-slate-200/80">
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 via-transparent to-transparent z-10 transition-colors duration-500"></div>
-                        <img src={program.img} alt={program.title} loading="lazy" decoding="async" className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700 ease-in-out" />
+                        <div className="absolute inset-0 z-10 bg-gradient-to-t from-slate-900/20 via-transparent to-transparent"></div>
+                        <img src={program.img} alt={program.title} loading="lazy" decoding="async" className="h-full w-full object-cover transition-transform duration-700 ease-in-out hover:scale-105" />
                       </div>
                     </div>
                   </motion.div>
-                  
-                  <motion.div 
-                    initial={{ opacity: 0, x: isEven ? -50 : 50 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true, margin: "-100px" }}
-                    transition={{ duration: 0.7, ease: "easeOut", delay: 0.2 }}
-                    className="w-full lg:w-1/2 flex flex-col justify-center"
-                  >
-                    <div className="flex items-center justify-center lg:justify-start gap-4 mb-6">
-                      <span className="h-px w-12 bg-gold"></span>
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-700 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full">
-                        {program.label}
-                      </span>
-                    </div>
-                    <h3 className="text-3xl sm:text-4xl font-serif text-slate-900 mb-5 leading-tight">{program.title}</h3>
-                    <p className="text-slate-600 text-[15px] mb-8 leading-8 max-w-xl mx-auto lg:mx-0">{program.desc}</p>
-                    <div className="mx-auto lg:mx-0">
-                      <Link to={program.link} className="inline-flex items-center text-xs font-bold uppercase tracking-widest text-slate-900 hover:text-emerald-700 border-b border-slate-300 hover:border-emerald-700 pb-1 transition-colors group">
-                        Learn More <ArrowRight className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
-                      </Link>
-                    </div>
+                  <motion.div initial={{ opacity: 0, x: reversed ? -50 : 50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: '-100px' }} transition={{ duration: 0.7, delay: 0.2, ease: 'easeOut' }} className="flex w-full flex-col justify-center lg:w-1/2">
+                    <div className="mb-6 flex items-center gap-4"><span className="h-px w-12 bg-gold"></span><span className="rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-emerald-700">{program.label}</span></div>
+                    <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-emerald-100 bg-white text-emerald-700"><program.icon className="h-6 w-6" /></div>
+                    <h3 className="mb-5 text-3xl font-serif leading-tight text-slate-900 sm:text-4xl">{program.title}</h3>
+                    <p className="mb-8 max-w-xl text-[15px] leading-8 text-slate-600">{program.desc}</p>
+                    <Link to={program.link} className="group inline-flex items-center self-start border-b border-slate-300 pb-1 text-xs font-bold uppercase tracking-widest text-slate-900 hover:border-emerald-700 hover:text-emerald-700">Learn More <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" /></Link>
                   </motion.div>
                 </div>
               );
@@ -666,15 +655,21 @@ export default function Home() {
           </div>
           <div className="relative w-full aspect-video rounded-[11px] overflow-hidden shadow-2xl border-[2.11px] border-slate-200 bg-slate-900">
             <iframe 
+              key={impactVideos[activeVideoIndex].id}
               loading="lazy"
               className="absolute top-0 left-0 w-full h-full" 
-              src="https://www.youtube.com/embed/ca28dtNXL64?si=uJyrihc5jfUwXTgc" 
-              title="YouTube video player" 
+              src={`https://www.youtube.com/embed/${impactVideos[activeVideoIndex].id}`}
+              title={impactVideos[activeVideoIndex].title}
               frameBorder="0" 
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
               referrerPolicy="strict-origin-when-cross-origin" 
               allowFullScreen
             ></iframe>
+          </div>
+          <div className="mt-6 flex items-center justify-center gap-4">
+            <button type="button" onClick={() => setActiveVideoIndex((current) => (current - 1 + impactVideos.length) % impactVideos.length)} className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 transition-colors hover:border-emerald-600 hover:text-emerald-700" aria-label="Show previous impact video"><ChevronLeft className="h-5 w-5" /></button>
+            <span className="min-w-20 text-center text-xs font-bold uppercase tracking-wider text-slate-500">{activeVideoIndex + 1} of {impactVideos.length}</span>
+            <button type="button" onClick={() => setActiveVideoIndex((current) => (current + 1) % impactVideos.length)} className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 transition-colors hover:border-emerald-600 hover:text-emerald-700" aria-label="Show next impact video"><ChevronRight className="h-5 w-5" /></button>
           </div>
         </div>
       </section>
