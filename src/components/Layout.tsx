@@ -1,6 +1,6 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { Menu, X, ChevronRight, ChevronDown, Mail, Twitter, Facebook, ArrowUp, User, Building2, Send, CheckCircle2, XCircle, MessageSquareWarning, ExternalLink } from 'lucide-react';
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { cn } from '../lib/utils';
 import { NacetemLogo } from './NacetemLogo';
 import { supabase } from '../lib/supabase';
@@ -17,6 +17,10 @@ export default function Layout() {
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterOrganization, setNewsletterOrganization] = useState('');
   const [newsletterMessage, setNewsletterMessage] = useState('');
+  const newsletterDialogRef = useRef<HTMLDivElement>(null);
+  const newsletterNameInputRef = useRef<HTMLInputElement>(null);
+  const newsletterSuccessButtonRef = useRef<HTMLButtonElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
   const location = useLocation();
 
   useEffect(() => {
@@ -64,12 +68,45 @@ export default function Layout() {
 
   useEffect(() => {
     if (!showNewsletterPopup) return;
+    previousFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const focusTimer = window.requestAnimationFrame(() => newsletterNameInputRef.current?.focus());
+
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') closeNewsletterPopup();
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeNewsletterPopup();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+
+      const focusable = (Array.from(newsletterDialogRef.current?.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      ) ?? []) as HTMLElement[]).filter((element) => !element.hasAttribute('hidden'));
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      window.cancelAnimationFrame(focusTimer);
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+      previousFocusRef.current?.focus();
+    };
   }, [showNewsletterPopup]);
+
+  useEffect(() => {
+    if (showNewsletterPopup && newsletterState === 'success') newsletterSuccessButtonRef.current?.focus();
+  }, [newsletterState, showNewsletterPopup]);
 
   const handleNewsletterSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -407,13 +444,12 @@ export default function Layout() {
 
       {showNewsletterPopup && (
         <div className="fixed inset-0 z-[80] flex items-center justify-center px-4 py-6">
-          <button
-            type="button"
-            aria-label="Close newsletter popup"
+          <div
+            aria-hidden="true"
             onClick={closeNewsletterPopup}
             className="absolute inset-0 bg-slate-900/65 backdrop-blur-sm"
           />
-          <div role="dialog" aria-modal="true" aria-labelledby="newsletter-popup-title" className="relative w-full max-w-3xl overflow-hidden rounded-[28px] bg-white shadow-2xl border border-white/70">
+          <div ref={newsletterDialogRef} role="dialog" aria-modal="true" aria-labelledby="newsletter-popup-title" aria-describedby="newsletter-popup-description" className="relative max-h-[calc(100vh-3rem)] w-full max-w-3xl overflow-y-auto rounded-[28px] bg-white shadow-2xl border border-white/70">
             <button
               type="button"
               onClick={closeNewsletterPopup}
@@ -443,9 +479,10 @@ export default function Layout() {
                     <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
                       <CheckCircle2 className="h-8 w-8" />
                     </div>
-                    <h3 className="text-3xl font-serif text-slate-900 mb-4">Thank you for joining.</h3>
-                    <p className="text-sm text-slate-600 leading-7 max-w-sm">{newsletterMessage}</p>
+                    <h3 id="newsletter-popup-title" className="text-3xl font-serif text-slate-900 mb-4">Thank you for joining.</h3>
+                    <p id="newsletter-popup-description" className="text-sm text-slate-600 leading-7 max-w-sm">{newsletterMessage}</p>
                     <button
+                      ref={newsletterSuccessButtonRef}
                       type="button"
                       onClick={closeNewsletterPopup}
                       className="mt-8 inline-flex items-center justify-center rounded-[8px] bg-emerald-600 px-6 py-3 text-xs font-bold uppercase tracking-wider text-white hover:bg-emerald-700 transition-colors"
@@ -456,7 +493,7 @@ export default function Layout() {
                 ) : (
                   <>
                     <h3 id="newsletter-popup-title" className="text-3xl font-serif text-slate-900 mb-3">Join Our Newsletter</h3>
-                    <p className="text-sm text-slate-600 leading-7 mb-8">
+                    <p id="newsletter-popup-description" className="text-sm text-slate-600 leading-7 mb-8">
                       Fill in your details to receive periodical updates about NACETEM activities, publications, and events.
                     </p>
 
@@ -471,6 +508,7 @@ export default function Layout() {
                         <div className="relative">
                           <User className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                           <input
+                            ref={newsletterNameInputRef}
                             id="newsletter-popup-name"
                             type="text"
                             required
