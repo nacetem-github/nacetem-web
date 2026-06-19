@@ -1,9 +1,10 @@
-import { Calendar, Clock, Mail, MapPin, Phone, Video, ArrowRight } from 'lucide-react';
+import { Calendar, Clock, Mail, MapPin, Phone, Video, ArrowRight, FileText } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { assets } from '../assets';
 import { useData } from '../contexts/DataContext';
 import { archivedPastEvents } from '../data/pastEvents';
+import { getArchivedEventReportByTitle } from '../data/eventReports';
 import { eventFallbackImages, getEventSlug, splitEventsByStatus } from '../utils/eventUtils';
 
 const fadeInUp = {
@@ -183,12 +184,17 @@ export default function Events() {
                       Expired
                     </span>
                   </div>
+                  <Link to={`/events/reports/${getEventSlug(event)}`} className="mt-5 inline-flex items-center justify-center rounded-[6px] bg-emerald-700 px-4 py-3 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-emerald-800">
+                    <FileText className="mr-2 h-4 w-4" /> View Report
+                  </Link>
                 </div>
               </motion.article>
             ))}
 
-            {archivedPastEvents.map((event) => (
-              <motion.article
+            {archivedPastEvents.map((event) => {
+              const report = getArchivedEventReportByTitle(event.title);
+
+              return <motion.article
                 key={event.title}
                 initial="hidden"
                 whileInView="visible"
@@ -219,9 +225,14 @@ export default function Events() {
                       Expired
                     </span>
                   </div>
+                  {report && (
+                    <Link to={`/events/reports/${report.slug}`} className="mt-5 inline-flex items-center justify-center rounded-[6px] bg-emerald-700 px-4 py-3 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-emerald-800">
+                      <FileText className="mr-2 h-4 w-4" /> View Report
+                    </Link>
+                  )}
                 </div>
-              </motion.article>
-            ))}
+              </motion.article>;
+            })}
           </div>
         </div>
       </section>

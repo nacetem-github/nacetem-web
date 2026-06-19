@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, Calendar, Camera, ChevronLeft, ChevronRight, Clock, Images, Mail, MapPin, Phone, Video, X } from 'lucide-react';
+import { ArrowRight, Calendar, Camera, ChevronLeft, ChevronRight, Clock, FileText, Images, Mail, MapPin, Phone, Video, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { assets } from '../assets';
 import { useData } from '../contexts/DataContext';
 import { newsArticles } from '../data/news';
 import { archivedPastEvents } from '../data/pastEvents';
+import { getArchivedEventReportByTitle } from '../data/eventReports';
 import { eventFallbackImages, getEventSlug, splitEventsByStatus } from '../utils/eventUtils';
 
 const fadeInUp = {
@@ -285,12 +286,17 @@ export default function News() {
                     <p className="flex items-center"><Calendar className="mr-2 h-4 w-4 text-gold" /> {event.date}</p>
                     <p className="flex items-start"><MapPin className="mr-2 mt-0.5 h-4 w-4 shrink-0 text-emerald-700" /> {event.location}</p>
                   </div>
+                  <Link to={`/events/reports/${getEventSlug(event)}`} className="mt-5 inline-flex items-center justify-center rounded-[6px] bg-emerald-700 px-4 py-3 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-emerald-800">
+                    <FileText className="mr-2 h-4 w-4" /> View Report
+                  </Link>
                 </div>
               </motion.article>
             ))}
 
-            {archivedPastEvents.map((event) => (
-              <motion.article
+            {archivedPastEvents.map((event) => {
+              const report = getArchivedEventReportByTitle(event.title);
+
+              return <motion.article
                 key={event.title}
                 initial="hidden"
                 whileInView="visible"
@@ -310,9 +316,14 @@ export default function News() {
                     <p className="flex items-center"><Calendar className="mr-2 h-4 w-4 text-gold" /> {event.date}</p>
                     <p className="flex items-start"><MapPin className="mr-2 mt-0.5 h-4 w-4 shrink-0 text-emerald-700" /> {event.location}</p>
                   </div>
+                  {report && (
+                    <Link to={`/events/reports/${report.slug}`} className="mt-5 inline-flex items-center justify-center rounded-[6px] bg-emerald-700 px-4 py-3 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-emerald-800">
+                      <FileText className="mr-2 h-4 w-4" /> View Report
+                    </Link>
+                  )}
                 </div>
-              </motion.article>
-            ))}
+              </motion.article>;
+            })}
           </div>
         </div>
       </section>
