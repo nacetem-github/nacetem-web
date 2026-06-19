@@ -76,7 +76,7 @@ export default function Home() {
                 Driving Science, Technology, and Innovation for national development through policy research, strategic capacity building, innovation system development, and technology management initiatives that strengthen evidence-based decision-making and institutional growth.
               </p>
               <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                <Link to="/about" className="inline-flex justify-center items-center w-full sm:w-auto px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase tracking-widest rounded-sm transition-colors">
+                <Link to="/initiatives" className="inline-flex justify-center items-center w-full sm:w-auto px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase tracking-widest rounded-sm transition-colors">
                   Explore Initiatives
                 </Link>
                 <Link to="/contact" className="inline-flex justify-center items-center w-full sm:w-auto px-6 py-3 bg-transparent border border-slate-300 hover:border-slate-400 text-slate-900 text-xs font-bold uppercase tracking-widest rounded-sm transition-colors">
@@ -185,37 +185,37 @@ export default function Home() {
               {
                 title: "Public Service Rules Exam Prep Tool",
                 desc: "AI-supported exam preparation platform designed to help public servants prepare effectively for promotion examinations.",
-                link: "/initiatives",
+                link: "/psr-test",
                 img: assets.psrImage
               },
               {
                 title: "NACETEM AI-Ecosystem powered by Daimlas",
                 desc: "A collaborative platform connecting AI stakeholders, research opportunities, innovation projects, and implementation support.",
-                link: "/initiatives",
+                link: "/initiatives#ai-ecosystem",
                 img: assets.aiEcosystemImage
               },
               {
                 title: "NACETEM Digital Academy",
                 desc: "Professional and academic learning programmes focused on digital skills, innovation, technology management, and institutional transformation.",
-                link: "/initiatives",
+                link: "/initiatives#digital-academy",
                 img: assets.digitalAcademyImage
               },
               {
                 title: "NACETEM Welding Initiative",
                 desc: "A technical capacity-building initiative supporting welding excellence, certification readiness, and industrial skills development.",
-                link: "/initiatives",
+                link: "/initiatives#welding-initiative",
                 img: assets.weldingImage
               },
               {
                 title: "Systems Dynamics and Systems Thinking",
                 desc: "A strategic programme for understanding complex systems, improving policy analysis, and strengthening evidence-based decision-making.",
-                link: "/initiatives",
+                link: "/initiatives#systems-thinking",
                 img: assets.seminarImage
               },
               {
                 title: "STI Dashboard / STI Intelligence Platform",
                 desc: "A data-driven platform for communicating science, technology, and innovation outputs for national planning and policy coordination.",
-                link: "/initiatives",
+                link: "/initiatives#sti-dashboard",
                 img: assets.dashboardImage
               }
             ].map((initiative, idx) => (
@@ -444,7 +444,7 @@ export default function Home() {
           
           <div className="mt-10 text-center pt-8 relative">
             <div className="absolute top-0 left-1/2 h-px w-32 -translate-x-1/2 bg-gradient-to-r from-transparent via-gold/70 to-transparent"></div>
-            <Link to="/gallery" className="inline-flex items-center text-xs font-bold uppercase tracking-widest text-slate-900 hover:text-emerald-700 border-b border-transparent hover:border-emerald-700 pb-1">
+            <Link to="/news#event-gallery" className="inline-flex items-center text-xs font-bold uppercase tracking-widest text-slate-900 hover:text-emerald-700 border-b border-transparent hover:border-emerald-700 pb-1">
               View Complete Gallery <ArrowRight className="ml-1 h-3 w-3" />
             </Link>
           </div>

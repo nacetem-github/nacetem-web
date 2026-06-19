@@ -42,7 +42,7 @@ export default function App() {
               <Route path="research/seminar-series" element={<SeminarSeries />} />
               <Route path="capacity-building" element={<CapacityBuilding />} />
               <Route path="capacity-building/:slug" element={<CapacityBuildingDetail />} />
-              <Route path="gallery" element={<PlaceholderPage title="Gallery" description="Visual highlights from our events and programs." />} />
+              <Route path="gallery" element={<Navigate to="/news#event-gallery" replace />} />
               <Route path="events" element={<Events />} />
               <Route path="events/reports/:slug" element={<EventReport />} />
               <Route path="events/:slug" element={<EventDetail />} />
