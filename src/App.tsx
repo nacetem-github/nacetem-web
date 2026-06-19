@@ -1,25 +1,27 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import Layout from './components/Layout';
-import Home from './pages/Home';
-import Initiatives from './pages/Initiatives';
-import About from './pages/About';
-import Contact from './pages/Contact';
-import News from './pages/News';
-import NewsDetail from './pages/NewsDetail';
-import Events from './pages/Events';
-import EventDetail from './pages/EventDetail';
-import EventReport from './pages/EventReport';
-import Publications from './pages/Publications';
-import CapacityBuilding from './pages/CapacityBuilding';
-import CapacityBuildingDetail from './pages/CapacityBuildingDetail';
-import PsrTest from './pages/PsrTest';
-import SeminarSeries from './pages/SeminarSeries';
-import Research from './pages/Research';
-import PlaceholderPage from './pages/PlaceholderPage';
-import { Login, AdminDashboard } from './pages/Admin';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { DataProvider } from './contexts/DataContext';
+
+const Home = lazy(() => import('./pages/Home'));
+const Initiatives = lazy(() => import('./pages/Initiatives'));
+const About = lazy(() => import('./pages/About'));
+const Contact = lazy(() => import('./pages/Contact'));
+const News = lazy(() => import('./pages/News'));
+const NewsDetail = lazy(() => import('./pages/NewsDetail'));
+const Events = lazy(() => import('./pages/Events'));
+const EventDetail = lazy(() => import('./pages/EventDetail'));
+const EventReport = lazy(() => import('./pages/EventReport'));
+const Publications = lazy(() => import('./pages/Publications'));
+const CapacityBuilding = lazy(() => import('./pages/CapacityBuilding'));
+const CapacityBuildingDetail = lazy(() => import('./pages/CapacityBuildingDetail'));
+const PsrTest = lazy(() => import('./pages/PsrTest'));
+const SeminarSeries = lazy(() => import('./pages/SeminarSeries'));
+const Research = lazy(() => import('./pages/Research'));
+const PlaceholderPage = lazy(() => import('./pages/PlaceholderPage'));
+const Login = lazy(() => import('./pages/Admin').then((module) => ({ default: module.Login })));
+const AdminDashboard = lazy(() => import('./pages/Admin').then((module) => ({ default: module.AdminDashboard })));
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -33,6 +35,7 @@ export default function App() {
     <AuthProvider>
       <DataProvider>
         <Router>
+          <Suspense fallback={<div className="min-h-[50vh] bg-slate-50" aria-label="Loading page" />}>
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Layout />}>
@@ -66,6 +69,7 @@ export default function App() {
               } 
             />
           </Routes>
+          </Suspense>
         </Router>
       </DataProvider>
     </AuthProvider>

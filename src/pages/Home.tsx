@@ -97,6 +97,9 @@ export default function Home() {
                     key={activeHero.image}
                     src={activeHero.image}
                     alt={activeHero.title}
+                    loading="eager"
+                    fetchPriority="high"
+                    decoding="async"
                     initial={{ opacity: 0, scale: 1.08, rotate: 1.5 }}
                     animate={{ opacity: 1, scale: 1, rotate: 0 }}
                     transition={{ duration: 0.9, ease: 'easeOut' }}
@@ -221,7 +224,7 @@ export default function Home() {
             ].map((initiative, idx) => (
               <div key={idx} className="bg-white border border-slate-200/80 rounded-2xl group flex flex-col p-5 shadow-sm hover:shadow-md hover:border-emerald-500/30 transition-all duration-300">
                 <div className="h-48 overflow-hidden mb-4 border border-slate-100 rounded-xl">
-                  <img src={initiative.img} alt={initiative.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <img src={initiative.img} alt={initiative.title} loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                 </div>
                 <div className="flex-1 flex flex-col pt-2">
                   <h4 className="text-lg font-serif text-slate-900 mb-2">{initiative.title}</h4>
@@ -375,7 +378,7 @@ export default function Home() {
                       <div className="absolute -inset-3 rounded-[34px] border border-emerald-600/10 pointer-events-none"></div>
                       <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[20px] border border-white ring-1 ring-slate-200/80">
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 via-transparent to-transparent z-10 transition-colors duration-500"></div>
-                        <img src={program.img} alt={program.title} className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700 ease-in-out" />
+                        <img src={program.img} alt={program.title} loading="lazy" decoding="async" className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700 ease-in-out" />
                       </div>
                     </div>
                   </motion.div>
@@ -432,7 +435,7 @@ export default function Home() {
             {displayedGallery.map((img) => (
               <div key={img.id} className="bg-white border border-slate-200/80 rounded-2xl group flex flex-col p-5 shadow-sm hover:shadow-md hover:border-emerald-500/30 transition-all duration-300">
                 <div className="h-64 overflow-hidden mb-4 border border-slate-100 rounded-xl relative">
-                  <img src={img.url} alt={img.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <img src={img.url} alt={img.title} loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                   <div className="absolute inset-0 bg-emerald-900/0 group-hover:bg-emerald-900/5 transition-colors duration-500"></div>
                 </div>
                 <div className="flex flex-col">
@@ -482,7 +485,7 @@ export default function Home() {
               <div key={event.id} className="bg-white border border-slate-200 p-8 hover:border-emerald-600 transition-all group flex flex-col md:flex-row gap-6">
                 {event.flyerUrl ? (
                   <div className="h-40 md:h-auto md:w-32 overflow-hidden bg-slate-900 border border-slate-100 shrink-0">
-                    <img src={event.flyerUrl} alt={`${event.title} flyer`} className="h-full w-full object-cover object-top group-hover:scale-105 transition-transform duration-700" />
+                    <img src={event.flyerUrl} alt={`${event.title} flyer`} loading="lazy" decoding="async" className="h-full w-full object-cover object-top group-hover:scale-105 transition-transform duration-700" />
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center bg-slate-50 border border-slate-100 p-4 shrink-0 min-w-24">
@@ -547,7 +550,7 @@ export default function Home() {
                 className="group flex flex-col h-full min-h-[520px] bg-white border border-slate-200/80 rounded-2xl p-5 relative overflow-hidden shadow-sm hover:shadow-md hover:border-emerald-500/30 transition-all duration-300"
               >
                 <div className="relative h-56 mb-6 border border-slate-100 rounded-xl overflow-hidden shrink-0">
-                  <img src={article.image} alt={article.imageAlt} className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" />
+                  <img src={article.image} alt={article.imageAlt} loading="lazy" decoding="async" className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" />
                   <div className="absolute top-4 left-4 bg-slate-900 text-white text-[10px] font-bold px-3 py-1.5 uppercase tracking-widest">{article.category}</div>
                 </div>
                 <p className="text-xs text-gold mb-3 font-bold uppercase tracking-widest">{article.date}</p>
@@ -607,7 +610,7 @@ export default function Home() {
                 { src: assets.daimlasLogo, alt: "Daimlas AI Ecosystem Builders" },
               ].map((logo, idx) => (
                 <div key={idx} className="flex items-center justify-center h-24 w-48 shrink-0 transition-all duration-300 opacity-70 hover:opacity-100 hover:scale-105">
-                  <img src={logo.src} alt={logo.alt} className="max-h-full max-w-full object-contain drop-shadow-sm" />
+                  <img src={logo.src} alt={logo.alt} loading="lazy" decoding="async" className="max-h-full max-w-full object-contain drop-shadow-sm" />
                 </div>
               ))}
             </div>
@@ -646,6 +649,7 @@ export default function Home() {
           </div>
           <div className="relative w-full aspect-video rounded-[11px] overflow-hidden shadow-2xl border-[2.11px] border-slate-200 bg-slate-900">
             <iframe 
+              loading="lazy"
               className="absolute top-0 left-0 w-full h-full" 
               src="https://www.youtube.com/embed/ca28dtNXL64?si=uJyrihc5jfUwXTgc" 
               title="YouTube video player" 

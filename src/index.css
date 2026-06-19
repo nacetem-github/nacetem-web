@@ -193,3 +193,9 @@ button {
 body {
   background-color: #f0f8ff; 
 }
+
+/* Defer layout and paint work for homepage content well below the fold. */
+main > div > section:nth-of-type(n + 3) {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 760px;
+}

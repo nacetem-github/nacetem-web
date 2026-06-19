@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { Menu, X, ChevronRight, ChevronDown, Mail, Twitter, Facebook, ArrowUp, User, Building2, Send, CheckCircle2, XCircle } from 'lucide-react';
+import { Menu, X, ChevronRight, ChevronDown, Mail, Twitter, Facebook, ArrowUp, User, Building2, Send, CheckCircle2, XCircle, MessageSquareWarning, ExternalLink } from 'lucide-react';
 import { useState, useEffect, type FormEvent } from 'react';
 import { cn } from '../lib/utils';
 import { NacetemLogo } from './NacetemLogo';
@@ -161,6 +161,20 @@ export default function Layout() {
           className="absolute bottom-0 left-0 h-[2px] bg-gold transition-all duration-75 z-50"
           style={{ width: `${scrollProgress}%` }}
         />
+        <div className="border-b border-emerald-800 bg-emerald-950 text-white">
+          <div className="mx-auto flex min-h-9 max-w-7xl items-center justify-center gap-2 px-4 py-1.5 text-center text-[11px] sm:justify-end sm:px-6 lg:px-8">
+            <MessageSquareWarning className="h-3.5 w-3.5 shrink-0 text-gold" aria-hidden="true" />
+            <span className="hidden text-white/75 sm:inline">Public or staff concern?</span>
+            <a
+              href="https://nacetem.gov.ng/nacetem_grm/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center font-bold uppercase tracking-wider text-gold transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+            >
+              Submit a grievance <ExternalLink className="ml-1 h-3 w-3" aria-hidden="true" />
+            </a>
+          </div>
+        </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-24 items-center justify-between sm:h-28">
             {/* Logo */}
