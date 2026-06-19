@@ -3,6 +3,7 @@ import React, { lazy, Suspense } from 'react';
 import Layout from './components/Layout';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { DataProvider } from './contexts/DataContext';
+import { MotionConfig } from 'motion/react';
 
 const Home = lazy(() => import('./pages/Home'));
 const Initiatives = lazy(() => import('./pages/Initiatives'));
@@ -32,6 +33,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
+    <MotionConfig reducedMotion="user">
     <AuthProvider>
       <DataProvider>
         <Router>
@@ -73,5 +75,6 @@ export default function App() {
         </Router>
       </DataProvider>
     </AuthProvider>
+    </MotionConfig>
   );
 }

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Search, Landmark, GraduationCap, Layers, MapPin, Calendar as CalendarIcon, Image as ImageIcon } from 'lucide-react';
-import { motion } from 'motion/react';
+import { ArrowRight, Search, Landmark, GraduationCap, Layers, MapPin, Calendar as CalendarIcon, Image as ImageIcon, Pause, Play } from 'lucide-react';
+import { motion, useReducedMotion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { useData } from '../contexts/DataContext';
 import { assets } from '../assets';
@@ -34,6 +34,8 @@ const galleryFallbacks = [
 export default function Home() {
   const { gallery, events, news } = useData();
   const [activeHeroIndex, setActiveHeroIndex] = useState(0);
+  const [isHeroPaused, setIsHeroPaused] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
   const [activeStoryIndex, setActiveStoryIndex] = useState(0);
   const activeHero = heroSlides[activeHeroIndex];
   const displayedGallery = [
@@ -47,12 +49,13 @@ export default function Home() {
     .sort((a, b) => a.startDate.localeCompare(b.startDate)).slice(0, 2);
 
   useEffect(() => {
+    if (isHeroPaused || prefersReducedMotion) return;
     const timer = window.setInterval(() => {
       setActiveHeroIndex((current) => (current + 1) % heroSlides.length);
     }, 5000);
 
     return () => window.clearInterval(timer);
-  }, []);
+  }, [isHeroPaused, prefersReducedMotion]);
 
   return (
     <div className="flex-1">
@@ -111,7 +114,7 @@ export default function Home() {
                       key={activeHeroIndex}
                       initial={{ width: '0%' }}
                       animate={{ width: '100%' }}
-                      transition={{ duration: 5, ease: 'linear' }}
+                      transition={{ duration: isHeroPaused || prefersReducedMotion ? 0 : 5, ease: 'linear' }}
                       className="h-full bg-gold"
                     />
                   </div>
@@ -126,6 +129,20 @@ export default function Home() {
                       aria-label={`Show ${slide.title}`}
                     />
                   ))}
+                  {prefersReducedMotion ? (
+                    <span className="ml-2 inline-flex h-9 items-center rounded-full border border-slate-200 bg-white px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">Motion reduced</span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setIsHeroPaused((current) => !current)}
+                      className="ml-2 inline-flex h-9 items-center gap-1.5 rounded-full border border-slate-300 bg-white px-3 text-[10px] font-bold uppercase tracking-wider text-slate-700 transition-colors hover:border-emerald-600 hover:text-emerald-700"
+                      aria-label={isHeroPaused ? 'Resume automatic hero slideshow' : 'Pause automatic hero slideshow'}
+                      aria-pressed={isHeroPaused}
+                    >
+                      {isHeroPaused ? <Play className="h-3.5 w-3.5" /> : <Pause className="h-3.5 w-3.5" />}
+                      {isHeroPaused ? 'Play' : 'Pause'}
+                    </button>
+                  )}
                 </div>
               </div>
               {/* Decorative elements */}
