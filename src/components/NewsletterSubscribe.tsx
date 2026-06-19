@@ -65,7 +65,12 @@ export function NewsletterSubscribe() {
       setMessage('Thank you for subscribing. You are on the NACETEM newsletter list.');
     } catch (error) {
       setSubmitState('error');
-      setMessage(error instanceof Error ? error.message : 'Unable to subscribe right now. Please try again.');
+      const errorMessage = error instanceof Error
+        ? error.message
+        : typeof error === 'object' && error && 'message' in error
+          ? String(error.message)
+          : 'Unable to subscribe right now. Please try again.';
+      setMessage(errorMessage);
     }
   };
 

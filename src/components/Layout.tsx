@@ -1,15 +1,22 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { Menu, X, ChevronRight, ChevronDown, Mail, Twitter, Facebook, ArrowUp, User, Building2, Send, CheckCircle2 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { Menu, X, ChevronRight, ChevronDown, Mail, Twitter, Facebook, ArrowUp, User, Building2, Send, CheckCircle2, XCircle } from 'lucide-react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { cn } from '../lib/utils';
 import { NacetemLogo } from './NacetemLogo';
+import { supabase } from '../lib/supabase';
+
+type NewsletterState = 'idle' | 'loading' | 'success' | 'error';
 
 export default function Layout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [showNewsletterPopup, setShowNewsletterPopup] = useState(false);
-  const [newsletterSubmitted, setNewsletterSubmitted] = useState(false);
+  const [newsletterState, setNewsletterState] = useState<NewsletterState>('idle');
+  const [newsletterName, setNewsletterName] = useState('');
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterOrganization, setNewsletterOrganization] = useState('');
+  const [newsletterMessage, setNewsletterMessage] = useState('');
   const location = useLocation();
 
   useEffect(() => {
@@ -46,13 +53,68 @@ export default function Layout() {
     const timer = window.setTimeout(() => {
       setShowNewsletterPopup(true);
       window.sessionStorage.setItem('nacetem-newsletter-popup', 'shown');
-    }, 1400);
+    }, 12000);
 
     return () => window.clearTimeout(timer);
   }, []);
 
   const closeNewsletterPopup = () => {
     setShowNewsletterPopup(false);
+  };
+
+  useEffect(() => {
+    if (!showNewsletterPopup) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') closeNewsletterPopup();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showNewsletterPopup]);
+
+  const handleNewsletterSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const email = newsletterEmail.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setNewsletterState('error');
+      setNewsletterMessage('Please enter a valid email address.');
+      return;
+    }
+
+    setNewsletterState('loading');
+    setNewsletterMessage('Submitting your subscription…');
+    try {
+      if (supabase) {
+        const { error } = await supabase.from('newsletter_subscribers').insert({
+          email,
+          full_name: newsletterName.trim(),
+          organization: newsletterOrganization.trim() || null,
+          status: 'subscribed',
+          source: 'website_popup',
+          subscribed_at: new Date().toISOString(),
+        });
+        if (error && error.code !== '23505') throw error;
+        setNewsletterMessage(error?.code === '23505' ? 'You are already on the NACETEM newsletter list.' : 'Your subscription has been recorded successfully.');
+      } else {
+        const response = await fetch('/api/newsletter', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, fullName: newsletterName.trim(), organization: newsletterOrganization.trim(), source: 'website_popup' }),
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error || 'Unable to subscribe right now.');
+        setNewsletterMessage('Your subscription has been recorded successfully.');
+      }
+      setNewsletterState('success');
+      setNewsletterEmail('');
+    } catch (error) {
+      setNewsletterState('error');
+      const message = error instanceof Error
+        ? error.message
+        : typeof error === 'object' && error && 'message' in error
+          ? String(error.message)
+          : 'Unable to subscribe right now. Please try again.';
+      setNewsletterMessage(message);
+    }
   };
 
   const navigation = [
@@ -337,7 +399,7 @@ export default function Layout() {
             onClick={closeNewsletterPopup}
             className="absolute inset-0 bg-slate-900/65 backdrop-blur-sm"
           />
-          <div className="relative w-full max-w-3xl overflow-hidden rounded-[28px] bg-white shadow-2xl border border-white/70">
+          <div role="dialog" aria-modal="true" aria-labelledby="newsletter-popup-title" className="relative w-full max-w-3xl overflow-hidden rounded-[28px] bg-white shadow-2xl border border-white/70">
             <button
               type="button"
               onClick={closeNewsletterPopup}
@@ -362,15 +424,13 @@ export default function Layout() {
               </div>
 
               <div className="p-8 sm:p-10">
-                {newsletterSubmitted ? (
+                {newsletterState === 'success' ? (
                   <div className="min-h-[360px] flex flex-col items-center justify-center text-center">
                     <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
                       <CheckCircle2 className="h-8 w-8" />
                     </div>
                     <h3 className="text-3xl font-serif text-slate-900 mb-4">Thank you for joining.</h3>
-                    <p className="text-sm text-slate-600 leading-7 max-w-sm">
-                      Your details have been received. You will now get NACETEM newsletter updates and programme announcements.
-                    </p>
+                    <p className="text-sm text-slate-600 leading-7 max-w-sm">{newsletterMessage}</p>
                     <button
                       type="button"
                       onClick={closeNewsletterPopup}
@@ -381,28 +441,27 @@ export default function Layout() {
                   </div>
                 ) : (
                   <>
-                    <h3 className="text-3xl font-serif text-slate-900 mb-3">Join Our Newsletter</h3>
+                    <h3 id="newsletter-popup-title" className="text-3xl font-serif text-slate-900 mb-3">Join Our Newsletter</h3>
                     <p className="text-sm text-slate-600 leading-7 mb-8">
                       Fill in your details to receive periodical updates about NACETEM activities, publications, and events.
                     </p>
 
                     <form
                       className="space-y-5"
-                      onSubmit={(event) => {
-                        event.preventDefault();
-                        setNewsletterSubmitted(true);
-                      }}
+                      onSubmit={handleNewsletterSubmit}
                     >
                       <div>
-                        <label htmlFor="newsletter-name" className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">
+                        <label htmlFor="newsletter-popup-name" className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">
                           Full Name
                         </label>
                         <div className="relative">
                           <User className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                           <input
-                            id="newsletter-name"
+                            id="newsletter-popup-name"
                             type="text"
                             required
+                            value={newsletterName}
+                            onChange={(event) => setNewsletterName(event.target.value)}
                             placeholder="Your full name"
                             className="w-full rounded-[8px] border border-slate-200 bg-slate-50 py-3.5 pl-11 pr-4 text-sm text-slate-900 outline-none transition-colors focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-600/10"
                           />
@@ -410,15 +469,17 @@ export default function Layout() {
                       </div>
 
                       <div>
-                        <label htmlFor="newsletter-email" className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">
+                        <label htmlFor="newsletter-popup-email" className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">
                           Email Address
                         </label>
                         <div className="relative">
                           <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                           <input
-                            id="newsletter-email"
+                            id="newsletter-popup-email"
                             type="email"
                             required
+                            value={newsletterEmail}
+                            onChange={(event) => setNewsletterEmail(event.target.value)}
                             placeholder="you@example.com"
                             className="w-full rounded-[8px] border border-slate-200 bg-slate-50 py-3.5 pl-11 pr-4 text-sm text-slate-900 outline-none transition-colors focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-600/10"
                           />
@@ -426,25 +487,35 @@ export default function Layout() {
                       </div>
 
                       <div>
-                        <label htmlFor="newsletter-organization" className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">
+                        <label htmlFor="newsletter-popup-organization" className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">
                           Organization
                         </label>
                         <div className="relative">
                           <Building2 className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                           <input
-                            id="newsletter-organization"
+                            id="newsletter-popup-organization"
                             type="text"
+                            value={newsletterOrganization}
+                            onChange={(event) => setNewsletterOrganization(event.target.value)}
                             placeholder="Institution, agency, or company"
                             className="w-full rounded-[8px] border border-slate-200 bg-slate-50 py-3.5 pl-11 pr-4 text-sm text-slate-900 outline-none transition-colors focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-600/10"
                           />
                         </div>
                       </div>
 
+                      {newsletterMessage && (
+                        <div className={`flex items-start gap-2 text-sm ${newsletterState === 'error' ? 'text-red-700' : 'text-slate-600'}`} role="status" aria-live="polite">
+                          {newsletterState === 'error' && <XCircle className="mt-0.5 h-4 w-4 shrink-0" />}
+                          <span>{newsletterMessage}</span>
+                        </div>
+                      )}
+
                       <button
                         type="submit"
+                        disabled={newsletterState === 'loading'}
                         className="inline-flex w-full items-center justify-center rounded-[8px] bg-emerald-600 px-6 py-4 text-xs font-bold uppercase tracking-wider text-white shadow-lg shadow-emerald-900/10 hover:bg-emerald-700 transition-colors"
                       >
-                        <Send className="mr-2 h-4 w-4" /> Join Newsletter
+                        <Send className="mr-2 h-4 w-4" /> {newsletterState === 'loading' ? 'Submitting…' : 'Join Newsletter'}
                       </button>
                     </form>
                   </>

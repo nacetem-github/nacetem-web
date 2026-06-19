@@ -78,7 +78,7 @@ app.post('/api/contact', async (req, res) => {
 });
 
 app.post('/api/newsletter', async (req, res) => {
-  const { email, source } = req.body || {};
+    const { email, source, fullName, organization } = req.body || {};
   const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
@@ -86,7 +86,7 @@ app.post('/api/newsletter', async (req, res) => {
   }
 
   const mailSubject = 'NACETEM Newsletter Subscription';
-  const mailText = `Email: ${normalizedEmail}\nSource: ${source || 'website'}\nSubscribed At: ${new Date().toISOString()}`;
+    const mailText = `Name: ${fullName || 'Not provided'}\nEmail: ${normalizedEmail}\nOrganization: ${organization || 'Not provided'}\nSource: ${source || 'website'}\nSubscribed At: ${new Date().toISOString()}`;
 
   if (mailTransporter) {
     try {

@@ -25,7 +25,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed.' });
   }
 
-  const { email, source } = req.body || {};
+  const { email, source, fullName, organization } = req.body || {};
   const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
@@ -41,7 +41,7 @@ export default async function handler(req, res) {
       from: smtpUser,
       to: newsletterRecipient,
       subject: 'NACETEM Newsletter Subscription',
-      text: `Email: ${normalizedEmail}\nSource: ${source || 'website'}\nSubscribed At: ${new Date().toISOString()}`,
+      text: `Name: ${fullName || 'Not provided'}\nEmail: ${normalizedEmail}\nOrganization: ${organization || 'Not provided'}\nSource: ${source || 'website'}\nSubscribed At: ${new Date().toISOString()}`,
     });
 
     return res.json({ success: true });

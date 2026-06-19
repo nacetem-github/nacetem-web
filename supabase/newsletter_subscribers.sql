@@ -1,6 +1,8 @@
 create table if not exists public.newsletter_subscribers (
   id uuid primary key default gen_random_uuid(),
   email text not null unique,
+  full_name text,
+  organization text,
   status text not null default 'subscribed',
   source text not null default 'website',
   subscribed_at timestamptz not null default now(),
@@ -9,15 +11,24 @@ create table if not exists public.newsletter_subscribers (
 );
 
 alter table public.newsletter_subscribers enable row level security;
+alter table public.newsletter_subscribers add column if not exists full_name text;
+alter table public.newsletter_subscribers add column if not exists organization text;
 
+alter table public.newsletter_subscribers
+  drop constraint if exists newsletter_subscribers_email_format;
+alter table public.newsletter_subscribers
+  add constraint newsletter_subscribers_email_format
+  check (email ~* '^[^[:space:]@]+@[^[:space:]@]+[.][^[:space:]@]+$')
+  not valid;
+
+grant insert on public.newsletter_subscribers to anon, authenticated;
+
+drop policy if exists "Allow public newsletter signups" on public.newsletter_subscribers;
 create policy "Allow public newsletter signups"
   on public.newsletter_subscribers
   for insert
-  to anon
-  with check (
-    email ~* '^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]+$'
-    and status = 'subscribed'
-  );
+  to public
+  with check (status = 'subscribed');
 
 create or replace function public.set_newsletter_updated_at()
 returns trigger as $$
