@@ -16,6 +16,7 @@ import dashboardImage from './assets/images/pages/dashboard.optimized.jpg';
 import bayelsaNewsImage from './assets/images/news/bayelsa-news.jpeg';
 import ntaImage from './assets/images/pages/nta.png';
 import pgdImage from './assets/images/pages/pgd.png';
+import industrialInspectionImage from './assets/images/pages/industrial-inspection.optimized.jpg';
 
 export const assets = {
   apodissiLogo,
@@ -37,4 +38,5 @@ export const assets = {
   news1Image: bayelsaNewsImage,
   ntaImage,
   pgdImage,
+  industrialInspectionImage,
 };

@@ -65,12 +65,12 @@ export default function Events() {
                 className="bg-slate-50 border border-slate-200 rounded-[11px] overflow-hidden group hover:border-emerald-500 transition-colors"
               >
                 <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] h-full">
-                  <div className="h-56 md:h-full min-h-[220px] overflow-hidden bg-slate-900">
+                  <div className="h-56 md:h-full min-h-[220px] overflow-hidden bg-slate-100">
                     {event.flyerUrl ? (
                       <img
                         src={event.flyerUrl}
                         alt={event.title}
-                        className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
+                        className="w-full h-full object-contain object-center"
                       />
                     ) : (
                       <div className="relative h-full w-full">
@@ -162,11 +162,11 @@ export default function Events() {
                 variants={fadeInUp}
                 className="bg-white border border-slate-200 rounded-[11px] overflow-hidden group hover:-translate-y-1 hover:shadow-xl hover:border-emerald-500 transition-all duration-300"
               >
-                <div className="h-48 overflow-hidden bg-slate-900">
+                <div className="h-48 overflow-hidden bg-slate-100">
                   <img
                     src={event.flyerUrl ?? eventFallbackImages[idx % eventFallbackImages.length]}
                     alt={event.title}
-                    className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
+                    className={`w-full h-full object-center ${event.flyerUrl ? 'object-contain' : 'object-cover group-hover:scale-105 transition-transform duration-700'}`}
                   />
                 </div>
                 <div className="p-6 flex flex-col min-h-[280px]">

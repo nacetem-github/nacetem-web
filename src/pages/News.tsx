@@ -166,12 +166,12 @@ export default function News() {
                   variants={fadeInUp}
                   className="bg-slate-50 border border-slate-200 rounded-[11px] overflow-hidden hover:border-emerald-500 transition-colors group relative flex flex-col"
                 >
-                  <div className="aspect-[4/3] overflow-hidden bg-slate-900 relative">
+                  <div className="aspect-[4/3] overflow-hidden bg-slate-100 relative">
                     {event.flyerUrl ? (
                       <img
                         src={event.flyerUrl}
                         alt={`${event.title} flyer`}
-                        className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
+                        className="h-full w-full object-contain object-center"
                       />
                     ) : (
                       <>
@@ -279,11 +279,11 @@ export default function News() {
                 variants={fadeInUp}
                 className="bg-white border border-slate-200 rounded-[11px] overflow-hidden group hover:border-emerald-500 transition-colors flex flex-col"
               >
-                <div className="aspect-[4/3] overflow-hidden bg-slate-900">
+                <div className="aspect-[4/3] overflow-hidden bg-slate-100">
                   <img
                     src={event.flyerUrl ?? eventFallbackImages[idx % eventFallbackImages.length]}
                     alt={event.title}
-                    className="h-full w-full object-cover object-top opacity-90 group-hover:scale-105 transition-transform duration-700"
+                    className={`h-full w-full object-center opacity-90 ${event.flyerUrl ? 'object-contain' : 'object-cover transition-transform duration-700 group-hover:scale-105'}`}
                   />
                 </div>
                 <div className="p-6 flex flex-1 flex-col">

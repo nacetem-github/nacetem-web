@@ -387,7 +387,7 @@ export default function Home() {
                 desc: "Partnerships and platforms that connect researchers, government, industry, innovators, and development stakeholders.",
                 label: "Connected ecosystems",
                 icon: Layers,
-                img: assets.aiEcosystemImage,
+                img: assets.industrialInspectionImage,
                 link: "/initiatives"
               }
             ].map((program, index) => {
@@ -490,8 +490,8 @@ export default function Home() {
             {homepageEvents.map((event) => (
               <div key={event.id} className="bg-white border border-slate-200 p-8 hover:border-emerald-600 transition-all group flex flex-col md:flex-row gap-6">
                 {event.flyerUrl ? (
-                  <div className="h-40 md:h-auto md:w-32 overflow-hidden bg-slate-900 border border-slate-100 shrink-0">
-                    <img src={event.flyerUrl} alt={`${event.title} flyer`} loading="lazy" decoding="async" className="h-full w-full object-cover object-top group-hover:scale-105 transition-transform duration-700" />
+                  <div className="h-40 md:h-auto md:w-32 overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
+                    <img src={event.flyerUrl} alt={`${event.title} flyer`} loading="lazy" decoding="async" className="h-full w-full object-contain object-center" />
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center bg-slate-50 border border-slate-100 p-4 shrink-0 min-w-24">
