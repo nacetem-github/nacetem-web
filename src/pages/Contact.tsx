@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, MapPin, Phone, Mail, Clock, Send, Handshake, BookOpen, Headphones, Facebook, Linkedin, Twitter, Youtube, Instagram, Plus, Minus } from 'lucide-react';
+import { ArrowRight, MapPin, Phone, Mail, Clock, Send, Handshake, BookOpen, Headphones, Facebook, Linkedin, Instagram, MessageCircle, Plus, Minus, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { divIcon, type Map as LeafletMap } from 'leaflet';
 import { assets } from '../assets';
+import { officialSocialLinks, type SocialPlatform } from '../socialLinks';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
 };
+
+const contactSocialIcons = { linkedin: Linkedin, facebook: Facebook, whatsapp: MessageCircle, instagram: Instagram } satisfies Record<SocialPlatform, typeof Linkedin>;
 
 const staggerContainer = {
   hidden: { opacity: 1 },
@@ -367,19 +370,16 @@ export default function Contact() {
               <p className="text-slate-600 mb-8 leading-relaxed">
                 Stay updated with our latest programmes, innovations, research activities, and national initiatives.
               </p>
-              <div className="flex flex-wrap gap-4">
-                {[
-                  { icon: Facebook, name: "Facebook", link: "#" },
-                  { icon: Linkedin, name: "LinkedIn", link: "#" },
-                  { icon: Twitter, name: "X (Twitter)", link: "#" },
-                  { icon: Youtube, name: "YouTube", link: "#" },
-                  { icon: Instagram, name: "Instagram", link: "#" }
-                ].map((social, idx) => (
-                  <a key={idx} href={social.link} className="w-12 h-12 flex items-center justify-center bg-slate-50 border-[2.11px] border-slate-200 rounded-[11px] text-slate-600 hover:text-emerald-700 hover:border-emerald-200 transition-all">
-                    <social.icon className="w-5 h-5" />
-                    <span className="sr-only">{social.name}</span>
-                  </a>
-                ))}
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+                {officialSocialLinks.map((social) => {
+                  const Icon = contactSocialIcons[social.platform];
+                  return (
+                    <a key={social.platform} href={social.url} target="_blank" rel="noopener noreferrer" className="group flex items-center justify-between rounded-[11px] border-2 border-slate-200 bg-slate-50 px-4 py-3 text-slate-700 transition-all hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-800">
+                      <span className="flex items-center gap-3"><Icon className="h-5 w-5" /><span className="text-xs font-bold uppercase tracking-wider">{social.name}</span></span>
+                      <ExternalLink className="h-3.5 w-3.5 opacity-50 transition-opacity group-hover:opacity-100" />
+                    </a>
+                  );
+                })}
               </div>
             </motion.div>
 

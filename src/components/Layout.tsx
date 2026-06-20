@@ -1,11 +1,14 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { Menu, X, ChevronRight, ChevronDown, Mail, ArrowUp, User, Building2, Send, CheckCircle2, XCircle, MessageSquareWarning, ExternalLink } from 'lucide-react';
+import { Menu, X, ChevronRight, ChevronDown, Mail, ArrowUp, User, Building2, Send, CheckCircle2, XCircle, MessageSquareWarning, ExternalLink, Linkedin, Facebook, Instagram, MessageCircle } from 'lucide-react';
 import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { cn } from '../lib/utils';
 import { NacetemLogo } from './NacetemLogo';
 import { supabase } from '../lib/supabase';
+import { officialSocialLinks, type SocialPlatform } from '../socialLinks';
 
 type NewsletterState = 'idle' | 'loading' | 'success' | 'error';
+
+const socialIcons = { linkedin: Linkedin, facebook: Facebook, whatsapp: MessageCircle, instagram: Instagram } satisfies Record<SocialPlatform, typeof Linkedin>;
 
 export default function Layout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -406,7 +409,16 @@ export default function Layout() {
             {/* Connect */}
             <div>
               <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-5 opacity-70">Connect With Us</h3>
-              <div className="flex space-x-4 mb-8">
+              <div className="mb-8 flex flex-wrap gap-3">
+                {officialSocialLinks.map((social) => {
+                  const Icon = socialIcons[social.platform];
+                  return (
+                    <a key={social.platform} href={social.url} target="_blank" rel="noopener noreferrer" title={social.name} className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-emerald-50 transition-all hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/20 hover:text-white">
+                      <span className="sr-only">Follow NACETEM on {social.name}</span>
+                      <Icon className="h-5 w-5" />
+                    </a>
+                  );
+                })}
                 <a href="mailto:info@nacetem.gov.ng" className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-emerald-50 transition-all hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/20 hover:text-white">
                   <span className="sr-only">Email NACETEM</span>
                   <Mail className="h-5 w-5" />
