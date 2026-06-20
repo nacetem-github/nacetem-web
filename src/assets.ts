@@ -17,6 +17,9 @@ import bayelsaNewsImage from './assets/images/news/bayelsa-news.jpeg';
 import ntaImage from './assets/images/pages/nta.png';
 import pgdImage from './assets/images/pages/pgd.png';
 import industrialInspectionImage from './assets/images/pages/industrial-inspection.optimized.jpg';
+import psrPlatformImage from './assets/images/pages/psr.jpeg';
+import digitalAcademyPlatformImage from './assets/images/pages/academy.jpeg';
+import stiDashboardPlatformImage from './assets/images/pages/sti-dashboard.jpeg';
 
 export const assets = {
   apodissiLogo,
@@ -39,4 +42,7 @@ export const assets = {
   ntaImage,
   pgdImage,
   industrialInspectionImage,
+  psrPlatformImage,
+  digitalAcademyPlatformImage,
+  stiDashboardPlatformImage,
 };

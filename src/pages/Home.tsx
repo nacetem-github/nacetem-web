@@ -216,42 +216,48 @@ export default function Home() {
                 title: "Public Service Rules Exam Prep Tool",
                 desc: "AI-supported exam preparation platform designed to help public servants prepare effectively for promotion examinations.",
                 link: "/psr-test",
-                img: assets.psrImage
+                img: assets.psrPlatformImage,
+                fit: "contain"
               },
               {
                 title: "NACETEM AI-Ecosystem powered by Daimlas",
                 desc: "A collaborative platform connecting AI stakeholders, research opportunities, innovation projects, and implementation support.",
                 link: "/initiatives#ai-ecosystem",
-                img: assets.aiEcosystemImage
+                img: assets.aiEcosystemImage,
+                fit: "cover"
               },
               {
                 title: "NACETEM Digital Academy",
                 desc: "Professional and academic learning programmes focused on digital skills, innovation, technology management, and institutional transformation.",
                 link: "/initiatives#digital-academy",
-                img: assets.digitalAcademyImage
+                img: assets.digitalAcademyPlatformImage,
+                fit: "contain"
               },
               {
                 title: "NACETEM Welding Initiative",
                 desc: "A technical capacity-building initiative supporting welding excellence, certification readiness, and industrial skills development.",
                 link: "/initiatives#welding-initiative",
-                img: assets.weldingImage
+                img: assets.weldingImage,
+                fit: "cover"
               },
               {
                 title: "Systems Dynamics and Systems Thinking",
                 desc: "A strategic programme for understanding complex systems, improving policy analysis, and strengthening evidence-based decision-making.",
                 link: "/initiatives#systems-thinking",
-                img: assets.seminarImage
+                img: assets.seminarImage,
+                fit: "cover"
               },
               {
                 title: "STI Dashboard / STI Intelligence Platform",
                 desc: "A data-driven platform for communicating science, technology, and innovation outputs for national planning and policy coordination.",
                 link: "/initiatives#sti-dashboard",
-                img: assets.dashboardImage
+                img: assets.stiDashboardPlatformImage,
+                fit: "contain"
               }
             ].map((initiative, idx) => (
               <div key={idx} className="bg-white border border-slate-200/80 rounded-2xl group flex flex-col p-5 shadow-sm hover:shadow-md hover:border-emerald-500/30 transition-all duration-300">
-                <div className="h-48 overflow-hidden mb-4 border border-slate-100 rounded-xl">
-                  <img src={initiative.img} alt={initiative.title} loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                <div className="h-48 overflow-hidden mb-4 border border-slate-100 rounded-xl bg-slate-50">
+                  <img src={initiative.img} alt={initiative.title} loading="lazy" decoding="async" className={`w-full h-full ${initiative.fit === 'contain' ? 'object-contain' : 'object-cover group-hover:scale-105'} transition-transform duration-700`} />
                 </div>
                 <div className="flex-1 flex flex-col pt-2">
                   <h4 className="text-lg font-serif text-slate-900 mb-2">{initiative.title}</h4>
