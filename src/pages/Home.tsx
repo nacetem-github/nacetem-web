@@ -20,6 +20,10 @@ const heroSlides = [
     image: assets.policyImage,
     title: 'STI Policy Engagement',
   },
+  {
+    image: assets.industrialInspectionImage,
+    title: 'Industry and Innovation Systems Engagement',
+  },
 ];
 
 const galleryFallbacks = [
