@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Target, Lightbulb, Shield, Users, Leaf, Zap, BookOpen, Monitor, Award, Briefcase, ChevronRight, CheckCircle2, Globe, Building2, GraduationCap, MapPin } from 'lucide-react';
+import { ArrowRight, Target, Lightbulb, Shield, Users, Leaf, Zap, BookOpen, Monitor, Award, Briefcase, ChevronRight, ChevronLeft, CheckCircle2, Globe, Building2, GraduationCap, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { assets } from '../assets';
 
@@ -19,7 +19,72 @@ const staggerContainer = {
   }
 };
 
+const strategicGoalCards = [
+  {
+    icon: Monitor,
+    label: 'Goal 01',
+    title: 'E-NACETEM Digital Operations',
+    goals: [
+      'Digitize all operational activities and services of the Agency (E-NACETEM).',
+    ],
+  },
+  {
+    icon: Building2,
+    label: 'Goal 02',
+    title: 'Agency Reform Implementation',
+    goals: [
+      'Implement FCSSIP25 for the reformation of the Agency.',
+    ],
+  },
+  {
+    icon: GraduationCap,
+    label: 'Goal 03',
+    title: 'New STEM Education Programmes',
+    goals: [
+      'Create new STEM education programs.',
+    ],
+  },
+  {
+    icon: Briefcase,
+    label: 'Goal 04',
+    title: 'Tech-Artisan Certification',
+    goals: [
+      'Develop certification programs for tech-artisans.',
+    ],
+  },
+  {
+    icon: Zap,
+    label: 'Goal 05',
+    title: 'Technology Infusion Across Sectors',
+    goals: [
+      'Drive technology infusion programs to all sectors of the national economy.',
+    ],
+  },
+  {
+    icon: Lightbulb,
+    label: 'Goal 06',
+    title: 'STI Research and Policy Evaluation',
+    goals: [
+      'Advance STI management researches and policy evaluations.',
+    ],
+  },
+];
+
 export default function About() {
+  const [activeGoalIndex, setActiveGoalIndex] = useState(0);
+  const activeGoal = strategicGoalCards[activeGoalIndex];
+  const nextGoal = strategicGoalCards[(activeGoalIndex + 1) % strategicGoalCards.length];
+  const ActiveGoalIcon = activeGoal.icon;
+  const NextGoalIcon = nextGoal.icon;
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setActiveGoalIndex((current) => (current + 1) % strategicGoalCards.length);
+    }, 6500);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
   return (
     <div className="bg-slate-50 min-h-screen font-sans overflow-hidden">
       {/* 1. Hero Section */}
@@ -280,12 +345,23 @@ export default function About() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row gap-12 items-center">
             <div className="md:w-1/3">
-              <div className="aspect-[3/4] relative rounded-2xl overflow-hidden border border-slate-200/80 shadow-sm">
-                <img 
-                  src={assets.ntaImage} 
-                  alt="NACETEM Director General interview" 
-                  className="w-full h-full object-cover"
-                />
+              <div className="relative">
+                <div className="absolute -left-4 -top-4 h-24 w-24 border-l border-t border-gold/70"></div>
+                <div className="absolute -right-4 -bottom-4 h-24 w-24 border-b border-r border-emerald-600/35"></div>
+                <div className="aspect-[3/4] relative overflow-hidden rounded-lg border border-slate-200 bg-white p-3 shadow-2xl shadow-slate-900/10">
+                  <div className="relative h-full overflow-hidden rounded-lg bg-slate-100">
+                    <img 
+                      src={assets.dgImage} 
+                      alt="Dr. Olushola Odusanya, NACETEM Director General and CEO" 
+                      className="w-full h-full object-cover object-top"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-transparent to-transparent"></div>
+                    <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-gold">Director General / CEO</p>
+                      <p className="mt-1 font-serif text-2xl leading-tight">Dr. Olushola Odusanya</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             <div className="md:w-2/3 max-w-2xl">
@@ -302,6 +378,166 @@ export default function About() {
                 <p className="text-sm text-slate-500 uppercase tracking-widest font-bold">Director General / CEO</p>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 9b. DG/CEO Strategic Goals */}
+      <section className="py-24 bg-white border-b border-slate-200 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-[0.78fr_1.22fr] gap-12 lg:gap-16 items-start">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={fadeInUp}
+              className="max-w-xl lg:sticky lg:top-28"
+            >
+              <p className="text-xs font-bold text-emerald-700 uppercase tracking-widest mb-4">From the DG/CEO's Desk</p>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif text-slate-900 mb-6 leading-tight">
+                New Strategic Goals of NACETEM
+              </h2>
+              <p className="text-slate-600 leading-8 text-[15px] mb-8">
+                NACETEM's renewed goals focus on digital transformation, public-sector reform, STEM education, artisan certification, technology infusion, and STI policy evaluation for national development.
+              </p>
+
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setActiveGoalIndex((activeGoalIndex - 1 + strategicGoalCards.length) % strategicGoalCards.length)}
+                  className="flex h-11 w-11 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 shadow-sm transition-colors hover:border-emerald-600/40 hover:text-emerald-700"
+                  aria-label="Show previous strategic goal"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveGoalIndex((activeGoalIndex + 1) % strategicGoalCards.length)}
+                  className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-emerald-600 bg-emerald-600 px-5 text-xs font-bold uppercase tracking-widest text-white shadow-sm transition-colors hover:bg-emerald-700"
+                  aria-label="Show next strategic goal"
+                >
+                  Next <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.7, ease: "easeOut" }}
+              className="relative"
+            >
+              <div className="absolute -left-5 top-10 hidden h-32 w-32 border-l border-t border-gold/60 lg:block"></div>
+              <div className="absolute -right-5 bottom-10 hidden h-32 w-32 border-b border-r border-emerald-600/30 lg:block"></div>
+
+              <div className="relative rounded-lg border border-slate-200 bg-slate-50 p-3 sm:p-4 shadow-2xl shadow-slate-900/8">
+                <div className="grid grid-cols-1 xl:grid-cols-[1fr_260px] gap-4">
+                  <motion.div
+                    key={activeGoal.title}
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.55, ease: "easeOut" }}
+                    className="relative min-h-[420px] overflow-hidden rounded-lg border border-slate-200 bg-white p-7 sm:p-10"
+                  >
+                    <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-emerald-600 via-gold to-emerald-600"></div>
+                    <div className="absolute right-6 top-6 text-slate-100">
+                      <ActiveGoalIcon className="h-28 w-28" />
+                    </div>
+
+                    <div className="relative z-10 flex min-h-[340px] flex-col">
+                      <div className="mb-10 flex items-start justify-between gap-6">
+                        <div className="flex items-center gap-4">
+                          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-emerald-600 text-white shadow-lg shadow-emerald-900/15">
+                            <ActiveGoalIcon className="h-8 w-8" />
+                          </div>
+                          <div>
+                            <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-gold">{activeGoal.label}</p>
+                            <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Strategic priority</p>
+                          </div>
+                        </div>
+                        <div className="hidden sm:block font-serif text-7xl leading-none text-slate-100">
+                          {String(activeGoalIndex + 1).padStart(2, '0')}
+                        </div>
+                      </div>
+
+                      <div className="mt-auto max-w-2xl">
+                        <h3 className="text-3xl sm:text-5xl font-serif leading-tight text-slate-900 mb-8">{activeGoal.title}</h3>
+                        {activeGoal.goals.map((goal) => (
+                          <div key={goal} className="flex gap-4 rounded-lg border border-slate-200 bg-slate-50 p-5 sm:p-6">
+                            <CheckCircle2 className="mt-1 h-6 w-6 shrink-0 text-emerald-600" />
+                            <p className="text-base sm:text-lg leading-8 text-slate-700">{goal}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-3">
+                    {strategicGoalCards.map((goal, idx) => {
+                      const GoalIcon = goal.icon;
+                      const isActive = idx === activeGoalIndex;
+
+                      return (
+                        <button
+                          key={goal.title}
+                          type="button"
+                          onClick={() => setActiveGoalIndex(idx)}
+                          className={`group flex items-center gap-3 rounded-lg border p-4 text-left transition-all ${
+                            isActive
+                              ? 'border-emerald-600 bg-emerald-600 text-white shadow-lg shadow-emerald-900/15'
+                              : 'border-slate-200 bg-white text-slate-800 hover:border-emerald-600/30 hover:bg-slate-50'
+                          }`}
+                          aria-label={`Show ${goal.title}`}
+                        >
+                          <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg transition-colors ${
+                            isActive ? 'bg-white/15 text-white' : 'bg-emerald-50 text-emerald-700 group-hover:bg-emerald-100'
+                          }`}>
+                            <GoalIcon className="h-5 w-5" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className={`text-[9px] font-bold uppercase tracking-widest ${isActive ? 'text-emerald-50' : 'text-gold'}`}>
+                              {goal.label}
+                            </p>
+                            <p className="truncate text-sm font-semibold">{goal.title}</p>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-[1fr_auto] sm:items-center">
+                  <button
+                    type="button"
+                    onClick={() => setActiveGoalIndex((activeGoalIndex + 1) % strategicGoalCards.length)}
+                    className="group flex items-center gap-4 rounded-lg border border-slate-200 bg-white p-3 text-left shadow-sm transition-colors hover:border-emerald-600/30"
+                    aria-label={`Preview next strategic goal: ${nextGoal.title}`}
+                  >
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-slate-900 text-gold">
+                      <NextGoalIcon className="h-6 w-6" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-700">Next goal</p>
+                      <p className="truncate text-sm font-semibold text-slate-900">{nextGoal.title}</p>
+                    </div>
+                    <ChevronRight className="ml-auto h-5 w-5 shrink-0 text-slate-400 transition-transform group-hover:translate-x-1 group-hover:text-emerald-700" />
+                  </button>
+
+                  <div className="flex items-center justify-end gap-2">
+                    {strategicGoalCards.map((goal, idx) => (
+                      <button
+                        key={goal.label}
+                        type="button"
+                        onClick={() => setActiveGoalIndex(idx)}
+                        className={`h-2 rounded-full transition-all ${idx === activeGoalIndex ? 'w-8 bg-emerald-600' : 'w-2.5 bg-slate-300 hover:bg-slate-400'}`}
+                        aria-label={`Show ${goal.title}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
