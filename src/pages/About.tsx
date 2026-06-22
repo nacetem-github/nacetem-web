@@ -64,7 +64,7 @@ export default function About() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link to="/initiatives" className="inline-flex justify-center items-center px-8 py-4 bg-emerald-600 text-white text-xs font-bold tracking-widest uppercase hover:bg-emerald-700 transition duration-300">
-                Explore Our Services <ArrowRight className="ml-2 h-4 w-4" />
+                Explore Our Initiatives <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
               <Link to="/contact" className="inline-flex justify-center items-center px-8 py-4 bg-transparent border border-slate-500 text-white text-xs font-bold tracking-widest uppercase hover:border-gold hover:text-gold transition duration-300">
                 Contact NACETEM
@@ -321,11 +321,11 @@ export default function About() {
             Join us in driving innovation, digital transformation, and sustainable national development through Science, Technology, and Innovation.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/contact" className="inline-flex items-center justify-center px-8 py-4 bg-gold text-slate-900 font-bold text-sm tracking-widest uppercase hover:bg-white hover:text-emerald-900 transition-colors rounded-sm">
+            <Link to="/contact#contact-form" className="inline-flex items-center justify-center px-8 py-4 bg-gold text-slate-900 font-bold text-sm tracking-widest uppercase hover:bg-white hover:text-emerald-900 transition-colors rounded-sm">
               Become a Partner <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
-            <Link to="/initiatives" className="inline-flex items-center justify-center px-8 py-4 bg-transparent border border-emerald-500 text-white font-bold text-sm tracking-widest uppercase hover:bg-emerald-800 transition-colors rounded-sm">
-              Explore Training 
+            <Link to="/capacity-building" className="inline-flex items-center justify-center px-8 py-4 bg-transparent border border-emerald-500 text-white font-bold text-sm tracking-widest uppercase hover:bg-emerald-800 transition-colors rounded-sm">
+              Explore Training Programmes
             </Link>
           </div>
         </div>

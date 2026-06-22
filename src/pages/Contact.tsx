@@ -237,7 +237,7 @@ export default function Contact() {
             </motion.div>
             
             {/* Contact Form */}
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="lg:w-2/3">
+            <motion.div id="contact-form" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="scroll-mt-28 lg:w-2/3">
               <div className="bg-slate-50 border-[2.11px] border-slate-200 rounded-[11px] p-8 md:p-12">
                 <h2 className="text-3xl font-serif text-slate-900 mb-8">Send Us a Message</h2>
                 <form className="space-y-6" onSubmit={handleSubmit}>
