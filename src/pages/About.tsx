@@ -255,7 +255,7 @@ export default function About() {
         </div>
       </section>
 
-      {/* 9. Director General Message */}
+      {/* Director-General's Leadership Direction */}
       <section className="py-24 bg-white border-y border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row gap-12 items-center">
@@ -271,17 +271,21 @@ export default function About() {
               </div>
             </div>
             <div className="md:w-2/3 max-w-2xl">
-              <h2 className="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-4">Message from the Director General/CEO</h2>
-              <h3 className="text-3xl font-serif text-slate-900 mb-8 leading-tight">"Together, we can harness technology and innovation for national prosperity."</h3>
+              <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-4">Office of the Director-General/CEO</p>
+              <h2 className="text-3xl font-serif text-slate-900 mb-8 leading-tight">Leadership Direction</h2>
               
               <div className="space-y-6 text-slate-600 leading-relaxed mb-10">
-                <p>At NACETEM, we recognize that Science, Technology, and Innovation remain critical drivers of economic growth, national competitiveness, and sustainable development.</p>
-                <p>Our commitment is to support Nigeria's transformation through strategic research, innovation management, digital transformation, and evidence-based policy support. We continue to build partnerships and develop innovative solutions that position Nigeria for the future global knowledge economy.</p>
+                <p>
+                  Under the leadership of Dr. Olushola Odusanya, NACETEM is strengthening its capacity-building services, digitising institutional operations, expanding STEM and technology certification programmes, and deepening STI management research and policy evaluation.
+                </p>
+                <p>
+                  These priorities guide the Centre's institutional reform and its work to build the expertise, evidence and technology-management systems required for sustainable national development.
+                </p>
               </div>
               
               <div>
                 <p className="font-serif text-xl text-slate-900">Dr. Olushola Odusanya</p>
-                <p className="text-sm text-slate-500 uppercase tracking-widest font-bold">Director General / CEO</p>
+                <p className="text-sm text-slate-500 uppercase tracking-widest font-bold">Director-General / Chief Executive Officer</p>
               </div>
             </div>
           </div>
