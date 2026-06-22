@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Target, Lightbulb, Shield, Users, Leaf, Zap, BookOpen, Monitor, Award, Briefcase, ChevronRight, CheckCircle2, Globe, Building2, GraduationCap, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { assets } from '../assets';
+import { officialMandates, officialMission, officialVision } from '../data/institutionalProfile';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -128,7 +129,7 @@ export default function About() {
               </div>
               <h3 className="text-2xl font-serif mb-4 text-gold">Our Vision</h3>
               <p className="text-slate-100/90 leading-relaxed text-lg">
-                To be a globally recognized centre of excellence in technology management, innovation policy research, and strategic development for national transformation.
+                {officialVision}
               </p>
             </motion.div>
             
@@ -138,7 +139,7 @@ export default function About() {
               </div>
               <h3 className="text-2xl font-serif mb-4 text-gold">Our Mission</h3>
               <p className="text-slate-100/90 leading-relaxed text-lg">
-                To strengthen Nigeria's socio-economic development through effective management of Science, Technology, and Innovation by providing strategic research, policy support, capacity development, and technology-driven solutions.
+                {officialMission}
               </p>
             </motion.div>
           </div>
@@ -172,6 +173,18 @@ export default function About() {
             <h2 className="text-3xl sm:text-4xl font-serif text-slate-900 mb-6">Our Mandate & Strategic Focus</h2>
             <p className="text-slate-600">NACETEM's mandate is centered on strengthening Nigeria's technological and innovation capabilities through strategic management systems, policy development, and institutional support.</p>
           </div>
+
+          <div className="mb-16 grid grid-cols-1 gap-6 md:grid-cols-2">
+            {officialMandates.map((mandate, index) => (
+              <motion.article key={mandate.title} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="rounded-2xl border border-emerald-100 bg-white p-8 shadow-sm">
+                <p className="mb-4 text-xs font-bold uppercase tracking-widest text-gold">Official Mandate {index + 1}</p>
+                <h3 className="mb-4 text-2xl font-serif text-slate-900">{mandate.title}</h3>
+                <p className="text-sm leading-7 text-slate-600">{mandate.description}</p>
+              </motion.article>
+            ))}
+          </div>
+
+          <h3 className="mb-10 text-center text-2xl font-serif text-slate-900">Strategic Focus Areas</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[

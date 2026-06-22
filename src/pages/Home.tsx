@@ -6,6 +6,7 @@ import { useData } from '../contexts/DataContext';
 import { assets } from '../assets';
 import { NewsletterSubscribe } from '../components/NewsletterSubscribe';
 import { getEventSlug, splitEventsByStatus } from '../utils/eventUtils';
+import { officialMandates, officialMission, officialVision } from '../data/institutionalProfile';
 
 const heroSlides = [
   {
@@ -310,7 +311,7 @@ export default function Home() {
                   </div>
                   <h4 className="text-2xl font-serif text-white mb-3 group-hover:text-gold transition-colors">Policy Research</h4>
                   <p className="text-white/68 text-sm leading-7">
-                    To conduct policy research, evaluation and review with a view to providing sound policy advice for dynamic technology-driven, knowledge-based development.
+                    {officialMandates[0].description}
                   </p>
                 </div>
 
@@ -320,7 +321,7 @@ export default function Home() {
                   </div>
                   <h4 className="text-2xl font-serif text-white mb-3 group-hover:text-gold transition-colors">Capacity Building</h4>
                   <p className="text-white/68 text-sm leading-7">
-                    To design and run postgraduate courses/programmes in STI management in conjunction with appropriate established institutions at home and abroad.
+                    {officialMandates[1].description}
                   </p>
                 </div>
               </div>
@@ -339,7 +340,7 @@ export default function Home() {
                   Our Mission
                 </h3>
                 <p className="text-white/82 text-[15px] leading-8 text-center lg:text-left relative z-10">
-                  To play a leading role in the build-up of expertise for effective management of science, technology and innovation and to actively engage in policy research, design, evaluation and review.
+                  {officialMission}
                 </p>
               </div>
 
@@ -351,7 +352,7 @@ export default function Home() {
                   Our Vision
                 </h3>
                 <p className="text-white/74 text-[15px] leading-8 text-center lg:text-left relative z-10">
-                  To be an internationally recognised centre of excellence in science, technology and innovation management for sustainable development.
+                  {officialVision}
                 </p>
               </div>
             </div>
