@@ -19,6 +19,19 @@ const staggerContainer = {
   }
 };
 
+const dgStrategicGoals = [
+  'Strengthen the Agency\'s capacity-building services.',
+  'Digitise the Agency\'s operational activities.',
+  'Implement FCSSIP25 to support institutional reform.',
+  'Create new STEM education training programmes.',
+  'Develop certification programmes for technology artisans.',
+  'Advance fish-finding technology and drone technology programmes.',
+  'Expand STI management research and policy evaluation.',
+  'Establish research and development demonstration centres.',
+  'Design management procedures for novel technology applications.',
+  'Build the capacity of NACETEM staff.',
+];
+
 export default function About() {
   return (
     <div className="bg-slate-50 min-h-screen font-sans overflow-hidden">
@@ -95,8 +108,8 @@ export default function About() {
             >
               <div className="relative aspect-square sm:aspect-[4/3] rounded-2xl overflow-hidden border border-slate-200/80 shadow-sm">
                 <img 
-                  src={assets.bayelsaNewsImage} 
-                  alt="NACETEM institutional engagement" 
+                  src={assets.headquartersImage}
+                  alt="NACETEM headquarters"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -279,12 +292,14 @@ export default function About() {
       <section className="py-24 bg-white border-y border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row gap-12 items-center">
-            <div className="md:w-1/3">
-              <div className="aspect-[3/4] relative rounded-2xl overflow-hidden border border-slate-200/80 shadow-sm">
+            <div className="w-full md:w-1/3">
+              <div className="aspect-[2/3] relative mx-auto max-w-sm rounded-2xl overflow-hidden border border-slate-200/80 bg-slate-100 shadow-sm">
                 <img 
-                  src={assets.ntaImage} 
-                  alt="NACETEM Director General interview" 
-                  className="w-full h-full object-cover"
+                  src="/uploads/about/dg-main.jpeg"
+                  alt="Dr. Olushola Odusanya, Director-General and Chief Executive Officer of NACETEM"
+                  className="w-full h-full object-cover object-top"
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
             </div>
@@ -303,6 +318,26 @@ export default function About() {
               </div>
             </div>
           </div>
+
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} variants={fadeInUp} className="mt-20 border-t border-slate-200 pt-16">
+            <div className="mx-auto mb-12 max-w-3xl text-center">
+              <p className="mb-4 text-xs font-bold uppercase tracking-widest text-emerald-700">Leadership Priorities</p>
+              <h2 className="mb-5 text-3xl font-serif text-slate-900 sm:text-4xl">Director-General's Strategic Goals</h2>
+              <p className="text-sm leading-7 text-slate-600">The leadership priorities guiding NACETEM's institutional reform, capacity development, research, and technology programmes.</p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {dgStrategicGoals.map((goal, index) => (
+                <article key={goal} className="group flex min-h-40 flex-col rounded-2xl border border-slate-200 bg-slate-50 p-6 transition-all hover:border-emerald-500/40 hover:bg-white hover:shadow-md">
+                  <div className="mb-5 flex items-center justify-between">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-700 text-xs font-bold text-white">{String(index + 1).padStart(2, '0')}</span>
+                    <Target className="h-5 w-5 text-gold" aria-hidden="true" />
+                  </div>
+                  <h3 className="text-base font-serif leading-7 text-slate-900">{goal}</h3>
+                </article>
+              ))}
+            </div>
+          </motion.div>
         </div>
       </section>
 
