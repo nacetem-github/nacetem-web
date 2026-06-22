@@ -22,7 +22,7 @@ const galleryEvents = [
     images: [
       { src: assets.policyImage, alt: 'STI policy dialogue session' },
       { src: assets.headquartersImage, alt: 'Participants at STI policy dialogue' },
-      { src: assets.dashboardImage, alt: 'STI dashboard presentation' },
+      { src: assets.dashboardImage, alt: 'STI Dashboard and Databank presentation' },
     ],
   },
   {

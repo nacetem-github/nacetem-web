@@ -248,11 +248,11 @@ export const newsArticles: NewsArticle[] = [
       'NACETEM continues to strengthen Nigeria\'s Science, Technology, and Innovation intelligence systems through STI indicators, innovation surveys, and research analytics platforms.',
     content: [
       'NACETEM continues to strengthen Nigeria\'s Science, Technology, and Innovation intelligence systems through the development of STI indicators, innovation surveys, and research analytics platforms.',
-      'The Centre\'s STI Dashboard initiative supports evidence-based national planning, research data management, innovation ecosystem monitoring, policy evaluation, and national competitiveness analysis.',
+      'The Centre\'s STI Dashboard & Databank supports evidence-based national planning, research data management, innovation ecosystem monitoring, policy evaluation, and national competitiveness analysis.',
       'Through this work, NACETEM contributes significantly to strategic decision-making, policy coordination, and improved visibility of Nigeria\'s science, technology, and innovation outputs.',
     ],
     image: assets.dashboardImage,
-    imageAlt: 'NACETEM STI intelligence dashboard',
+    imageAlt: 'NACETEM STI Dashboard and Databank',
   },
   {
     id: 'innovation-hub-abuja',

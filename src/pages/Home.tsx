@@ -32,7 +32,7 @@ const galleryFallbacks = [
   { id: 'fallback-2', url: assets.capacityImage, title: 'Capacity Development Session' },
   { id: 'fallback-3', url: assets.policyImage, title: 'STI Policy Programme' },
   { id: 'fallback-4', url: assets.seminarImage, title: 'Research Seminar Series' },
-  { id: 'fallback-5', url: assets.dashboardImage, title: 'STI Intelligence Platform' },
+  { id: 'fallback-5', url: assets.dashboardImage, title: 'STI Dashboard & Databank' },
   { id: 'fallback-6', url: assets.ntaImage, title: 'Media Engagement' },
 ];
 
@@ -249,7 +249,7 @@ export default function Home() {
                 fit: "cover"
               },
               {
-                title: "STI Dashboard / STI Intelligence Platform",
+                title: "STI Dashboard & Databank",
                 desc: "A data-driven platform for communicating science, technology, and innovation outputs for national planning and policy coordination.",
                 link: "https://stidashboard.nacetem.gov.ng",
                 external: true,
@@ -266,7 +266,7 @@ export default function Home() {
                   <p className="text-slate-500 mb-4 flex-1 text-xs leading-relaxed">{initiative.desc}</p>
                   {initiative.external ? (
                     <a href={initiative.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-xs font-bold uppercase tracking-widest text-slate-900 hover:text-emerald-700 transition-colors border-b border-transparent hover:border-emerald-700 pb-1 self-start">
-                      Open Dashboard <ArrowRight className="ml-1 h-3 w-3" />
+                      Visit the STI Dashboard &amp; Databank <ArrowRight className="ml-1 h-3 w-3" />
                     </a>
                   ) : (
                     <Link to={initiative.link} className="inline-flex items-center text-xs font-bold uppercase tracking-widest text-slate-900 hover:text-emerald-700 transition-colors border-b border-transparent hover:border-emerald-700 pb-1 self-start">

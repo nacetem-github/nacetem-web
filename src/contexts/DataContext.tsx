@@ -15,7 +15,7 @@ const defaultGallery: GalleryItem[] = [
   { id: 'gallery-capacity', title: 'Capacity Development Session', imageUrl: assets.capacityImage, imageAlt: 'NACETEM capacity development session', album: 'Capacity Development' },
   { id: 'gallery-policy', title: 'STI Policy Programme', imageUrl: assets.policyImage, imageAlt: 'NACETEM STI policy programme', album: 'Policy Programmes' },
   { id: 'gallery-seminar', title: 'Research Seminar Series', imageUrl: assets.seminarImage, imageAlt: 'NACETEM research seminar', album: 'Seminar Series' },
-  { id: 'gallery-dashboard', title: 'STI Intelligence Platform', imageUrl: assets.dashboardImage, imageAlt: 'STI intelligence platform', album: 'Digital Platforms' },
+  { id: 'gallery-dashboard', title: 'STI Dashboard & Databank', imageUrl: assets.dashboardImage, imageAlt: 'NACETEM STI Dashboard and Databank', album: 'Digital Platforms' },
   { id: 'gallery-media', title: 'Media Engagement', imageUrl: assets.ntaImage, imageAlt: 'NACETEM media engagement', album: 'Media Engagements' },
 ].map((item, index) => ({ ...item, url: item.imageUrl, status: 'published' as const, featured: index < 6, publishedAt: now }));
 const defaultEvents: EventItem[] = [{

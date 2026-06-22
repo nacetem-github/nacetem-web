@@ -361,10 +361,17 @@ export default function Layout() {
                   { name: 'Event Gallery', href: '/news#event-gallery' },
                 ].map((item) => (
                   <li key={item.name}>
-                    <Link to={item.href} className="hover:text-emerald-200 flex items-center transition-colors">
-                      <ChevronRight className="h-4 w-4 mr-1 opacity-70" />
-                      {item.name}
-                    </Link>
+                    {'external' in item && item.external ? (
+                      <a href={item.href} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-200 flex items-center transition-colors">
+                        <ChevronRight className="h-4 w-4 mr-1 opacity-70" />
+                        {item.name}
+                      </a>
+                    ) : (
+                      <Link to={item.href} className="hover:text-emerald-200 flex items-center transition-colors">
+                        <ChevronRight className="h-4 w-4 mr-1 opacity-70" />
+                        {item.name}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -377,14 +384,21 @@ export default function Layout() {
                 {[
                   { name: 'Research', href: '/research' },
                   { name: 'Capacity Building', href: '/capacity-building' },
-                  { name: 'STI Indicator Dashboard', href: '/initiatives' },
+                  { name: 'STI Dashboard & Databank', href: 'https://stidashboard.nacetem.gov.ng', external: true },
                   { name: 'PSR Test', href: '/psr-test' },
                 ].map((item) => (
                   <li key={item.name}>
-                    <Link to={item.href} className="hover:text-emerald-200 flex items-center transition-colors">
-                      <ChevronRight className="h-4 w-4 mr-1 opacity-70" />
-                      {item.name}
-                    </Link>
+                    {'external' in item && item.external ? (
+                      <a href={item.href} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-200 flex items-center transition-colors">
+                        <ChevronRight className="h-4 w-4 mr-1 opacity-70" />
+                        {item.name}
+                      </a>
+                    ) : (
+                      <Link to={item.href} className="hover:text-emerald-200 flex items-center transition-colors">
+                        <ChevronRight className="h-4 w-4 mr-1 opacity-70" />
+                        {item.name}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>

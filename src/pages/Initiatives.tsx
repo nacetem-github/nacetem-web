@@ -18,9 +18,10 @@ const initiatives = [
     id: "psr-test",
     title: "Public Service Rules Exam Prep Tool",
     desc: "AI-supported exam preparation platform designed to help public servants prepare effectively for promotion examinations.",
-    img: assets.psrImage,
+    img: assets.psrPlatformImage,
     link: "/psr-test",
-    linkLabel: "Open PSR Test"
+    linkLabel: "Open PSR Test",
+    imageFit: "contain"
   },
   {
     id: "ai-ecosystem",
@@ -28,15 +29,17 @@ const initiatives = [
     desc: "A collaborative platform connecting AI stakeholders, research opportunities, innovation projects, and implementation support.",
     img: assets.aiEcosystemImage,
     link: "/contact",
-    linkLabel: "Enquire About the Platform"
+    linkLabel: "Enquire About the Platform",
+    imageFit: "contain"
   },
   {
     id: "digital-academy",
     title: "NACETEM Digital Academy",
     desc: "Professional and academic learning programmes focused on digital skills, innovation, technology management, and institutional transformation.",
-    img: assets.digitalAcademyImage,
+    img: assets.digitalAcademyPlatformImage,
     link: "/capacity-building",
-    linkLabel: "View Learning Programmes"
+    linkLabel: "View Learning Programmes",
+    imageFit: "contain"
   },
   {
     id: "welding-initiative",
@@ -44,7 +47,8 @@ const initiatives = [
     desc: "A technical capacity-building initiative supporting welding excellence, certification readiness, and industrial skills development.",
     img: assets.weldingImage,
     link: "/capacity-building",
-    linkLabel: "View Technical Training"
+    linkLabel: "View Technical Training",
+    imageFit: "contain"
   },
   {
     id: "systems-thinking",
@@ -52,15 +56,18 @@ const initiatives = [
     desc: "A strategic programme for understanding complex systems, improving policy analysis, and strengthening evidence-based decision-making.",
     img: assets.seminarImage,
     link: "/research",
-    linkLabel: "Explore Research Programmes"
+    linkLabel: "Explore Research Programmes",
+    imageFit: "contain"
   },
   {
     id: "sti-dashboard",
-    title: "STI Dashboard / STI Intelligence Platform",
-    desc: "A data-driven platform for communicating science, technology, and innovation outputs for national planning and policy coordination.",
-    img: assets.dashboardImage,
-    link: "/contact",
-    linkLabel: "Request Dashboard Information"
+    title: "STI Dashboard & Databank",
+    desc: "A data-driven dashboard and databank for accessing science, technology, and innovation information that supports national planning and policy coordination.",
+    img: assets.stiDashboardPlatformImage,
+    link: "https://stidashboard.nacetem.gov.ng",
+    linkLabel: "Visit the STI Dashboard & Databank",
+    imageFit: "contain",
+    external: true
   }
 ];
 
@@ -111,16 +118,22 @@ export default function Initiatives() {
           <div className="space-y-12">
             {initiatives.map((init, idx) => (
                <motion.div id={init.id} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={fadeInUp} key={init.id} className="scroll-mt-32 bg-slate-50 border border-slate-200/80 flex flex-col md:flex-row overflow-hidden group rounded-2xl hover:border-emerald-500/50 shadow-sm hover:shadow-md transition-all duration-300">
-                 <div className="md:w-1/3 h-64 md:h-auto border-b md:border-b-0 md:border-r border-slate-200 relative overflow-hidden">
-                    <img src={init.img} alt={init.title} className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700" />
+                 <div className={`h-64 overflow-hidden border-b border-slate-200 md:h-auto md:min-h-72 md:w-1/3 md:border-b-0 md:border-r ${init.imageFit === 'contain' ? 'bg-white p-2 sm:p-3' : 'bg-slate-200'}`}>
+                    <img src={init.img} alt={init.title} loading="lazy" decoding="async" className={`h-full w-full ${init.imageFit === 'contain' ? 'object-contain' : 'object-cover'} transition-transform duration-700 ease-out group-hover:scale-[1.03]`} />
                  </div>
                  <div className="p-8 md:p-12 md:w-2/3 flex flex-col justify-center">
                     <div className="w-12 h-1 bg-gold mb-6"></div>
                     <h2 className="text-2xl font-serif text-slate-900 mb-4">{init.title}</h2>
                     <p className="text-slate-600 text-sm leading-relaxed mb-8">{init.desc}</p>
-                    <Link to={init.link} className="inline-flex items-center text-xs font-bold uppercase tracking-widest text-emerald-700 hover:text-emerald-900 transition-colors border-b border-transparent hover:border-emerald-700 pb-1 self-start">
-                      {init.linkLabel} <ChevronRight className="h-4 w-4 ml-1" />
-                    </Link>
+                    {init.external ? (
+                      <a href={init.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-xs font-bold uppercase tracking-widest text-emerald-700 hover:text-emerald-900 transition-colors border-b border-transparent hover:border-emerald-700 pb-1 self-start">
+                        {init.linkLabel} <ChevronRight className="h-4 w-4 ml-1" />
+                      </a>
+                    ) : (
+                      <Link to={init.link} className="inline-flex items-center text-xs font-bold uppercase tracking-widest text-emerald-700 hover:text-emerald-900 transition-colors border-b border-transparent hover:border-emerald-700 pb-1 self-start">
+                        {init.linkLabel} <ChevronRight className="h-4 w-4 ml-1" />
+                      </Link>
+                    )}
                  </div>
                </motion.div>
             ))}
