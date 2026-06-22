@@ -251,7 +251,8 @@ export default function Home() {
               {
                 title: "STI Dashboard / STI Intelligence Platform",
                 desc: "A data-driven platform for communicating science, technology, and innovation outputs for national planning and policy coordination.",
-                link: "/initiatives#sti-dashboard",
+                link: "https://stidashboard.nacetem.gov.ng",
+                external: true,
                 img: assets.stiDashboardPlatformImage,
                 fit: "contain"
               }
@@ -263,9 +264,15 @@ export default function Home() {
                 <div className="flex-1 flex flex-col pt-2">
                   <h4 className="text-lg font-serif text-slate-900 mb-2">{initiative.title}</h4>
                   <p className="text-slate-500 mb-4 flex-1 text-xs leading-relaxed">{initiative.desc}</p>
-                  <Link to={initiative.link} className="inline-flex items-center text-xs font-bold uppercase tracking-widest text-slate-900 hover:text-emerald-700 transition-colors border-b border-transparent hover:border-emerald-700 pb-1 self-start">
-                    Read More <ArrowRight className="ml-1 h-3 w-3" />
-                  </Link>
+                  {initiative.external ? (
+                    <a href={initiative.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-xs font-bold uppercase tracking-widest text-slate-900 hover:text-emerald-700 transition-colors border-b border-transparent hover:border-emerald-700 pb-1 self-start">
+                      Open Dashboard <ArrowRight className="ml-1 h-3 w-3" />
+                    </a>
+                  ) : (
+                    <Link to={initiative.link} className="inline-flex items-center text-xs font-bold uppercase tracking-widest text-slate-900 hover:text-emerald-700 transition-colors border-b border-transparent hover:border-emerald-700 pb-1 self-start">
+                      Read More <ArrowRight className="ml-1 h-3 w-3" />
+                    </Link>
+                  )}
                 </div>
               </div>
             ))}
