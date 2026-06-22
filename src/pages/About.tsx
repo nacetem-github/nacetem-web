@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Target, Lightbulb, Shield, Users, Leaf, Zap, BookOpen, Monitor, Award, Briefcase, ChevronRight, CheckCircle2, Globe, Building2, GraduationCap, MapPin } from 'lucide-react';
+import { ArrowRight, Target, Lightbulb, Shield, Users, Leaf, Zap, BookOpen, Monitor, Award, Briefcase, ChevronRight, Globe, Building2, GraduationCap, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { assets } from '../assets';
 import { officialMandates, officialMission, officialVision } from '../data/institutionalProfile';
@@ -74,7 +74,7 @@ export default function About() {
         </div>
       </section>
 
-      {/* 2. Who We Are */}
+      {/* 2. Institutional History & Administrative Status */}
       <section className="py-24 bg-white relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row gap-16 items-center">
@@ -82,24 +82,24 @@ export default function About() {
               initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeInUp}
               className="lg:w-1/2"
             >
-              <h2 className="text-3xl sm:text-4xl font-serif text-slate-900 mb-6">Who We Are</h2>
+              <p className="mb-3 text-xs font-bold uppercase tracking-widest text-emerald-700">Our Institutional Journey</p>
+              <h2 className="text-3xl sm:text-4xl font-serif text-slate-900 mb-6">History & Administrative Status</h2>
               <p className="text-slate-600 mb-6 leading-relaxed">
-                Established to strengthen Nigeria's technological advancement and national competitiveness, NACETEM serves as a critical think-tank and implementation support institution under the Federal Ministry of Innovation, Science and Technology.
+                NACETEM was established in September 1992 following the second Conference of Ministers Responsible for the Application of Science and Technology to the Socio-Economic Development of Africa (CASTAFRICA II), held in 1987.
               </p>
               <p className="text-slate-600 mb-8 leading-relaxed">
-                As a bridge between research, government policy, industry, and society, NACETEM works to ensure that scientific knowledge and emerging technologies contribute directly to national development priorities.
+                The Centre began operations in January 1993 at Obafemi Awolowo University, Ile-Ife. It operates today as an agency of the Federal Ministry of Innovation, Science and Technology, connecting research, policy, industry and society to support Nigeria's development.
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {[
-                  "Technology Management", "Innovation Policy Research", 
-                  "Strategic Planning", "Digital Transformation",
-                  "AI Ecosystems", "Capacity Development"
-                ].map((item, idx) => (
-                  <div key={idx} className="flex items-center text-sm font-bold text-slate-800">
-                    <CheckCircle2 className="h-5 w-5 text-emerald-600 mr-2 shrink-0" />
-                    {item}
+              <div className="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-6">
+                <div className="flex items-start gap-4">
+                  <Building2 className="mt-0.5 h-6 w-6 shrink-0 text-emerald-700" />
+                  <div>
+                    <h3 className="mb-2 font-bold text-slate-900">Expanded national and regional role</h3>
+                    <p className="text-sm leading-6 text-slate-600">
+                      In November 2005, NACETEM merged with the former Regional Programme for Technology Management (REPTEM), expanding its role to the West African sub-region and attaining agency status under the then Federal Ministry of Science and Technology.
+                    </p>
                   </div>
-                ))}
+                </div>
               </div>
             </motion.div>
             
@@ -116,6 +116,24 @@ export default function About() {
               </div>
             </motion.div>
           </div>
+
+          <motion.div
+            initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={staggerContainer}
+            className="mt-14 grid grid-cols-1 gap-5 md:grid-cols-3"
+          >
+            {[
+              { icon: GraduationCap, date: 'September 1992', title: 'Centre established', detail: 'Created following the CASTAFRICA II recommendation to strengthen technology management capacity.' },
+              { icon: MapPin, date: 'January 1993', title: 'Operations commenced', detail: 'NACETEM began operating at Obafemi Awolowo University in Ile-Ife, Osun State.' },
+              { icon: Building2, date: 'November 2005', title: 'Mandate expanded', detail: 'The REPTEM merger broadened its regional responsibilities and established its federal agency status.' },
+            ].map((milestone) => (
+              <motion.article key={milestone.date} variants={fadeInUp} className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+                <milestone.icon className="mb-5 h-7 w-7 text-emerald-700" />
+                <p className="mb-2 text-xs font-bold uppercase tracking-widest text-gold">{milestone.date}</p>
+                <h3 className="mb-3 text-lg font-serif text-slate-900">{milestone.title}</h3>
+                <p className="text-sm leading-6 text-slate-600">{milestone.detail}</p>
+              </motion.article>
+            ))}
+          </motion.div>
         </div>
       </section>
 
@@ -190,7 +208,7 @@ export default function About() {
             {[
               { icon: BookOpen, title: "STI Policy & Research", desc: "Conducting evidence-based policy research and analysis to strengthen Nigeria's innovation ecosystem." },
               { icon: Monitor, title: "Digital Transformation", desc: "Promoting digital governance, smart systems, AI adoption, and technology-enabled public service delivery." },
-              { icon: Briefcase, title: "Capacity Building & Training", desc: "Delivering specialized training programmes, executive development courses, and institutional strengthening initiatives." },
+              { icon: Briefcase, title: "Capacity Building & Training", desc: "Training and developing middle- to high-level manpower through specialized programmes, executive development courses, and institutional strengthening initiatives." },
               { icon: Globe, title: "Technology Foresight", desc: "Providing strategic intelligence and forecasting emerging trends shaping future economies." },
             ].map((focus, idx) => (
               <motion.div key={idx} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="bg-white p-8 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md hover:border-emerald-500/30 transition-all duration-300 group">
@@ -205,71 +223,7 @@ export default function About() {
         </div>
       </section>
 
-      {/* 6. Our Impact */}
-      <section className="py-24 bg-emerald-900 text-white relative border-t-8 border-gold">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl sm:text-4xl font-serif mb-6">Our Impact</h2>
-            <p className="text-emerald-100 leading-relaxed text-lg">
-              Over the years, NACETEM has contributed significantly to Nigeria's Science, Technology, and Innovation landscape.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            {[
-              "STI policy frameworks",
-              "Strategic advisory support",
-              "Capacity development",
-              "Digital transformation initiatives",
-              "AI ecosystem development",
-              "Technology management research",
-              "Innovation-driven projects",
-              "National collaborations",
-              "Research commercialization",
-              "STI intelligence systems"
-            ].map((impact, idx) => (
-              <motion.div key={idx} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="bg-emerald-800/50 p-6 rounded-2xl border border-emerald-700/50 flex flex-col items-center text-center hover:bg-emerald-800 transition-all duration-300">
-                <CheckCircle2 className="h-6 w-6 text-gold mb-3" />
-                <p className="text-sm font-bold text-emerald-50 leading-snug">{impact}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 7. Key Initiatives */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-xs font-bold text-gold uppercase tracking-widest mb-4">Featured Initiatives</h2>
-            <h3 className="text-3xl sm:text-4xl font-serif text-slate-900 mb-6">Key Programmes</h3>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              { title: "NACETEM AI Ecosystem", desc: "A collaborative platform promoting Artificial Intelligence development, research, policy engagement, and innovation partnerships in Nigeria.", img: assets.aiEcosystemImage },
-              { title: "STI Dashboard Platform", desc: "A national intelligence platform designed to communicate and monitor Science, Technology, and Innovation outputs and indicators.", img: assets.dashboardImage },
-              { title: "NACETEM Digital Academy", desc: "An online learning and professional development platform focused on emerging technologies, leadership, and innovation management.", img: assets.digitalAcademyImage },
-              { title: "Research Commercialization", desc: "Programs designed to bridge the gap between research outputs and industry adoption.", img: assets.policyImage },
-              { title: "Technology Foresight", desc: "Strategic future-oriented studies supporting national planning and technological preparedness.", img: assets.seminarImage }
-            ].map((initiative, idx) => (
-              <motion.div key={idx} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="bg-slate-50 border border-slate-200/80 rounded-2xl overflow-hidden group shadow-sm hover:shadow-md transition-all duration-300">
-                <div className="h-48 overflow-hidden relative">
-                  <div className="absolute inset-0 bg-slate-900/10 z-10 group-hover:bg-transparent transition-colors duration-500"></div>
-                  <img src={initiative.img} alt={initiative.title} className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-in-out" />
-                </div>
-                <div className="p-6">
-                  <h4 className="text-xl font-serif text-slate-900 mb-3">{initiative.title}</h4>
-                  <p className="text-sm text-slate-600 leading-relaxed mb-4">{initiative.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 8. Partnerships & Collaborations */}
+      {/* Partnerships & Collaborations */}
       <section className="py-24 bg-slate-50 border-t border-slate-200 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
            <div className="flex flex-col md:flex-row gap-12 items-center">
@@ -354,33 +308,7 @@ export default function About() {
         </div>
       </section>
 
-      {/* 10. Why NACETEM */}
-      <section className="py-24 bg-slate-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-serif mb-6">Why NACETEM?</h2>
-            <p className="text-slate-100/80 max-w-2xl mx-auto">Providing unmatched expertise in technology management and policy implementation.</p>
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              { title: "National STI Expertise", desc: "Deep experience in technology management and innovation systems." },
-              { title: "Policy-Driven Solutions", desc: "Research and recommendations aligned with national development priorities." },
-              { title: "Strategic Partnerships", desc: "Strong collaborations with national and international stakeholders." },
-              { title: "Emerging Technology", desc: "Leadership in AI, digital transformation, and innovation ecosystems." },
-              { title: "Capacity Development", desc: "Professional training and institutional strengthening programmes." },
-              { title: "Research Excellence", desc: "Commitment to evidence-based analysis and impactful outcomes." },
-            ].map((reason, idx) => (
-              <div key={idx} className="border border-slate-700/60 bg-slate-800 p-8 rounded-2xl hover:border-emerald-500/50 transition-all duration-300 shadow-md">
-                <h4 className="text-lg font-serif text-gold mb-3">{reason.title}</h4>
-                <p className="text-sm text-slate-100/90 leading-relaxed">{reason.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 11. Call To Action & Footer Quick Info */}
+      {/* Call To Action */}
       <section className="py-24 bg-emerald-900 relative overflow-hidden text-center text-white">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -388,37 +316,13 @@ export default function About() {
           <p className="text-emerald-100 text-lg mb-10 leading-relaxed">
             Join us in driving innovation, digital transformation, and sustainable national development through Science, Technology, and Innovation.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/contact" className="inline-flex items-center justify-center px-8 py-4 bg-gold text-slate-900 font-bold text-sm tracking-widest uppercase hover:bg-white hover:text-emerald-900 transition-colors rounded-sm">
               Become a Partner <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
             <Link to="/initiatives" className="inline-flex items-center justify-center px-8 py-4 bg-transparent border border-emerald-500 text-white font-bold text-sm tracking-widest uppercase hover:bg-emerald-800 transition-colors rounded-sm">
               Explore Training 
             </Link>
-          </div>
-          
-          <div className="border-t border-emerald-800/50 pt-12 flex flex-wrap justify-center gap-8 text-left">
-            <div className="flex items-center gap-3">
-              <Building2 className="w-8 h-8 text-gold" />
-              <div>
-                <p className="text-xs text-emerald-200 uppercase tracking-widest font-bold">Institution</p>
-                <p className="text-sm">National STI Think-Tank</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <GraduationCap className="w-8 h-8 text-gold" />
-              <div>
-                <p className="text-xs text-emerald-200 uppercase tracking-widest font-bold">Focus</p>
-                <p className="text-sm">AI, Digital Transformation, STI Policy</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Globe className="w-8 h-8 text-gold" />
-              <div>
-                <p className="text-xs text-emerald-200 uppercase tracking-widest font-bold">Reach</p>
-                <p className="text-sm">Nationwide & International</p>
-              </div>
-            </div>
           </div>
         </div>
       </section>
