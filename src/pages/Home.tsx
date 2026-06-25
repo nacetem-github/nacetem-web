@@ -258,7 +258,7 @@ export default function Home() {
               }
             ].map((initiative, idx) => (
               <div key={idx} className="bg-white border border-slate-200/80 rounded-2xl group flex flex-col p-5 shadow-sm hover:shadow-md hover:border-emerald-500/30 transition-all duration-300">
-                <div className="h-48 overflow-hidden mb-4 border border-slate-100 rounded-xl bg-slate-50">
+                <div className="image-frame h-48 mb-4 border border-slate-100 rounded-xl bg-slate-50">
                   <img src={initiative.img} alt={initiative.title} loading="lazy" decoding="async" className={`w-full h-full ${initiative.fit === 'contain' ? 'object-contain' : 'object-cover group-hover:scale-105'} transition-transform duration-700`} />
                 </div>
                 <div className="flex-1 flex flex-col pt-2">
@@ -415,7 +415,7 @@ export default function Home() {
                   <motion.div initial={{ opacity: 0, x: reversed ? 50 : -50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: '-100px' }} transition={{ duration: 0.7, ease: 'easeOut' }} className="w-full lg:w-1/2">
                     <div className="relative rounded-[28px] border border-gold/40 bg-white p-2 shadow-xl shadow-slate-900/5">
                       <div className="pointer-events-none absolute -inset-3 rounded-[34px] border border-emerald-600/10"></div>
-                      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[20px] border border-white ring-1 ring-slate-200/80">
+                      <div className="image-frame relative aspect-[4/3] w-full rounded-[20px] border border-white ring-1 ring-slate-200/80">
                         <div className="absolute inset-0 z-10 bg-gradient-to-t from-slate-900/20 via-transparent to-transparent"></div>
                         <img src={program.img} alt={program.title} loading="lazy" decoding="async" className="h-full w-full object-cover transition-transform duration-700 ease-in-out hover:scale-105" />
                       </div>
@@ -458,7 +458,7 @@ export default function Home() {
           >
             {displayedGallery.map((img) => (
               <div key={img.id} className="bg-white border border-slate-200/80 rounded-2xl group flex flex-col p-5 shadow-sm hover:shadow-md hover:border-emerald-500/30 transition-all duration-300">
-                <div className="h-64 overflow-hidden mb-4 border border-slate-100 rounded-xl relative">
+                <div className="image-frame h-64 mb-4 border border-slate-100 rounded-xl relative">
                   <img src={img.url} alt={img.title} loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                   <div className="absolute inset-0 bg-emerald-900/0 group-hover:bg-emerald-900/5 transition-colors duration-500"></div>
                 </div>
@@ -508,7 +508,7 @@ export default function Home() {
             {homepageEvents.map((event) => (
               <div key={event.id} className="bg-white border border-slate-200 p-8 hover:border-emerald-600 transition-all group flex flex-col md:flex-row gap-6">
                 {event.flyerUrl ? (
-                  <div className="h-40 md:h-auto md:w-32 overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
+                  <div className="image-frame h-40 md:h-auto md:w-32 bg-slate-100 border border-slate-200 shrink-0">
                     <img src={event.flyerUrl} alt={`${event.title} flyer`} loading="lazy" decoding="async" className="h-full w-full object-contain object-center" />
                   </div>
                 ) : (
@@ -573,7 +573,7 @@ export default function Home() {
                 to={`/news/${article.slug}`}
                 className="group flex flex-col h-full min-h-[520px] bg-white border border-slate-200/80 rounded-2xl p-5 relative overflow-hidden shadow-sm hover:shadow-md hover:border-emerald-500/30 transition-all duration-300"
               >
-                <div className="relative h-56 mb-6 border border-slate-100 rounded-xl overflow-hidden shrink-0">
+                <div className="image-frame relative h-56 mb-6 border border-slate-100 rounded-xl shrink-0">
                   <img src={article.image} alt={article.imageAlt} loading="lazy" decoding="async" className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" />
                   <div className="absolute top-4 left-4 bg-slate-900 text-white text-[10px] font-bold px-3 py-1.5 uppercase tracking-widest">{article.category}</div>
                 </div>

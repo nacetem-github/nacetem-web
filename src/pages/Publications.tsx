@@ -196,7 +196,7 @@ export default function Publications() {
               className="bg-slate-50 border border-slate-200 rounded-[11px] overflow-hidden"
             >
               <div className="grid grid-cols-1 lg:grid-cols-[360px_1fr]">
-                <div className="bg-slate-900 min-h-[280px]">
+                <div className="image-frame bg-slate-900 min-h-[280px]">
                   <img src={assets.policyImage} alt={report.title} className="w-full h-full object-cover opacity-90" />
                 </div>
                 <div className="p-8 sm:p-10 lg:p-12">
@@ -246,7 +246,7 @@ export default function Publications() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6 items-start">
-            <div className="overflow-hidden rounded-[11px] border border-slate-200 bg-white shadow-sm">
+            <div className="rounded-[11px] border border-slate-200 bg-white shadow-sm">
               <div className="flex flex-col gap-4 border-b border-slate-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-700">Currently Viewing</p>

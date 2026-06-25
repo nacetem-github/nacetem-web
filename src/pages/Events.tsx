@@ -65,7 +65,7 @@ export default function Events() {
                 className="bg-slate-50 border border-slate-200 rounded-[11px] overflow-hidden group hover:border-emerald-500 transition-colors"
               >
                 <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] h-full">
-                  <div className="h-56 md:h-full min-h-[220px] overflow-hidden bg-slate-100">
+                  <div className="image-frame h-56 md:h-full min-h-[220px] bg-slate-100">
                     {event.flyerUrl ? (
                       <img
                         src={event.flyerUrl}
@@ -162,7 +162,7 @@ export default function Events() {
                 variants={fadeInUp}
                 className="bg-white border border-slate-200 rounded-[11px] overflow-hidden group hover:-translate-y-1 hover:shadow-xl hover:border-emerald-500 transition-all duration-300"
               >
-                <div className="h-48 overflow-hidden bg-slate-100">
+                <div className="image-frame h-48 bg-slate-100">
                   <img
                     src={event.flyerUrl ?? eventFallbackImages[idx % eventFallbackImages.length]}
                     alt={event.title}
@@ -203,7 +203,7 @@ export default function Events() {
                 variants={fadeInUp}
                 className="bg-white border border-slate-200 rounded-[11px] overflow-hidden group hover:-translate-y-1 hover:shadow-xl hover:border-emerald-500 transition-all duration-300"
               >
-                <div className="h-48 overflow-hidden bg-slate-900">
+                <div className="image-frame h-48 bg-slate-900">
                   <img
                     src={event.image}
                     alt={event.title}

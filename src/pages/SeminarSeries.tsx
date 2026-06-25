@@ -394,7 +394,7 @@ export default function SeminarSeries() {
                   className="bg-slate-50 border border-slate-200 rounded-[11px] overflow-hidden hover:border-emerald-500 transition-all shadow-sm hover:shadow-md group flex flex-col h-full"
                 >
                   {seminar.imageUrl ? (
-                    <div className="aspect-[16/9] overflow-hidden bg-slate-200">
+                    <div className="image-frame aspect-[16/9] bg-slate-200">
                       <img
                         src={seminar.imageUrl}
                         alt={`${seminar.title} seminar artwork`}

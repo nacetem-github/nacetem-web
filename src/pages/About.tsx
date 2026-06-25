@@ -107,7 +107,7 @@ export default function About() {
               initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeInUp}
               className="lg:w-1/2 w-full"
             >
-              <div className="relative aspect-square sm:aspect-[4/3] rounded-2xl overflow-hidden border border-slate-200/80 shadow-sm">
+              <div className="image-frame relative aspect-square sm:aspect-[4/3] rounded-2xl border border-slate-200/80 shadow-sm">
                 <img 
                   src={assets.headquartersImage}
                   alt="NACETEM headquarters"
@@ -260,7 +260,7 @@ export default function About() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row gap-12 items-center">
             <div className="w-full md:w-1/3">
-              <div className="aspect-[2/3] relative mx-auto max-w-sm rounded-2xl overflow-hidden border border-slate-200/80 bg-slate-100 shadow-sm">
+              <div className="image-frame aspect-[2/3] relative mx-auto max-w-sm rounded-2xl border border-slate-200/80 bg-slate-100 shadow-sm">
                 <img 
                   src="/uploads/about/dg-main.jpeg"
                   alt="Dr. Olushola Odusanya, Director-General and Chief Executive Officer of NACETEM"

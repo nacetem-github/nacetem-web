@@ -118,7 +118,7 @@ export default function Initiatives() {
           <div className="space-y-12">
             {initiatives.map((init, idx) => (
                <motion.div id={init.id} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={fadeInUp} key={init.id} className="scroll-mt-32 bg-slate-50 border border-slate-200/80 flex flex-col md:flex-row overflow-hidden group rounded-2xl hover:border-emerald-500/50 shadow-sm hover:shadow-md transition-all duration-300">
-                 <div className={`h-64 overflow-hidden border-b border-slate-200 md:h-auto md:min-h-72 md:w-1/3 md:border-b-0 md:border-r ${init.imageFit === 'contain' ? 'bg-white p-2 sm:p-3' : 'bg-slate-200'}`}>
+                 <div className={`image-frame h-64 border-b border-slate-200 md:h-auto md:min-h-72 md:w-1/3 md:border-b-0 md:border-r ${init.imageFit === 'contain' ? 'bg-white p-2 sm:p-3' : 'bg-slate-200'}`}>
                     <img src={init.img} alt={init.title} loading="lazy" decoding="async" className={`h-full w-full ${init.imageFit === 'contain' ? 'object-contain' : 'object-cover'} transition-transform duration-700 ease-out group-hover:scale-[1.03]`} />
                  </div>
                  <div className="p-8 md:p-12 md:w-2/3 flex flex-col justify-center">

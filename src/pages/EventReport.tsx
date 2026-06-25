@@ -65,7 +65,7 @@ export default function EventReport() {
 
       <section className="bg-white py-20">
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="overflow-hidden rounded-[11px] border border-slate-200 bg-slate-900">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="image-frame rounded-[11px] border border-slate-200 bg-slate-900">
             <img src={image} alt={title} className={`h-full min-h-[360px] max-h-[620px] w-full object-center ${dynamicEvent?.flyerUrl ? 'object-contain bg-slate-100' : 'object-cover'}`} />
           </motion.div>
 

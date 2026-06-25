@@ -166,7 +166,7 @@ export default function News() {
                   variants={fadeInUp}
                   className="bg-slate-50 border border-slate-200 rounded-[11px] overflow-hidden hover:border-emerald-500 transition-colors group relative flex flex-col"
                 >
-                  <div className="aspect-[4/3] overflow-hidden bg-slate-100 relative">
+                  <div className="image-frame aspect-[4/3] bg-slate-100 relative">
                     {event.flyerUrl ? (
                       <img
                         src={event.flyerUrl}
@@ -279,7 +279,7 @@ export default function News() {
                 variants={fadeInUp}
                 className="bg-white border border-slate-200 rounded-[11px] overflow-hidden group hover:border-emerald-500 transition-colors flex flex-col"
               >
-                <div className="aspect-[4/3] overflow-hidden bg-slate-100">
+                <div className="image-frame aspect-[4/3] bg-slate-100">
                   <img
                     src={event.flyerUrl ?? eventFallbackImages[idx % eventFallbackImages.length]}
                     alt={event.title}
@@ -313,7 +313,7 @@ export default function News() {
                 variants={fadeInUp}
                 className="bg-white border border-slate-200 rounded-[11px] overflow-hidden group hover:border-emerald-500 transition-colors flex flex-col"
               >
-                <div className="aspect-[4/3] overflow-hidden bg-slate-900">
+                <div className="image-frame aspect-[4/3] bg-slate-900">
                   <img src={event.image} alt={event.title} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-700" />
                 </div>
                 <div className="p-6 flex flex-1 flex-col">
@@ -376,7 +376,7 @@ export default function News() {
                   className="group border border-slate-200 rounded-[11px] overflow-hidden bg-white hover:border-emerald-500 transition-colors flex h-full flex-col"
                 >
                   <Link to={`/news/${article.slug}`} className="flex flex-col h-full">
-                    <div className="h-48 sm:h-56 overflow-hidden relative shrink-0">
+                    <div className="image-frame h-48 sm:h-56 relative shrink-0">
                       <img src={article.image} alt={article.imageAlt} className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-in-out" />
                       <div className="absolute top-4 left-4 bg-gold text-slate-900 text-[10px] font-bold uppercase tracking-widest px-3 py-1 pb-1">{article.category}</div>
                     </div>
@@ -485,9 +485,9 @@ export default function News() {
               })}
             </div>
 
-            <div className="overflow-hidden rounded-[11px] border border-slate-200 bg-slate-50 shadow-sm">
+            <div className="image-frame rounded-[11px] border border-slate-200 bg-slate-50 shadow-sm">
               <div className="grid grid-cols-1 xl:grid-cols-[1.35fr_0.65fr]">
-                <div className="relative min-h-[420px] bg-slate-900">
+                <div className="image-frame relative min-h-[420px] bg-slate-900">
                   <button
                     type="button"
                     onClick={() => setLightboxImageIndex(activeImageIndex)}
@@ -547,7 +547,7 @@ export default function News() {
                           type="button"
                           onClick={() => setActiveImageIndex(index)}
                           onDoubleClick={() => setLightboxImageIndex(index)}
-                          className={`group relative overflow-hidden rounded-[8px] border transition-all aspect-[4/3] ${
+                          className={`image-frame group relative rounded-[8px] border transition-all aspect-[4/3] ${
                             isSelected ? 'border-emerald-600 ring-2 ring-emerald-600/20' : 'border-slate-200 hover:border-emerald-300'
                           }`}
                         >
@@ -602,7 +602,7 @@ export default function News() {
           <img
             src={activeGallery.images[lightboxImageIndex].src}
             alt={activeGallery.images[lightboxImageIndex].alt}
-            className="max-h-[86vh] w-auto max-w-full rounded-[10px] object-contain shadow-2xl"
+            className="fullscreen-image h-auto w-auto rounded-[10px] object-contain shadow-2xl"
           />
         </div>
       )}

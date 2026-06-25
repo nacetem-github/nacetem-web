@@ -473,7 +473,7 @@ export function AdminDashboard() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {gallery.map((img) => (
                   <div key={img.id} className="bg-white border border-slate-200 group flex flex-col">
-                    <div className="h-48 overflow-hidden border-b border-slate-100">
+                    <div className="image-frame h-48 border-b border-slate-100">
                       <img src={img.url} alt={img.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     </div>
                     <div className="p-4 flex justify-between items-center bg-slate-50 flex-1">

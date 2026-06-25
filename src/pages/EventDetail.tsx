@@ -56,7 +56,7 @@ export default function EventDetail() {
 
       <section className="border-b border-slate-200 bg-white py-20">
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="overflow-hidden rounded-[11px] border border-slate-200 bg-slate-900">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="image-frame rounded-[11px] border border-slate-200 bg-slate-900">
             {event.flyerUrl ? (
               <img src={event.flyerUrl} alt={`${event.title} flyer`} className="h-full max-h-[760px] w-full object-contain object-top" />
             ) : (

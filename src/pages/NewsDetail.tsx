@@ -84,7 +84,7 @@ export default function NewsDetail() {
       <section className="py-16 lg:py-20 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}>
-            <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm mb-12">
+            <div className="image-frame rounded-2xl border border-slate-200 shadow-sm mb-12">
               <img src={article.image} alt={article.imageAlt} className="w-full h-[260px] sm:h-[420px] object-cover" />
             </div>
 
@@ -137,7 +137,7 @@ export default function NewsDetail() {
                 to={`/news/${item.slug}`}
                 className="group bg-white border border-slate-200 rounded-[11px] overflow-hidden hover:border-emerald-500 transition-colors flex flex-col h-full"
               >
-                <div className="h-44 overflow-hidden relative">
+                <div className="image-frame h-44 relative">
                   <img src={item.image} alt={item.imageAlt} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                 </div>
                 <div className="p-6 flex flex-col flex-1">

@@ -61,7 +61,7 @@ export default function CapacityBuilding() {
                 variants={fadeInUp} 
                 className="bg-white border border-slate-200 rounded-[11px] overflow-hidden hover:border-emerald-500 transition-colors group relative flex flex-col h-full shadow-sm hover:shadow-md"
               >
-                <div className="h-56 sm:h-64 overflow-hidden relative">
+                <div className="image-frame h-56 sm:h-64 relative">
                   <img src={program.img} alt={program.title} className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-in-out" />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
                   <div className="absolute bottom-4 left-6 flex items-center">
