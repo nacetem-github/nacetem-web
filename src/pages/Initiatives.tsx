@@ -15,34 +15,59 @@ const staggerContainer = {
 
 const initiatives = [
   {
+    id: "psr-test",
     title: "Public Service Rules Exam Prep Tool",
     desc: "AI-supported exam preparation platform designed to help public servants prepare effectively for promotion examinations.",
-    img: assets.psrImage
+    img: assets.psrPlatformImage,
+    link: "/psr-test",
+    linkLabel: "Open PSR Test",
+    imageFit: "contain"
   },
   {
+    id: "ai-ecosystem",
     title: "NACETEM AI-Ecosystem powered by Daimlas",
     desc: "A collaborative platform connecting AI stakeholders, research opportunities, innovation projects, and implementation support.",
-    img: assets.aiEcosystemImage
+    img: assets.aiEcosystemImage,
+    link: "/contact",
+    linkLabel: "Enquire About the Platform",
+    imageFit: "contain"
   },
   {
+    id: "digital-academy",
     title: "NACETEM Digital Academy",
     desc: "Professional and academic learning programmes focused on digital skills, innovation, technology management, and institutional transformation.",
-    img: assets.digitalAcademyImage
+    img: assets.digitalAcademyPlatformImage,
+    link: "/capacity-building",
+    linkLabel: "View Learning Programmes",
+    imageFit: "contain"
   },
   {
+    id: "welding-initiative",
     title: "NACETEM Welding Initiative",
     desc: "A technical capacity-building initiative supporting welding excellence, certification readiness, and industrial skills development.",
-    img: assets.weldingImage
+    img: assets.weldingImage,
+    link: "/capacity-building",
+    linkLabel: "View Technical Training",
+    imageFit: "contain"
   },
   {
+    id: "systems-thinking",
     title: "Systems Dynamics and Systems Thinking",
     desc: "A strategic programme for understanding complex systems, improving policy analysis, and strengthening evidence-based decision-making.",
-    img: assets.seminarImage
+    img: assets.seminarImage,
+    link: "/research",
+    linkLabel: "Explore Research Programmes",
+    imageFit: "contain"
   },
   {
-    title: "STI Dashboard / STI Intelligence Platform",
-    desc: "A data-driven platform for communicating science, technology, and innovation outputs for national planning and policy coordination.",
-    img: assets.dashboardImage
+    id: "sti-dashboard",
+    title: "STI Dashboard & Databank",
+    desc: "A data-driven dashboard and databank for accessing science, technology, and innovation information that supports national planning and policy coordination.",
+    img: assets.stiDashboardPlatformImage,
+    link: "https://stidashboard.nacetem.gov.ng",
+    linkLabel: "Visit the STI Dashboard & Databank",
+    imageFit: "contain",
+    external: true
   }
 ];
 
@@ -83,7 +108,7 @@ export default function Initiatives() {
       </section>
 
       {/* Featured Initiatives Cards */}
-      <section className="py-24 bg-white relative">
+      <section id="featured-initiatives" className="py-24 bg-white relative scroll-mt-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-xs font-bold text-gold uppercase tracking-widest mb-4">Core Programmes</h2>
@@ -92,17 +117,23 @@ export default function Initiatives() {
           
           <div className="space-y-12">
             {initiatives.map((init, idx) => (
-               <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={fadeInUp} key={idx} className="bg-slate-50 border border-slate-200/80 flex flex-col md:flex-row overflow-hidden group rounded-2xl hover:border-emerald-500/50 shadow-sm hover:shadow-md transition-all duration-300">
-                 <div className="md:w-1/3 h-64 md:h-auto border-b md:border-b-0 md:border-r border-slate-200 relative overflow-hidden">
-                    <img src={init.img} alt={init.title} className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700" />
+               <motion.div id={init.id} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={fadeInUp} key={init.id} className="scroll-mt-32 bg-slate-50 border border-slate-200/80 flex flex-col md:flex-row overflow-hidden group rounded-2xl hover:border-emerald-500/50 shadow-sm hover:shadow-md transition-all duration-300">
+                 <div className={`h-64 overflow-hidden border-b border-slate-200 md:h-auto md:min-h-72 md:w-1/3 md:border-b-0 md:border-r ${init.imageFit === 'contain' ? 'bg-white p-2 sm:p-3' : 'bg-slate-200'}`}>
+                    <img src={init.img} alt={init.title} loading="lazy" decoding="async" className={`h-full w-full ${init.imageFit === 'contain' ? 'object-contain' : 'object-cover'} transition-transform duration-700 ease-out group-hover:scale-[1.03]`} />
                  </div>
                  <div className="p-8 md:p-12 md:w-2/3 flex flex-col justify-center">
                     <div className="w-12 h-1 bg-gold mb-6"></div>
                     <h2 className="text-2xl font-serif text-slate-900 mb-4">{init.title}</h2>
                     <p className="text-slate-600 text-sm leading-relaxed mb-8">{init.desc}</p>
-                    <Link to="#" className="inline-flex items-center text-xs font-bold uppercase tracking-widest text-emerald-700 hover:text-emerald-900 transition-colors border-b border-transparent hover:border-emerald-700 pb-1 self-start">
-                      Read More <ChevronRight className="h-4 w-4 ml-1" />
-                    </Link>
+                    {init.external ? (
+                      <a href={init.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-xs font-bold uppercase tracking-widest text-emerald-700 hover:text-emerald-900 transition-colors border-b border-transparent hover:border-emerald-700 pb-1 self-start">
+                        {init.linkLabel} <ChevronRight className="h-4 w-4 ml-1" />
+                      </a>
+                    ) : (
+                      <Link to={init.link} className="inline-flex items-center text-xs font-bold uppercase tracking-widest text-emerald-700 hover:text-emerald-900 transition-colors border-b border-transparent hover:border-emerald-700 pb-1 self-start">
+                        {init.linkLabel} <ChevronRight className="h-4 w-4 ml-1" />
+                      </Link>
+                    )}
                  </div>
                </motion.div>
             ))}
@@ -326,7 +357,7 @@ export default function Initiatives() {
             Collaborate with us to advance innovation, research, digital transformation, and sustainable national development.
           </p>
           <div className="flex flex-col sm:flex-row flex-wrap gap-4 justify-center">
-            <Link to="/initiatives" className="inline-flex items-center justify-center px-8 py-4 bg-gold text-slate-900 font-bold text-sm tracking-widest uppercase hover:bg-white hover:text-emerald-900 transition-colors rounded-sm">
+            <Link to="/initiatives#featured-initiatives" className="inline-flex items-center justify-center px-8 py-4 bg-gold text-slate-900 font-bold text-sm tracking-widest uppercase hover:bg-white hover:text-emerald-900 transition-colors rounded-sm">
               Explore Platforms <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
             <Link to="/contact" className="inline-flex items-center justify-center px-8 py-4 bg-transparent border border-emerald-500 text-white font-bold text-sm tracking-widest uppercase hover:bg-emerald-800 transition-colors rounded-sm">
