@@ -2,37 +2,100 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useData, type EventItem } from '../contexts/DataContext';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Settings, LogOut, LayoutDashboard, Search, Bell, Image as ImageIcon, Calendar, Plus, Trash2, Menu, X, Save, Video, Presentation, Library } from 'lucide-react';
+import { FileText, Settings, LogOut, LayoutDashboard, Search, Bell, Image as ImageIcon, Calendar, Plus, Trash2, Menu, X, Save, Video, Presentation, Library, KeyRound, UserPlus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { CmsManager } from '../components/CmsManager';
 
 export function Login() {
+  const [mode, setMode] = useState<'login' | 'create' | 'reset'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const [notice, setNotice] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { login, createAccount, requestPasswordReset } = useAuth();
   const navigate = useNavigate();
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (await login(email, password)) {
-      if (supabase) window.location.assign('/admin');
-      else navigate('/admin');
-    } else {
-      setError('Invalid email or password access denied.');
+    setError('');
+    setNotice('');
+    setIsSubmitting(true);
+
+    try {
+      if (mode === 'login') {
+        if (await login(email, password)) {
+          if (supabase) window.location.assign('/admin');
+          else navigate('/admin');
+        } else {
+          setError('Invalid email or password access denied.');
+        }
+        return;
+      }
+
+      if (mode === 'create') {
+        if (password.length < 8) {
+          setError('Use at least 8 characters for the password.');
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          setError('Passwords do not match.');
+          return;
+        }
+
+        const result = await createAccount(email, password);
+        if (result.ok) {
+          setNotice(result.message || 'Account created. Check your email to confirm access before signing in.');
+          setMode('login');
+          setPassword('');
+          setConfirmPassword('');
+        } else {
+          setError(result.message || 'Unable to create account.');
+        }
+        return;
+      }
+
+      const result = await requestPasswordReset(email);
+      if (result.ok) {
+        setNotice(result.message || 'Password reset instructions have been sent to your email.');
+        setMode('login');
+      } else {
+        setError(result.message || 'Unable to send password reset instructions.');
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
+
+  const switchMode = (nextMode: 'login' | 'create' | 'reset') => {
+    setMode(nextMode);
+    setError('');
+    setNotice('');
+    setPassword('');
+    setConfirmPassword('');
+  };
+
+  const title = mode === 'login' ? 'Portal Login' : mode === 'create' ? 'Create Account' : 'Reset Password';
+  const subtitle = mode === 'login'
+    ? 'NACETEM Extranet Authorized Access Only'
+    : mode === 'create'
+      ? 'Request administrative portal access'
+      : 'Receive password recovery instructions';
+  const submitLabel = mode === 'login' ? 'Authenticate' : mode === 'create' ? 'Create Account' : 'Send Reset Link';
 
   return (
     <div className="min-h-screen flex flex-col sm:flex-row items-center justify-center bg-slate-50 p-4">
       <div className="bg-white p-8 sm:p-12 w-full max-w-md border border-slate-200">
         <div className="mb-8">
           <span className="text-gold text-[10px] font-bold uppercase tracking-widest mb-2 block">Secure Admin Access</span>
-          <h2 className="text-3xl font-serif text-slate-900 leading-none mb-2">Portal Login</h2>
-          <p className="text-slate-500 text-xs">NACETEM Extranet Authorized Access Only</p>
+          <h2 className="text-3xl font-serif text-slate-900 leading-none mb-2">{title}</h2>
+          <p className="text-slate-500 text-xs">{subtitle}</p>
         </div>
 
         {error && <div className="p-3 bg-red-50 text-red-700 text-xs border border-red-200 mb-6">{error}</div>}
+        {notice && <div className="p-3 bg-emerald-50 text-emerald-700 text-xs border border-emerald-200 mb-6">{notice}</div>}
 
         <form onSubmit={handleAuth} className="space-y-6">
           <div>
@@ -46,24 +109,74 @@ export function Login() {
               required
             />
           </div>
-          <div>
-            <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-700 mb-2">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border border-slate-300 focus:border-emerald-700 outline-none text-sm bg-slate-50 focus:bg-white transition-colors"
-              placeholder="••••••••"
-              required
-            />
-          </div>
+
+          {mode !== 'reset' && (
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-700 mb-2">Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-3 border border-slate-300 focus:border-emerald-700 outline-none text-sm bg-slate-50 focus:bg-white transition-colors"
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+          )}
+
+          {mode === 'create' && (
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-700 mb-2">Confirm Password</label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full px-4 py-3 border border-slate-300 focus:border-emerald-700 outline-none text-sm bg-slate-50 focus:bg-white transition-colors"
+                placeholder="Confirm your password"
+                required
+              />
+            </div>
+          )}
+
           <button
             type="submit"
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-widest py-4 transition-colors"
+            disabled={isSubmitting}
+            className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:cursor-wait disabled:opacity-60 text-white font-bold text-xs uppercase tracking-widest py-4 transition-colors"
           >
-            Authenticate
+            {isSubmitting ? 'Processing...' : submitLabel}
           </button>
         </form>
+
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {mode !== 'create' && (
+            <button
+              type="button"
+              onClick={() => switchMode('create')}
+              className="inline-flex items-center justify-center gap-2 border border-slate-200 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-600 hover:border-emerald-700 hover:text-emerald-700 transition-colors"
+            >
+              <UserPlus className="h-4 w-4" /> Create Account
+            </button>
+          )}
+          {mode !== 'reset' && (
+            <button
+              type="button"
+              onClick={() => switchMode('reset')}
+              className="inline-flex items-center justify-center gap-2 border border-slate-200 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-600 hover:border-emerald-700 hover:text-emerald-700 transition-colors"
+            >
+              <KeyRound className="h-4 w-4" /> Forgot Password
+            </button>
+          )}
+          {mode !== 'login' && (
+            <button
+              type="button"
+              onClick={() => switchMode('login')}
+              className="inline-flex items-center justify-center gap-2 border border-slate-200 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-600 hover:border-emerald-700 hover:text-emerald-700 transition-colors sm:col-span-2"
+            >
+              Back To Login
+            </button>
+          )}
+        </div>
+
         <div className="mt-8 text-center text-[10px] tracking-widest uppercase text-slate-400">
           Protected by FMIST Infrastructure
         </div>
