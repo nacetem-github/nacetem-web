@@ -15,7 +15,8 @@ import weldingImage from './assets/images/pages/welding.optimized.jpg';
 import dashboardImage from './assets/images/pages/dashboard.optimized.jpg';
 import bayelsaNewsImage from './assets/images/news/bayelsa-news.jpeg';
 import ntaImage from './assets/images/pages/nta.png';
-import pgdImage from './assets/images/pages/pgd.png';
+
+const pgdImage = '/uploads/capacity-building/pgd.jpeg';
 import industrialInspectionImage from './assets/images/pages/industrial-inspection.optimized.jpg';
 import psrPlatformImage from './assets/images/pages/psr.jpeg';
 import digitalAcademyPlatformImage from './assets/images/pages/academy.jpeg';

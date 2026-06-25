@@ -31,14 +31,14 @@ export function Login() {
           <h2 className="text-3xl font-serif text-slate-900 leading-none mb-2">Portal Login</h2>
           <p className="text-slate-500 text-xs">NACETEM Extranet Authorized Access Only</p>
         </div>
-        
+
         {error && <div className="p-3 bg-red-50 text-red-700 text-xs border border-red-200 mb-6">{error}</div>}
-        
+
         <form onSubmit={handleAuth} className="space-y-6">
           <div>
             <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-700 mb-2">Email Address</label>
-            <input 
-              type="email" 
+            <input
+              type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-3 border border-slate-300 focus:border-emerald-700 outline-none text-sm bg-slate-50 focus:bg-white transition-colors"
@@ -48,8 +48,8 @@ export function Login() {
           </div>
           <div>
             <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-700 mb-2">Password</label>
-            <input 
-              type="password" 
+            <input
+              type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-3 border border-slate-300 focus:border-emerald-700 outline-none text-sm bg-slate-50 focus:bg-white transition-colors"
@@ -57,7 +57,7 @@ export function Login() {
               required
             />
           </div>
-          <button 
+          <button
             type="submit"
             className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-widest py-4 transition-colors"
           >
@@ -107,7 +107,7 @@ export function AdminDashboard() {
       try {
         setIsUploadingImage(true);
         let imageUrl = '';
-        
+
         if (supabase) {
           const fileExt = newImageFile.name.split('.').pop();
           const fileName = `${Math.random()}.${fileExt}`;
@@ -136,7 +136,7 @@ export function AdminDashboard() {
           url: imageUrl,
           title: newImageTitle,
         });
-        
+
         setNewImageFile(null);
         setNewImageTitle('');
       } catch (error) {
@@ -193,10 +193,10 @@ export function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row h-screen overflow-hidden relative">
-      
+
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 md:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
@@ -215,15 +215,15 @@ export function AdminDashboard() {
         </div>
         <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-2">
           {menuItems.map((item, idx) => (
-            <button 
+            <button
               key={idx}
               onClick={() => {
                 setActiveTab(item.label);
                 setIsMobileMenuOpen(false);
               }}
               className={`w-full flex items-center px-4 py-3.5 text-xs font-bold uppercase tracking-wider transition-all duration-200 rounded-[6px] ${
-                activeTab === item.label 
-                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/20' 
+                activeTab === item.label
+                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/20'
                   : 'text-slate-200 hover:bg-slate-800 hover:text-white'
               }`}
             >
@@ -233,7 +233,7 @@ export function AdminDashboard() {
           ))}
         </nav>
         <div className="p-4 border-t border-slate-800 shrink-0">
-          <button 
+          <button
             onClick={handleLogout}
             className="w-full flex items-center px-4 py-3.5 text-xs font-bold uppercase tracking-wider text-slate-300 hover:text-white hover:bg-slate-800 transition-colors rounded-[6px]"
           >
@@ -253,9 +253,9 @@ export function AdminDashboard() {
             </button>
             <div className="relative w-full max-w-sm hidden sm:block">
               <Search className="h-4 w-4 absolute left-3 top-2.5 text-slate-400" />
-              <input 
-                type="text" 
-                placeholder="Search resources..." 
+              <input
+                type="text"
+                placeholder="Search resources..."
                 className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-[6px] text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
               />
             </div>
@@ -332,8 +332,8 @@ export function AdminDashboard() {
                 <form onSubmit={handleAddImage} className="flex flex-col sm:flex-row gap-4 items-end">
                   <div className="flex-1 w-full">
                     <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">Upload Photo</label>
-                    <input 
-                      type="file" 
+                    <input
+                      type="file"
                       accept="image/*"
                       onChange={(e) => setNewImageFile(e.target.files?.[0] || null)}
                       className="w-full px-4 py-2 border border-slate-300 text-sm focus:outline-none focus:border-emerald-700 bg-slate-50"
@@ -342,8 +342,8 @@ export function AdminDashboard() {
                   </div>
                   <div className="flex-1 w-full">
                     <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">Image Title</label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       placeholder="Image Title"
                       value={newImageTitle}
                       onChange={(e) => setNewImageTitle(e.target.value)}
@@ -365,7 +365,7 @@ export function AdminDashboard() {
                     </div>
                     <div className="p-4 flex justify-between items-center bg-slate-50 flex-1">
                       <h3 className="font-serif text-slate-900 text-sm truncate pr-4">{img.title}</h3>
-                      <button 
+                      <button
                         onClick={() => removeGalleryImage(img.id)}
                         className="text-slate-400 hover:text-red-600 transition-colors bg-white p-2 border border-slate-200 rounded-full"
                         title="Remove image"
@@ -391,8 +391,8 @@ export function AdminDashboard() {
                 <form onSubmit={handleAddEvent} className="flex flex-col gap-4">
                   <div className="flex flex-col sm:flex-row gap-4">
                     <div className="flex-1">
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         placeholder="Event Title"
                         value={newEventTitle}
                         onChange={(e) => setNewEventTitle(e.target.value)}
@@ -401,8 +401,8 @@ export function AdminDashboard() {
                       />
                     </div>
                     <div className="flex-1">
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         placeholder="Event Date (e.g., August 15, 2026)"
                         value={newEventDate}
                         onChange={(e) => setNewEventDate(e.target.value)}
@@ -411,8 +411,8 @@ export function AdminDashboard() {
                       />
                     </div>
                     <div className="flex-1">
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         placeholder="Event Time (e.g., 10:00am - 2:00pm)"
                         value={newEventTime}
                         onChange={(e) => setNewEventTime(e.target.value)}
@@ -420,8 +420,8 @@ export function AdminDashboard() {
                       />
                     </div>
                     <div className="flex-1">
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         placeholder="Event Location (e.g., Abuja, Nigeria)"
                         value={newEventLocation}
                         onChange={(e) => setNewEventLocation(e.target.value)}
@@ -431,29 +431,29 @@ export function AdminDashboard() {
                     </div>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       placeholder="Format (e.g., Hybrid)"
                       value={newEventFormat}
                       onChange={(e) => setNewEventFormat(e.target.value)}
                       className="w-full px-4 py-3 border border-slate-300 text-sm focus:outline-none focus:border-emerald-700"
                     />
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       placeholder="Fee (optional)"
                       value={newEventFee}
                       onChange={(e) => setNewEventFee(e.target.value)}
                       className="w-full px-4 py-3 border border-slate-300 text-sm focus:outline-none focus:border-emerald-700"
                     />
-                    <input 
-                      type="email" 
+                    <input
+                      type="email"
                       placeholder="Contact Email (optional)"
                       value={newEventContactEmail}
                       onChange={(e) => setNewEventContactEmail(e.target.value)}
                       className="w-full px-4 py-3 border border-slate-300 text-sm focus:outline-none focus:border-emerald-700"
                     />
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       placeholder="Contact Phones, comma separated"
                       value={newEventContactPhones}
                       onChange={(e) => setNewEventContactPhones(e.target.value)}
@@ -461,22 +461,22 @@ export function AdminDashboard() {
                     />
                   </div>
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                    <input 
-                      type="url" 
+                    <input
+                      type="url"
                       placeholder="Flyer URL (optional)"
                       value={newEventFlyerUrl}
                       onChange={(e) => setNewEventFlyerUrl(e.target.value)}
                       className="w-full px-4 py-3 border border-slate-300 text-sm focus:outline-none focus:border-emerald-700"
                     />
-                    <input 
-                      type="url" 
+                    <input
+                      type="url"
                       placeholder="Zoom register/join link (optional)"
                       value={newEventActionUrl}
                       onChange={(e) => setNewEventActionUrl(e.target.value)}
                       className="w-full px-4 py-3 border border-slate-300 text-sm focus:outline-none focus:border-emerald-700"
                     />
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       placeholder="Action label"
                       value={newEventActionLabel}
                       onChange={(e) => setNewEventActionLabel(e.target.value)}
