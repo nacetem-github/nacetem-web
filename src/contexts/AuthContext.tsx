@@ -1,7 +1,20 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { supabase } from '../lib/supabase';
 
-interface AuthContextType { isAuthenticated: boolean; isLoading: boolean; login(email: string, password: string): Promise<boolean>; logout(): Promise<void>; }
+type AuthResult = {
+  ok: boolean;
+  message?: string;
+};
+
+interface AuthContextType {
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  login(email: string, password: string): Promise<boolean>;
+  createAccount(email: string, password: string): Promise<AuthResult>;
+  requestPasswordReset(email: string): Promise<AuthResult>;
+  logout(): Promise<void>;
+}
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -19,7 +32,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (valid) { sessionStorage.setItem('nacetem-local-admin', 'true'); setIsAuthenticated(true); }
     return valid;
   };
+
+  const createAccount = async (email: string, password: string) => {
+    if (!supabase) {
+      return {
+        ok: false,
+        message: 'Account creation requires Supabase to be configured for this deployment.',
+      };
+    }
+
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/admin/login`,
+      },
+    });
+
+    return {
+      ok: !error,
+      message: error?.message || 'Account created. Check your email to confirm access before signing in.',
+    };
+  };
+
+  const requestPasswordReset = async (email: string) => {
+    if (!supabase) {
+      return {
+        ok: false,
+        message: 'Password reset requires Supabase to be configured for this deployment.',
+      };
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/admin/login`,
+    });
+
+    return {
+      ok: !error,
+      message: error?.message || 'Password reset instructions have been sent to your email.',
+    };
+  };
+
   const logout = async () => { if (supabase) await supabase.auth.signOut(); sessionStorage.removeItem('nacetem-local-admin'); setIsAuthenticated(false); };
-  return <AuthContext.Provider value={{ isAuthenticated, isLoading, login, logout }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ isAuthenticated, isLoading, login, createAccount, requestPasswordReset, logout }}>{children}</AuthContext.Provider>;
 }
 export function useAuth() { const value = useContext(AuthContext); if (!value) throw new Error('useAuth must be used within an AuthProvider'); return value; }
