@@ -1,14 +1,28 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Download, Video } from 'lucide-react';
+import { Calendar, Download, ExternalLink, UserRound, Video } from 'lucide-react';
 import { assets } from '../assets';
+import { useData } from '../contexts/DataContext';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
 };
 
-const seminars = [
+type DisplaySeminar = {
+  title: string;
+  presenter: string;
+  date: string;
+  year: number;
+  summary?: string;
+  registrationUrl?: string;
+  meetingUrl?: string;
+  presentationUrl: string | null;
+  videoUrl: string | null;
+  imageUrl?: string;
+};
+
+const seededSeminars: DisplaySeminar[] = [
   {
     title: "FACTORS INFLUENCING THE ADOPTION OF GREEN SUPPLY CHAIN MANAGEMENT TECHNOLOGIES AND PRACTICES IN SELECTED PHARMACEUTICAL AND TEXTILE FIRMS IN SOUTHWESTERN NIGERIA",
     presenter: "Grace OJO-EMMANUEL",
@@ -95,6 +109,54 @@ const seminars = [
     date: "2025",
     year: 2025,
     presentationUrl: "/uploads/research/seminar-series/2025/presentations/presidential-priorities-ministerial-deliverables-emeka-joseph.pptx",
+    videoUrl: null,
+  },
+  {
+    title: "Unlocking Nigeria's Natural Resources through Strategies for Sustainable Development in Clean Energy",
+    presenter: "Thompson-Adewole Valentina",
+    date: "2025",
+    year: 2025,
+    presentationUrl: "/uploads/research/seminar-series/2025/presentations/unlocking-nigerias-natural-resources-clean-energy.pptx",
+    videoUrl: null,
+  },
+  {
+    title: "Assessment of Atmospheric Particulate Matter and Air Pollutants in Five Motor Parks in Ughelli, Delta State, Nigeria",
+    presenter: "Dr. Tari, Joel Honda",
+    date: "2025",
+    year: 2025,
+    presentationUrl: "/uploads/research/seminar-series/2025/presentations/assessment-atmospheric-particulate-matter-air-pollutants-ughelli.pptx",
+    videoUrl: null,
+  },
+  {
+    title: "Digital Transformation in Nigerian Private Universities: Adoption of E-Learning Technologies",
+    presenter: "Victor O. Sobanke (PhD)",
+    date: "2025",
+    year: 2025,
+    presentationUrl: "/uploads/research/seminar-series/2025/presentations/digital-transformation-nigerian-private-universities-elearning.pptx",
+    videoUrl: null,
+  },
+  {
+    title: "Collaborative Manufacturing Network: A Tool for SMMEs Growth in Nigeria",
+    presenter: "Engr A.A OGUNGBEMI",
+    date: "2025",
+    year: 2025,
+    presentationUrl: "/uploads/research/seminar-series/2025/presentations/collaborative-manufacturing-network-smmes-growth-nigeria.pptx",
+    videoUrl: null,
+  },
+  {
+    title: "Integrated Framework for R&D Commercialisation at Public Research Institutions",
+    presenter: "Dr. Babalola O.O. (ADR)",
+    date: "20th March, 2025",
+    year: 2025,
+    presentationUrl: "/uploads/research/seminar-series/2025/presentations/rd-commercialisation-public-research-institutions.pdf",
+    videoUrl: null,
+  },
+  {
+    title: "Proposal on In-Depth Evaluation of Leather Tanning Industry in the North-West Region of Nigeria",
+    presenter: "Mohammed Zayyanu Musa",
+    date: "2025",
+    year: 2025,
+    presentationUrl: "/uploads/research/seminar-series/2025/presentations/leather-tanning-industry-north-west-nigeria.pptx",
     videoUrl: null,
   },
   {
@@ -203,15 +265,36 @@ function ResourceAction({ href, type }: ResourceActionProps) {
   );
 }
 
+function formatSeminarDate(value: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+  const [year, month, day] = value.split('-').map(Number);
+  return new Intl.DateTimeFormat('en-NG', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(Date.UTC(year, month - 1, day)));
+}
+
 export default function SeminarSeries() {
+  const { seminars: managedSeminars } = useData();
+  const seminars: DisplaySeminar[] = managedSeminars
+    .filter((item) => item.status === 'published')
+    .map((item) => ({
+      ...item,
+      date: item.seminarDate,
+      presentationUrl: item.presentationUrl ?? null,
+      videoUrl: item.videoUrl ?? null,
+    }));
+  const displayedSeminars = seminars.length ? seminars : seededSeminars;
   const currentYear = new Date().getFullYear();
   const recentYears = Array.from({ length: 3 }, (_, index) => currentYear - index);
-  const archiveSeminars = seminars.filter((seminar) => seminar.year < currentYear - 2);
+  const archiveSeminars = displayedSeminars.filter((seminar) => seminar.year < currentYear - 2);
   const [selectedYear, setSelectedYear] = useState<number | 'archive'>(currentYear);
   const visibleSeminars =
     selectedYear === 'archive'
       ? archiveSeminars
-      : seminars.filter((seminar) => seminar.year === selectedYear);
+      : displayedSeminars.filter((seminar) => seminar.year === selectedYear);
 
   return (
     <div className="bg-slate-50 min-h-screen font-sans overflow-hidden">
@@ -300,35 +383,71 @@ export default function SeminarSeries() {
           </div>
 
           {visibleSeminars.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 items-stretch">
               {visibleSeminars.map((seminar) => (
-                <motion.div
+                <motion.article
                   key={`${seminar.title}-${seminar.presenter}`}
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true }}
                   variants={fadeInUp}
-                  className="bg-slate-50 border border-slate-200 rounded-[11px] p-8 hover:border-emerald-500 transition-all shadow-sm hover:shadow-md group flex flex-col h-full"
+                  className="bg-slate-50 border border-slate-200 rounded-[11px] overflow-hidden hover:border-emerald-500 transition-all shadow-sm hover:shadow-md group flex flex-col h-full"
                 >
-                  <div className="flex-1">
-                    <div className="inline-block bg-white text-emerald-700 font-bold text-[10px] uppercase tracking-widest px-3 py-1 rounded-[4px] border border-emerald-100 mb-6">
-                      <Calendar className="w-3 h-3 inline mr-1 -mt-0.5" /> {seminar.date}
+                  {seminar.imageUrl ? (
+                    <div className="aspect-[16/9] overflow-hidden bg-slate-200">
+                      <img
+                        src={seminar.imageUrl}
+                        alt={`${seminar.title} seminar artwork`}
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                        loading="lazy"
+                        decoding="async"
+                      />
                     </div>
-                    <h4 className="text-xl font-serif text-slate-900 mb-4 leading-snug group-hover:text-emerald-700 transition-colors">
-                      {seminar.title}
-                    </h4>
-                    <p className="text-slate-600 text-sm mb-6 flex items-center">
-                      <span className="font-bold text-slate-700 mr-2">Presented by:</span> {seminar.presenter}
-                    </p>
-                  </div>
+                  ) : null}
 
-                  <div className="pt-6 mt-auto border-t border-slate-200">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <ResourceAction href={seminar.presentationUrl} type="presentation" />
-                      <ResourceAction href={seminar.videoUrl} type="video" />
+                  <div className="flex flex-1 flex-col p-6 sm:p-8">
+                    <div className="flex-1">
+                      <div className="mb-6 inline-flex items-center rounded-[4px] border border-emerald-100 bg-white px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-emerald-700">
+                        <Calendar className="mr-2 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                        <time dateTime={seminar.date}>{formatSeminarDate(seminar.date)}</time>
+                      </div>
+                      <h4 className="mb-5 break-words text-xl font-serif leading-snug text-slate-900 transition-colors group-hover:text-emerald-700">
+                      {seminar.title}
+                      </h4>
+
+                      {seminar.summary ? (
+                        <p className="mb-6 line-clamp-3 text-sm leading-6 text-slate-600">{seminar.summary}</p>
+                      ) : null}
+
+                      <div className="mb-7 flex items-start gap-3 rounded-lg border border-slate-200 bg-white p-4">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
+                          <UserRound className="h-4 w-4" aria-hidden="true" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">Presented by</p>
+                          <p className="break-words text-sm font-bold leading-5 text-slate-800">{seminar.presenter}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-auto border-t border-slate-200 pt-6">
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <ResourceAction href={seminar.presentationUrl} type="presentation" />
+                        <ResourceAction href={seminar.videoUrl} type="video" />
+                        {seminar.registrationUrl ? (
+                          <a href={seminar.registrationUrl} target="_blank" rel="noreferrer" className="inline-flex w-full items-center justify-center rounded-[6px] border border-emerald-600 bg-white px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-emerald-700 transition-colors hover:bg-emerald-50 sm:text-xs">
+                            <ExternalLink className="mr-2 h-4 w-4 shrink-0" /> Register
+                          </a>
+                        ) : null}
+                        {seminar.meetingUrl ? (
+                          <a href={seminar.meetingUrl} target="_blank" rel="noreferrer" className="inline-flex w-full items-center justify-center rounded-[6px] border border-slate-300 bg-white px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-slate-900 transition-colors hover:border-emerald-600 hover:text-emerald-700 sm:text-xs">
+                            <Video className="mr-2 h-4 w-4 shrink-0" /> Join Meeting
+                          </a>
+                        ) : null}
+                      </div>
                     </div>
                   </div>
-                </motion.div>
+                </motion.article>
               ))}
             </div>
           ) : (

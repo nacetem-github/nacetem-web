@@ -1,15 +1,29 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { Menu, X, ChevronRight, ChevronDown, Mail, Twitter, Facebook, ArrowUp, User, Building2, Send, CheckCircle2 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { Menu, X, ChevronRight, ChevronDown, Mail, ArrowUp, User, Building2, Send, CheckCircle2, XCircle, MessageSquareWarning, ExternalLink, Linkedin, Facebook, Instagram, MessageCircle } from 'lucide-react';
+import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { cn } from '../lib/utils';
 import { NacetemLogo } from './NacetemLogo';
+import { supabase } from '../lib/supabase';
+import { officialSocialLinks, type SocialPlatform } from '../socialLinks';
+
+type NewsletterState = 'idle' | 'loading' | 'success' | 'error';
+
+const socialIcons = { linkedin: Linkedin, facebook: Facebook, whatsapp: MessageCircle, instagram: Instagram } satisfies Record<SocialPlatform, typeof Linkedin>;
 
 export default function Layout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [showNewsletterPopup, setShowNewsletterPopup] = useState(false);
-  const [newsletterSubmitted, setNewsletterSubmitted] = useState(false);
+  const [newsletterState, setNewsletterState] = useState<NewsletterState>('idle');
+  const [newsletterName, setNewsletterName] = useState('');
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterOrganization, setNewsletterOrganization] = useState('');
+  const [newsletterMessage, setNewsletterMessage] = useState('');
+  const newsletterDialogRef = useRef<HTMLDivElement>(null);
+  const newsletterNameInputRef = useRef<HTMLInputElement>(null);
+  const newsletterSuccessButtonRef = useRef<HTMLButtonElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
   const location = useLocation();
 
   useEffect(() => {
@@ -28,19 +42,119 @@ export default function Layout() {
   }, [location.pathname]);
 
   useEffect(() => {
+    if (!location.hash) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    window.setTimeout(() => {
+      const target = document.querySelector(location.hash);
+      target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 0);
+  }, [location.pathname, location.hash]);
+
+  useEffect(() => {
     const hasSeenNewsletter = window.sessionStorage.getItem('nacetem-newsletter-popup');
     if (hasSeenNewsletter) return;
 
     const timer = window.setTimeout(() => {
       setShowNewsletterPopup(true);
       window.sessionStorage.setItem('nacetem-newsletter-popup', 'shown');
-    }, 1400);
+    }, 12000);
 
     return () => window.clearTimeout(timer);
   }, []);
 
   const closeNewsletterPopup = () => {
     setShowNewsletterPopup(false);
+  };
+
+  useEffect(() => {
+    if (!showNewsletterPopup) return;
+    previousFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const focusTimer = window.requestAnimationFrame(() => newsletterNameInputRef.current?.focus());
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeNewsletterPopup();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+
+      const focusable = (Array.from(newsletterDialogRef.current?.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      ) ?? []) as HTMLElement[]).filter((element) => !element.hasAttribute('hidden'));
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.cancelAnimationFrame(focusTimer);
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+      previousFocusRef.current?.focus();
+    };
+  }, [showNewsletterPopup]);
+
+  useEffect(() => {
+    if (showNewsletterPopup && newsletterState === 'success') newsletterSuccessButtonRef.current?.focus();
+  }, [newsletterState, showNewsletterPopup]);
+
+  const handleNewsletterSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const email = newsletterEmail.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setNewsletterState('error');
+      setNewsletterMessage('Please enter a valid email address.');
+      return;
+    }
+
+    setNewsletterState('loading');
+    setNewsletterMessage('Submitting your subscription…');
+    try {
+      if (supabase) {
+        const { error } = await supabase.from('newsletter_subscribers').insert({
+          email,
+          full_name: newsletterName.trim(),
+          organization: newsletterOrganization.trim() || null,
+          status: 'subscribed',
+          source: 'website_popup',
+          subscribed_at: new Date().toISOString(),
+        });
+        if (error && error.code !== '23505') throw error;
+        setNewsletterMessage(error?.code === '23505' ? 'You are already on the NACETEM newsletter list.' : 'Your subscription has been recorded successfully.');
+      } else {
+        const response = await fetch('/api/newsletter', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, fullName: newsletterName.trim(), organization: newsletterOrganization.trim(), source: 'website_popup' }),
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error || 'Unable to subscribe right now.');
+        setNewsletterMessage('Your subscription has been recorded successfully.');
+      }
+      setNewsletterState('success');
+      setNewsletterEmail('');
+    } catch (error) {
+      setNewsletterState('error');
+      const message = error instanceof Error
+        ? error.message
+        : typeof error === 'object' && error && 'message' in error
+          ? String(error.message)
+          : 'Unable to subscribe right now. Please try again.';
+      setNewsletterMessage(message);
+    }
   };
 
   const navigation = [
@@ -55,8 +169,24 @@ export default function Layout() {
     },
     { name: 'Capacity Building', href: '/capacity-building' },
     { name: 'PSR Test', href: '/psr-test' },
-    { name: 'News', href: '/news' },
-    { name: 'Publications', href: '/publications' },
+    {
+      name: 'News & Gallery',
+      href: '/news',
+      children: [
+        { name: 'Upcoming Events', href: '/news#upcoming-events' },
+        { name: 'Featured Stories', href: '/news#featured-stories' },
+        { name: 'Event Gallery', href: '/news#event-gallery' },
+      ],
+    },
+    {
+      name: 'Publications',
+      href: '/publications',
+      children: [
+        { name: 'Policy Brief', href: '/publications#policy-briefs' },
+        { name: 'Technical Report', href: '/publications#technical-reports' },
+        { name: 'Newsletter', href: '/publications#newsletter' },
+      ],
+    },
     { name: 'Contact', href: '/contact' },
   ];
 
@@ -71,6 +201,20 @@ export default function Layout() {
           className="absolute bottom-0 left-0 h-[2px] bg-gold transition-all duration-75 z-50"
           style={{ width: `${scrollProgress}%` }}
         />
+        <div className="border-b border-emerald-800 bg-emerald-950 text-white">
+          <div className="mx-auto flex min-h-9 max-w-7xl items-center justify-center gap-2 px-4 py-1.5 text-center text-[11px] sm:justify-end sm:px-6 lg:px-8">
+            <MessageSquareWarning className="h-3.5 w-3.5 shrink-0 text-gold" aria-hidden="true" />
+            <span className="hidden text-white/75 sm:inline">Public or staff concern?</span>
+            <a
+              href="https://nacetem.gov.ng/nacetem_grm/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center font-bold uppercase tracking-wider text-gold transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+            >
+              Submit a grievance <ExternalLink className="ml-1 h-3 w-3" aria-hidden="true" />
+            </a>
+          </div>
+        </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-24 items-center justify-between sm:h-28">
             {/* Logo */}
@@ -91,7 +235,7 @@ export default function Layout() {
                     className={cn(
                       'text-xs font-bold uppercase tracking-wider transition-colors inline-flex items-center',
                       'py-2 border-b-2',
-                      isActive(item.href) && !item.children
+                      isActive(item.href)
                         ? 'border-emerald-600 text-slate-900 opacity-100'
                         : 'border-transparent text-slate-900 opacity-70 hover:opacity-100 hover:border-slate-300'
                     )}
@@ -147,7 +291,7 @@ export default function Layout() {
                     }}
                     className={cn(
                       'flex items-center justify-between px-3 py-2 rounded-md text-base font-medium',
-                      isActive(item.href) && !item.children
+                      isActive(item.href)
                         ? 'bg-emerald-50 text-emerald-800'
                         : 'text-slate-600 hover:text-emerald-700 hover:bg-slate-50'
                     )}
@@ -209,14 +353,25 @@ export default function Layout() {
                 ))}
               </ul>
               
-              <h3 className="text-xs font-bold text-white uppercase tracking-wider mt-8 mb-5 opacity-70">News & Events</h3>
+              <h3 className="text-xs font-bold text-white uppercase tracking-wider mt-8 mb-5 opacity-70">News & Gallery</h3>
               <ul className="space-y-3 font-medium text-sm">
-                {['Latest News', 'Upcoming Events', 'Past Events'].map((item) => (
-                  <li key={item}>
-                    <Link to="/news" className="hover:text-emerald-200 flex items-center transition-colors">
-                      <ChevronRight className="h-4 w-4 mr-1 opacity-70" />
-                      {item}
-                    </Link>
+                {[
+                  { name: 'Upcoming Events', href: '/news#upcoming-events' },
+                  { name: 'Featured Stories', href: '/news#featured-stories' },
+                  { name: 'Event Gallery', href: '/news#event-gallery' },
+                ].map((item) => (
+                  <li key={item.name}>
+                    {'external' in item && item.external ? (
+                      <a href={item.href} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-200 flex items-center transition-colors">
+                        <ChevronRight className="h-4 w-4 mr-1 opacity-70" />
+                        {item.name}
+                      </a>
+                    ) : (
+                      <Link to={item.href} className="hover:text-emerald-200 flex items-center transition-colors">
+                        <ChevronRight className="h-4 w-4 mr-1 opacity-70" />
+                        {item.name}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -229,8 +384,31 @@ export default function Layout() {
                 {[
                   { name: 'Research', href: '/research' },
                   { name: 'Capacity Building', href: '/capacity-building' },
-                  { name: 'STI Indicator Dashboard', href: '/initiatives' },
+                  { name: 'STI Dashboard & Databank', href: 'https://stidashboard.nacetem.gov.ng', external: true },
                   { name: 'PSR Test', href: '/psr-test' },
+                ].map((item) => (
+                  <li key={item.name}>
+                    {'external' in item && item.external ? (
+                      <a href={item.href} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-200 flex items-center transition-colors">
+                        <ChevronRight className="h-4 w-4 mr-1 opacity-70" />
+                        {item.name}
+                      </a>
+                    ) : (
+                      <Link to={item.href} className="hover:text-emerald-200 flex items-center transition-colors">
+                        <ChevronRight className="h-4 w-4 mr-1 opacity-70" />
+                        {item.name}
+                      </Link>
+                    )}
+                  </li>
+                ))}
+              </ul>
+
+              <h3 className="text-xs font-bold text-white uppercase tracking-wider mt-8 mb-5 opacity-70">Publications</h3>
+              <ul className="space-y-3 font-medium text-sm">
+                {[
+                  { name: 'Policy Brief', href: '/publications#policy-briefs' },
+                  { name: 'Technical Report', href: '/publications#technical-reports' },
+                  { name: 'Newsletter', href: '/publications#newsletter' },
                 ].map((item) => (
                   <li key={item.name}>
                     <Link to={item.href} className="hover:text-emerald-200 flex items-center transition-colors">
@@ -240,35 +418,32 @@ export default function Layout() {
                   </li>
                 ))}
               </ul>
-
-              <h3 className="text-xs font-bold text-white uppercase tracking-wider mt-8 mb-5 opacity-70">Publications</h3>
-              <ul className="space-y-3 font-medium text-sm">
-                {['Policy Brief', 'Technical Report', 'Newsletter'].map((item) => (
-                  <li key={item}>
-                    <Link to="/publications" className="hover:text-emerald-200 flex items-center transition-colors">
-                      <ChevronRight className="h-4 w-4 mr-1 opacity-70" />
-                      {item}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
             </div>
 
             {/* Connect */}
             <div>
               <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-5 opacity-70">Connect With Us</h3>
-              <div className="flex space-x-4 mb-8">
-                <a href="#" className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-emerald-50 transition-all hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/20 hover:text-white">
-                  <span className="sr-only">Email</span>
+              <div className="mb-8 flex flex-wrap gap-3">
+                {officialSocialLinks.map((social) => {
+                  const Icon = socialIcons[social.platform];
+                  return (
+                    <a key={social.platform} href={social.url} target="_blank" rel="noopener noreferrer" title={social.name} className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-emerald-50 transition-all hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/20 hover:text-white">
+                      <span className="sr-only">Follow NACETEM on {social.name}</span>
+                      <Icon className="h-5 w-5" />
+                    </a>
+                  );
+                })}
+                <a href="mailto:info@nacetem.gov.ng" className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-emerald-50 transition-all hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/20 hover:text-white">
+                  <span className="sr-only">Email NACETEM</span>
                   <Mail className="h-5 w-5" />
                 </a>
-                <a href="#" className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-emerald-50 transition-all hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/20 hover:text-white">
-                  <span className="sr-only">Twitter</span>
-                  <Twitter className="h-5 w-5" />
-                </a>
-                <a href="#" className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-emerald-50 transition-all hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/20 hover:text-white">
-                  <span className="sr-only">Facebook</span>
-                  <Facebook className="h-5 w-5" />
+                <Link to="/contact" className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-emerald-50 transition-all hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/20 hover:text-white">
+                  <span className="sr-only">Open the contact page</span>
+                  <Send className="h-5 w-5" />
+                </Link>
+                <a href="https://nacetem.gov.ng/nacetem_grm/" target="_blank" rel="noopener noreferrer" className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-emerald-50 transition-all hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/20 hover:text-white">
+                  <span className="sr-only">Open the Grievance Redress Management System</span>
+                  <MessageSquareWarning className="h-5 w-5" />
                 </a>
               </div>
             </div>
@@ -295,13 +470,12 @@ export default function Layout() {
 
       {showNewsletterPopup && (
         <div className="fixed inset-0 z-[80] flex items-center justify-center px-4 py-6">
-          <button
-            type="button"
-            aria-label="Close newsletter popup"
+          <div
+            aria-hidden="true"
             onClick={closeNewsletterPopup}
             className="absolute inset-0 bg-slate-900/65 backdrop-blur-sm"
           />
-          <div className="relative w-full max-w-3xl overflow-hidden rounded-[28px] bg-white shadow-2xl border border-white/70">
+          <div ref={newsletterDialogRef} role="dialog" aria-modal="true" aria-labelledby="newsletter-popup-title" aria-describedby="newsletter-popup-description" className="relative max-h-[calc(100vh-3rem)] w-full max-w-3xl overflow-y-auto rounded-[28px] bg-white shadow-2xl border border-white/70">
             <button
               type="button"
               onClick={closeNewsletterPopup}
@@ -326,16 +500,15 @@ export default function Layout() {
               </div>
 
               <div className="p-8 sm:p-10">
-                {newsletterSubmitted ? (
+                {newsletterState === 'success' ? (
                   <div className="min-h-[360px] flex flex-col items-center justify-center text-center">
                     <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
                       <CheckCircle2 className="h-8 w-8" />
                     </div>
-                    <h3 className="text-3xl font-serif text-slate-900 mb-4">Thank you for joining.</h3>
-                    <p className="text-sm text-slate-600 leading-7 max-w-sm">
-                      Your details have been received. You will now get NACETEM newsletter updates and programme announcements.
-                    </p>
+                    <h3 id="newsletter-popup-title" className="text-3xl font-serif text-slate-900 mb-4">Thank you for joining.</h3>
+                    <p id="newsletter-popup-description" className="text-sm text-slate-600 leading-7 max-w-sm">{newsletterMessage}</p>
                     <button
+                      ref={newsletterSuccessButtonRef}
                       type="button"
                       onClick={closeNewsletterPopup}
                       className="mt-8 inline-flex items-center justify-center rounded-[8px] bg-emerald-600 px-6 py-3 text-xs font-bold uppercase tracking-wider text-white hover:bg-emerald-700 transition-colors"
@@ -345,28 +518,28 @@ export default function Layout() {
                   </div>
                 ) : (
                   <>
-                    <h3 className="text-3xl font-serif text-slate-900 mb-3">Join Our Newsletter</h3>
-                    <p className="text-sm text-slate-600 leading-7 mb-8">
+                    <h3 id="newsletter-popup-title" className="text-3xl font-serif text-slate-900 mb-3">Join Our Newsletter</h3>
+                    <p id="newsletter-popup-description" className="text-sm text-slate-600 leading-7 mb-8">
                       Fill in your details to receive periodical updates about NACETEM activities, publications, and events.
                     </p>
 
                     <form
                       className="space-y-5"
-                      onSubmit={(event) => {
-                        event.preventDefault();
-                        setNewsletterSubmitted(true);
-                      }}
+                      onSubmit={handleNewsletterSubmit}
                     >
                       <div>
-                        <label htmlFor="newsletter-name" className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">
+                        <label htmlFor="newsletter-popup-name" className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">
                           Full Name
                         </label>
                         <div className="relative">
                           <User className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                           <input
-                            id="newsletter-name"
+                            ref={newsletterNameInputRef}
+                            id="newsletter-popup-name"
                             type="text"
                             required
+                            value={newsletterName}
+                            onChange={(event) => setNewsletterName(event.target.value)}
                             placeholder="Your full name"
                             className="w-full rounded-[8px] border border-slate-200 bg-slate-50 py-3.5 pl-11 pr-4 text-sm text-slate-900 outline-none transition-colors focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-600/10"
                           />
@@ -374,15 +547,17 @@ export default function Layout() {
                       </div>
 
                       <div>
-                        <label htmlFor="newsletter-email" className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">
+                        <label htmlFor="newsletter-popup-email" className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">
                           Email Address
                         </label>
                         <div className="relative">
                           <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                           <input
-                            id="newsletter-email"
+                            id="newsletter-popup-email"
                             type="email"
                             required
+                            value={newsletterEmail}
+                            onChange={(event) => setNewsletterEmail(event.target.value)}
                             placeholder="you@example.com"
                             className="w-full rounded-[8px] border border-slate-200 bg-slate-50 py-3.5 pl-11 pr-4 text-sm text-slate-900 outline-none transition-colors focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-600/10"
                           />
@@ -390,25 +565,35 @@ export default function Layout() {
                       </div>
 
                       <div>
-                        <label htmlFor="newsletter-organization" className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">
+                        <label htmlFor="newsletter-popup-organization" className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">
                           Organization
                         </label>
                         <div className="relative">
                           <Building2 className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                           <input
-                            id="newsletter-organization"
+                            id="newsletter-popup-organization"
                             type="text"
+                            value={newsletterOrganization}
+                            onChange={(event) => setNewsletterOrganization(event.target.value)}
                             placeholder="Institution, agency, or company"
                             className="w-full rounded-[8px] border border-slate-200 bg-slate-50 py-3.5 pl-11 pr-4 text-sm text-slate-900 outline-none transition-colors focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-600/10"
                           />
                         </div>
                       </div>
 
+                      {newsletterMessage && (
+                        <div className={`flex items-start gap-2 text-sm ${newsletterState === 'error' ? 'text-red-700' : 'text-slate-600'}`} role="status" aria-live="polite">
+                          {newsletterState === 'error' && <XCircle className="mt-0.5 h-4 w-4 shrink-0" />}
+                          <span>{newsletterMessage}</span>
+                        </div>
+                      )}
+
                       <button
                         type="submit"
+                        disabled={newsletterState === 'loading'}
                         className="inline-flex w-full items-center justify-center rounded-[8px] bg-emerald-600 px-6 py-4 text-xs font-bold uppercase tracking-wider text-white shadow-lg shadow-emerald-900/10 hover:bg-emerald-700 transition-colors"
                       >
-                        <Send className="mr-2 h-4 w-4" /> Join Newsletter
+                        <Send className="mr-2 h-4 w-4" /> {newsletterState === 'loading' ? 'Submitting…' : 'Join Newsletter'}
                       </button>
                     </form>
                   </>
