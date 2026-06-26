@@ -71,9 +71,19 @@ export default function News() {
   const hasMoreArticles = visibleArticles < newsArticles.length;
   const { upcomingEvents, pastEvents } = splitEventsByStatus(events.filter((event) => event.status === 'published'));
   const managedGalleryEvents = Object.values(gallery.filter((item) => item.status === 'published').reduce<Record<string, GalleryAlbum>>((albums, item) => {
-    const id = item.album.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    if (!albums[id]) albums[id] = { id, title: item.album, meta: [item.location, item.eventDate?.slice(0, 4)].filter(Boolean).join(' | '), folder: '', images: [] };
-    albums[id].images.push({ src: item.imageUrl, alt: item.imageAlt });
+    const title = item.album || item.title;
+    const id = item.id || title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const meta = [item.location, item.eventDate].filter(Boolean).join(' | ');
+    const eventImages = item.images?.length ? item.images : [{ src: item.imageUrl, alt: item.imageAlt }];
+
+    if (item.images?.length) {
+      albums[id] = { id, title, meta, folder: '', images: eventImages };
+      return albums;
+    }
+
+    const legacyId = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    if (!albums[legacyId]) albums[legacyId] = { id: legacyId, title, meta, folder: '', images: [] };
+    albums[legacyId].images.push(...eventImages);
     return albums;
   }, {})) as GalleryAlbum[];
   const availableGalleries = managedGalleryEvents.length ? managedGalleryEvents : galleryEvents;
@@ -486,8 +496,8 @@ export default function News() {
             </div>
 
             <div className="image-frame rounded-[11px] border border-slate-200 bg-slate-50 shadow-sm">
-              <div className="grid grid-cols-1 xl:grid-cols-[1.35fr_0.65fr]">
-                <div className="image-frame relative min-h-[420px] bg-slate-900">
+              <div className="grid grid-cols-1 xl:h-[560px] xl:grid-cols-[1.35fr_0.65fr]">
+                <div className="image-frame relative min-h-[420px] bg-slate-900 xl:h-full xl:min-h-0">
                   <button
                     type="button"
                     onClick={() => setLightboxImageIndex(activeImageIndex)}
@@ -531,19 +541,19 @@ export default function News() {
                   </div>
                 </div>
 
-                <div className="p-5 sm:p-6">
+                <div className="flex min-h-0 flex-col p-5 sm:p-6">
                   <div className="mb-5 rounded-[8px] border border-slate-200 bg-white p-4">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">Selected Event</p>
                     <p className="text-sm font-bold text-slate-900">{activeGallery.title}</p>
                     <p className="mt-1 text-xs font-bold uppercase tracking-widest text-emerald-700">{activeGallery.meta}</p>
                   </div>
-                  <div className="grid grid-cols-3 xl:grid-cols-1 gap-3">
+                  <div className="grid max-h-[360px] grid-cols-3 gap-3 overflow-y-auto pr-1 xl:max-h-none xl:min-h-0 xl:flex-1 xl:grid-cols-1">
                     {activeGallery.images.map((image, index) => {
                       const isSelected = activeImageIndex === index;
 
                       return (
                         <button
-                          key={image.alt}
+                          key={`${image.src}-${index}`}
                           type="button"
                           onClick={() => setActiveImageIndex(index)}
                           onDoubleClick={() => setLightboxImageIndex(index)}

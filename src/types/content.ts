@@ -28,6 +28,10 @@ export interface GalleryItem extends ManagedFields {
   url: string;
   imageAlt: string;
   album: string;
+  images?: Array<{
+    src: string;
+    alt: string;
+  }>;
   eventDate?: string;
   location?: string;
 }
