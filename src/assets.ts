@@ -21,6 +21,7 @@ import industrialInspectionImage from './assets/images/pages/industrial-inspecti
 import psrPlatformImage from './assets/images/pages/psr.jpeg';
 import digitalAcademyPlatformImage from './assets/images/pages/academy.jpeg';
 import stiDashboardPlatformImage from './assets/images/pages/sti-dashboard.jpeg';
+import dgImage from '../Dr-Shola-1024x936 (1).jpg';
 
 export const assets = {
   apodissiLogo,
@@ -46,4 +47,5 @@ export const assets = {
   psrPlatformImage,
   digitalAcademyPlatformImage,
   stiDashboardPlatformImage,
+  dgImage,
 };

@@ -346,16 +346,27 @@ export default function About() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row gap-12 items-center">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeInLeft} className="w-full md:w-1/3">
-              <motion.div whileHover={{ y: -6 }} transition={{ duration: 0.3 }} className="image-frame aspect-[2/3] relative mx-auto max-w-sm rounded-2xl border border-slate-200/80 bg-slate-100 shadow-sm">
-                <motion.img
-                  src="/uploads/about/dg-main.jpeg"
-                  alt="Dr. Olushola Odusanya, Director-General and Chief Executive Officer of NACETEM"
-                  className="w-full h-full object-cover object-top"
-                  loading="lazy"
-                  decoding="async"
-                  whileHover={{ scale: 1.035 }}
-                  transition={{ duration: 0.6, ease: "easeOut" }}
-                />
+              <motion.div whileHover={{ y: -6 }} transition={{ duration: 0.3 }} className="relative mx-auto max-w-sm">
+                <div className="absolute -left-4 -top-4 h-24 w-24 border-l border-t border-gold/70"></div>
+                <div className="absolute -right-4 -bottom-4 h-24 w-24 border-b border-r border-emerald-600/35"></div>
+                <div className="aspect-[3/4] relative overflow-hidden rounded-lg border border-slate-200 bg-white p-3 shadow-2xl shadow-slate-900/10">
+                  <div className="relative h-full overflow-hidden rounded-lg bg-slate-100">
+                    <motion.img
+                      src={assets.dgImage}
+                      alt="Dr. Olushola Odusanya, Director-General and Chief Executive Officer of NACETEM"
+                      className="w-full h-full object-cover object-top"
+                      loading="lazy"
+                      decoding="async"
+                      whileHover={{ scale: 1.035 }}
+                      transition={{ duration: 0.6, ease: "easeOut" }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-transparent to-transparent"></div>
+                    <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-gold">Director General / CEO</p>
+                      <p className="mt-1 font-serif text-2xl leading-tight">Dr. Olushola Odusanya</p>
+                    </div>
+                  </div>
+                </div>
               </motion.div>
             </motion.div>
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeInRight} className="md:w-2/3 max-w-2xl">
