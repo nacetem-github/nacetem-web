@@ -79,10 +79,10 @@ export default function Publications() {
               NACETEM Knowledge Products
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-7xl font-serif text-white leading-tight mb-8">
-              Publications
+              Research Publications and Knowledge Resources
             </h1>
             <p className="text-lg sm:text-xl text-slate-100/90 leading-relaxed font-light mx-auto max-w-3xl">
-              Bridging the Gap Between Technology, Innovation, and Policy for Nigeria's Sustainable Development.
+              Explore NACETEM's policy briefs, technical reports, newsletters, and evidence products supporting science, technology, innovation, and national development.
             </p>
           </motion.div>
         </div>
