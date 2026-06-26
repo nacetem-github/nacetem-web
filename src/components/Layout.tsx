@@ -223,7 +223,7 @@ export default function Layout() {
               aria-label="NACETEM home"
               className="group block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-4"
             >
-              <NacetemLogo className="group-hover:-translate-y-0.5 group-hover:border-emerald-600/25 group-hover:shadow-[0_12px_30px_rgba(0,102,51,0.12)]" />
+              <NacetemLogo size="compact" unframed className="group-hover:-translate-y-0.5" />
             </Link>
 
             {/* Desktop Navigation */}
