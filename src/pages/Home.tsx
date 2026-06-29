@@ -602,7 +602,7 @@ export default function Home() {
               >
                 <ChevronRight className="h-5 w-5" />
               </button>
-              <Link to="/events" className="hidden md:inline-flex items-center text-xs font-bold uppercase tracking-widest text-emerald-600 hover:text-emerald-700 border-b border-transparent hover:border-emerald-700 pb-1">
+              <Link to="/News" className="hidden md:inline-flex items-center text-xs font-bold uppercase tracking-widest text-emerald-600 hover:text-emerald-700 border-b border-transparent hover:border-emerald-700 pb-1">
                 View All Events <ArrowRight className="ml-1 h-3 w-3" />
               </Link>
             </div>
