@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, type Dispatch, type Rea
 import { supabase } from '../lib/supabase';
 import { assets } from '../assets';
 import { newsArticles as seededNews } from '../data/news';
+import { defaultPublications } from '../data/publications';
 import type { CmsContentType, EventItem, GalleryItem, NewsItem, PublicationItem, SeminarItem } from '../types/content';
 
 export type { EventItem, GalleryItem, NewsItem, PublicationItem, SeminarItem } from '../types/content';
@@ -25,11 +26,15 @@ const defaultEvents: EventItem[] = [{
   location: 'NACETEM South-West Office, 9 Kofo Abayomi Street, V.I. Lagos', format: 'Hybrid', flyerUrl: '/uploads/events/flyers/2026/entrepreneurship-innovation-driving-organisation-change/flyer.jpeg', fee: 'N300,000',
   contactPhones: ['07033091950', '08033640647'], contactEmail: 'nacetemsouthwest@gmail.com', status: 'published', featured: true, publishedAt: now,
 }];
-const defaults = { news: defaultNews, event: defaultEvents, gallery: defaultGallery, seminar: [] as SeminarItem[], publication: [] as PublicationItem[] };
+const defaults = { news: defaultNews, event: defaultEvents, gallery: defaultGallery, seminar: [] as SeminarItem[], publication: defaultPublications };
 const key = (type: CmsContentType) => `nacetem-cms-${type}`;
 
 function localItems<T>(type: CmsContentType, fallback: T[]): T[] {
   try { const value = localStorage.getItem(key(type)); return value ? JSON.parse(value) : fallback; } catch { return fallback; }
+}
+function withDefaultPublications(items: PublicationItem[]) {
+  const ids = new Set(items.map((item) => item.id));
+  return [...items, ...defaultPublications.filter((item) => !ids.has(item.id))];
 }
 function sortItems<T extends { featured: boolean; publishedAt: string }>(items: T[]) {
   return [...items].sort((a, b) => Number(b.featured) - Number(a.featured) || String(b.publishedAt).localeCompare(String(a.publishedAt)));
@@ -47,7 +52,7 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export function DataProvider({ children }: { children: ReactNode }) {
   const [news, setNews] = useState(defaultNews); const [events, setEvents] = useState(defaultEvents); const [gallery, setGallery] = useState(defaultGallery);
-  const [seminars, setSeminars] = useState<SeminarItem[]>([]); const [publications, setPublications] = useState<PublicationItem[]>([]); const [isLoading, setIsLoading] = useState(true);
+  const [seminars, setSeminars] = useState<SeminarItem[]>([]); const [publications, setPublications] = useState<PublicationItem[]>(defaultPublications); const [isLoading, setIsLoading] = useState(true);
   const setters: Record<CmsContentType, Setter> = { news: setNews, event: setEvents, gallery: setGallery, seminar: setSeminars, publication: setPublications };
 
   useEffect(() => { (async () => {
@@ -57,12 +62,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
         if (!error && data) {
           (Object.keys(setters) as CmsContentType[]).forEach((type) => {
             const items = data.filter((row) => row.type === type).map((row) => ({ ...row.data, id: row.id, createdAt: row.created_at, updatedAt: row.updated_at }));
-            setters[type](items.length ? items : defaults[type]);
+            setters[type](type === 'publication' ? withDefaultPublications(items as PublicationItem[]) : items.length ? items : defaults[type]);
           });
           return;
         }
       }
-      (Object.keys(setters) as CmsContentType[]).forEach((type) => setters[type](localItems<any>(type, defaults[type] as any[])));
+      (Object.keys(setters) as CmsContentType[]).forEach((type) => {
+        const items = localItems<any>(type, defaults[type] as any[]);
+        setters[type](type === 'publication' ? withDefaultPublications(items) : items);
+      });
     } finally { setIsLoading(false); }
   })(); }, []);
 
