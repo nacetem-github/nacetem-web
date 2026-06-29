@@ -9,6 +9,9 @@ type Field = { name: string; label: string; type?: string; required?: boolean; a
 type FileMap = Record<string, File[]>;
 const slugify = (v: string) => v.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 const today = () => new Date().toISOString().slice(0, 10);
+const IMAGE_MAX_WIDTH = 1800;
+const IMAGE_MAX_HEIGHT = 1400;
+const IMAGE_QUALITY = 0.82;
 
 const config: Record<CmsContentType, { title: string; help: string; fields: Field[] }> = {
   news: { title: 'News & Featured Stories', help: 'The image and source document are stored with this story, so they stay correctly paired everywhere.', fields: [
@@ -32,12 +35,40 @@ const config: Record<CmsContentType, { title: string; help: string; fields: Fiel
     {name:'author',label:'Author(s)'},{name:'summary',label:'Summary',type:'textarea',required:true},{name:'fileUrl',label:'Publication file',type:'file',accept:'.pdf,.doc,.docx',required:true},{name:'coverImageUrl',label:'Cover image',type:'file',accept:'image/*'}]},
 };
 
+async function optimizeImage(file: File) {
+  if (!file.type.startsWith('image/') || file.type === 'image/svg+xml') return file;
+
+  try {
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, IMAGE_MAX_WIDTH / bitmap.width, IMAGE_MAX_HEIGHT / bitmap.height);
+    const width = Math.max(1, Math.round(bitmap.width * scale));
+    const height = Math.max(1, Math.round(bitmap.height * scale));
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext('2d');
+    if (!context) return file;
+
+    context.drawImage(bitmap, 0, 0, width, height);
+    bitmap.close();
+
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/jpeg', IMAGE_QUALITY));
+    if (!blob || blob.size >= file.size) return file;
+
+    const optimizedName = file.name.replace(/\.[^.]+$/, '') + '.jpg';
+    return new File([blob], optimizedName, { type: 'image/jpeg', lastModified: Date.now() });
+  } catch {
+    return file;
+  }
+}
+
 async function upload(file: File, type: CmsContentType, id: string) {
-  if (!supabase) return await new Promise<string>((resolve, reject) => { const r = new FileReader(); r.onload=()=>resolve(String(r.result)); r.onerror=reject; r.readAsDataURL(file); });
-  const name = file.name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-');
+  const uploadFile = await optimizeImage(file);
+  if (!supabase) return await new Promise<string>((resolve, reject) => { const r = new FileReader(); r.onload=()=>resolve(String(r.result)); r.onerror=reject; r.readAsDataURL(uploadFile); });
+  const name = uploadFile.name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-');
   const unique = typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const path = `${type}/${new Date().getFullYear()}/${id}/${unique}-${name}`;
-  const { error } = await supabase.storage.from('content-media').upload(path, file);
+  const { error } = await supabase.storage.from('content-media').upload(path, uploadFile, { contentType: uploadFile.type });
   if (error) throw error;
   return supabase.storage.from('content-media').getPublicUrl(path).data.publicUrl;
 }
