@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Search, Landmark, GraduationCap, Layers, MapPin, Calendar as CalendarIcon, Image as ImageIcon, Pause, Play, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, Search, Landmark, GraduationCap, Layers, MapPin, Calendar as CalendarIcon, Pause, Play, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, useReducedMotion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { useData } from '../contexts/DataContext';
@@ -12,18 +12,27 @@ const heroSlides = [
   {
     image: assets.headquartersImage,
     title: 'NACETEM Headquarters',
+    eyebrow: 'Institutional leadership',
   },
   {
     image: assets.capacityImage,
     title: 'Capacity Development Programmes',
+    eyebrow: 'Skills and training',
   },
   {
     image: assets.policyImage,
     title: 'STI Policy Engagement',
+    eyebrow: 'Evidence for policy',
+  },
+  {
+    image: assets.seminarImage,
+    title: 'Research Seminar Series',
+    eyebrow: 'Knowledge exchange',
   },
   {
     image: assets.industrialInspectionImage,
     title: 'Industry and Innovation Systems Engagement',
+    eyebrow: 'Connected ecosystems',
   },
 ];
 
@@ -49,6 +58,7 @@ export default function Home() {
   const [activeStoryIndex, setActiveStoryIndex] = useState(0);
   const [activeVideoIndex, setActiveVideoIndex] = useState(0);
   const activeHero = heroSlides[activeHeroIndex];
+  const nextHero = heroSlides[(activeHeroIndex + 1) % heroSlides.length];
   const displayedGallery = [
     ...gallery.filter((item) => item.status === 'published'),
     ...galleryFallbacks.filter((fallback) => !gallery.some((img) => img.url === fallback.url)),
@@ -104,49 +114,96 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="relative mt-12 lg:mt-0 min-w-0 flex justify-center lg:justify-end"
             >
-              <div className="relative z-10 w-full max-w-[520px]">
-                <div className="absolute left-0 right-0 top-1/2 h-px bg-gradient-to-r from-transparent via-gold to-transparent -translate-y-1/2 z-0"></div>
-                <div className="relative mx-auto aspect-square w-full max-w-[500px] rounded-full border-[10px] border-white bg-slate-100 shadow-2xl overflow-hidden z-10">
-                  <motion.img
-                    key={activeHero.image}
-                    src={activeHero.image}
-                    alt={activeHero.title}
-                    loading="eager"
-                    fetchPriority="high"
-                    decoding="async"
-                    initial={{ opacity: 0, scale: 1.08, rotate: 1.5 }}
-                    animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                    transition={{ duration: 0.9, ease: 'easeOut' }}
-                    className="w-full h-full object-cover"
+              <div className="relative z-10 w-full max-w-[560px]">
+                <div className="relative mx-auto aspect-square w-full max-w-[520px]">
+                  <motion.div
+                    key={`orbit-${activeHeroIndex}`}
+                    initial={{ rotate: -18 }}
+                    animate={{ rotate: 342 }}
+                    transition={{ duration: isHeroPaused || prefersReducedMotion ? 0 : 5, ease: 'linear' }}
+                    className="absolute inset-0 rounded-full border border-dashed border-gold/60"
                   />
-                  <div className="absolute inset-0 rounded-full ring-1 ring-black/10 pointer-events-none"></div>
-                  <div className="absolute inset-x-12 bottom-10 h-1 bg-white/40 rounded-full overflow-hidden">
-                    <motion.div
-                      key={activeHeroIndex}
-                      initial={{ width: '0%' }}
-                      animate={{ width: '100%' }}
-                      transition={{ duration: isHeroPaused || prefersReducedMotion ? 0 : 5, ease: 'linear' }}
-                      className="h-full bg-gold"
+                  <div className="absolute inset-8 rounded-full border border-emerald-600/20"></div>
+                  <div className="absolute inset-14 rounded-full bg-white shadow-2xl shadow-slate-900/10"></div>
+
+                  <div className="absolute inset-8 overflow-hidden rounded-full border-[10px] border-white bg-slate-100 shadow-2xl">
+                    <motion.img
+                      key={activeHero.image}
+                      src={activeHero.image}
+                      alt={activeHero.title}
+                      loading="eager"
+                      fetchPriority="high"
+                      decoding="async"
+                      initial={{ opacity: 0, scale: 1.1, rotate: 2 }}
+                      animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                      transition={{ duration: 0.9, ease: 'easeOut' }}
+                      className="h-full w-full object-cover"
                     />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/10 to-transparent"></div>
+                    <div className="absolute inset-0 rounded-full ring-1 ring-black/10 pointer-events-none"></div>
+                    <div className="absolute bottom-10 left-8 right-8 text-center text-white">
+                      <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-gold">{activeHero.eyebrow}</p>
+                      <h2 className="text-2xl sm:text-3xl font-serif leading-tight">{activeHero.title}</h2>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setActiveHeroIndex((activeHeroIndex + 1) % heroSlides.length)}
+                    className="absolute right-2 top-8 w-28 overflow-hidden rounded-full border-[6px] border-white bg-white shadow-2xl shadow-slate-900/20 transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gold sm:right-5 sm:top-10 sm:w-36"
+                    aria-label={`Preview next image: ${nextHero.title}`}
+                  >
+                    <div className="aspect-square overflow-hidden rounded-full bg-slate-100">
+                      <motion.img
+                        key={nextHero.image}
+                        src={nextHero.image}
+                        alt=""
+                        initial={{ opacity: 0.65, scale: 1.12 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.6, ease: 'easeOut' }}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                    <span className="absolute inset-x-2 bottom-2 rounded-full bg-white/90 px-2 py-1 text-center text-[9px] font-bold uppercase tracking-widest text-emerald-700">
+                      Next
+                    </span>
+                  </button>
+
+                  <div className="absolute bottom-5 left-1/2 w-[68%] -translate-x-1/2">
+                    <div className="h-1.5 overflow-hidden rounded-full bg-white/65">
+                      <motion.div
+                        key={activeHeroIndex}
+                        initial={{ width: '0%' }}
+                        animate={{ width: '100%' }}
+                        transition={{ duration: isHeroPaused || prefersReducedMotion ? 0 : 5, ease: 'linear' }}
+                        className="h-full bg-gold"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="absolute -bottom-7 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-3 shadow-lg shadow-slate-900/8">
+                    {heroSlides.map((slide, idx) => (
+                      <button
+                        key={slide.title}
+                        type="button"
+                        onClick={() => setActiveHeroIndex(idx)}
+                        className={`h-2.5 rounded-full transition-all ${idx === activeHeroIndex ? 'w-8 bg-emerald-600' : 'w-2.5 bg-slate-300 hover:bg-slate-400'}`}
+                        aria-label={`Show ${slide.title}`}
+                      />
+                    ))}
                   </div>
                 </div>
-                <div className="mt-6 flex items-center justify-center gap-3">
-                  {heroSlides.map((slide, idx) => (
-                    <button
-                      key={slide.title}
-                      type="button"
-                      onClick={() => setActiveHeroIndex(idx)}
-                      className={`h-2.5 rounded-full transition-all ${idx === activeHeroIndex ? 'w-10 bg-emerald-600' : 'w-2.5 bg-slate-300 hover:bg-slate-400'}`}
-                      aria-label={`Show ${slide.title}`}
-                    />
-                  ))}
+
+                <div className="absolute left-2 top-16 hidden h-24 w-24 rounded-full border border-gold/40 lg:block"></div>
+                <div className="absolute bottom-8 right-4 hidden h-28 w-28 rounded-full border border-emerald-600/20 lg:block"></div>
+                <div className="mt-12 flex items-center justify-center">
                   {prefersReducedMotion ? (
-                    <span className="ml-2 inline-flex h-9 items-center rounded-full border border-slate-200 bg-white px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">Motion reduced</span>
+                    <span className="inline-flex h-9 items-center rounded-full border border-slate-200 bg-white px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">Motion reduced</span>
                   ) : (
                     <button
                       type="button"
                       onClick={() => setIsHeroPaused((current) => !current)}
-                      className="ml-2 inline-flex h-9 items-center gap-1.5 rounded-full border border-slate-300 bg-white px-3 text-[10px] font-bold uppercase tracking-wider text-slate-700 transition-colors hover:border-emerald-600 hover:text-emerald-700"
+                      className="inline-flex h-9 items-center gap-1.5 rounded-full border border-slate-300 bg-white px-3 text-[10px] font-bold uppercase tracking-wider text-slate-700 transition-colors hover:border-emerald-600 hover:text-emerald-700"
                       aria-label={isHeroPaused ? 'Resume automatic hero slideshow' : 'Pause automatic hero slideshow'}
                       aria-pressed={isHeroPaused}
                     >
@@ -156,9 +213,8 @@ export default function Home() {
                   )}
                 </div>
               </div>
-              {/* Decorative elements */}
-              <div className="absolute bottom-8 right-0 sm:right-4 w-32 h-32 sm:w-44 sm:h-44 rounded-full bg-emerald-50 border border-emerald-100 z-0"></div>
-              <div className="absolute top-2 left-0 sm:left-4 w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-slate-100 border border-slate-200 z-0"></div>
+              <div className="absolute bottom-10 right-0 h-20 w-20 rounded-full border border-emerald-600/10 bg-emerald-50/60 z-0"></div>
+              <div className="absolute top-8 left-0 h-16 w-16 rounded-full border border-slate-200 bg-slate-100/70 z-0"></div>
             </motion.div>
           </div>
         </div>
@@ -217,49 +273,49 @@ export default function Home() {
                 title: "Public Service Rules Exam Prep Tool",
                 desc: "AI-supported exam preparation platform designed to help public servants prepare effectively for promotion examinations.",
                 link: "/psr-test",
-                img: assets.psrPlatformImage,
-                fit: "contain"
+                img: assets.psrPlatformImage
               },
               {
                 title: "NACETEM AI-Ecosystem powered by Daimlas",
                 desc: "A collaborative platform connecting AI stakeholders, research opportunities, innovation projects, and implementation support.",
                 link: "/initiatives#ai-ecosystem",
-                img: assets.aiEcosystemImage,
-                fit: "cover"
+                img: assets.aiEcosystemImage
               },
               {
                 title: "NACETEM Digital Academy",
                 desc: "Professional and academic learning programmes focused on digital skills, innovation, technology management, and institutional transformation.",
                 link: "/initiatives#digital-academy",
-                img: assets.digitalAcademyPlatformImage,
-                fit: "contain"
+                img: assets.digitalAcademyPlatformImage
               },
               {
                 title: "NACETEM Welding Initiative",
                 desc: "A technical capacity-building initiative supporting welding excellence, certification readiness, and industrial skills development.",
                 link: "/initiatives#welding-initiative",
-                img: assets.weldingImage,
-                fit: "cover"
+                img: assets.weldingImage
               },
               {
                 title: "Systems Dynamics and Systems Thinking",
                 desc: "A strategic programme for understanding complex systems, improving policy analysis, and strengthening evidence-based decision-making.",
                 link: "/initiatives#systems-thinking",
-                img: assets.seminarImage,
-                fit: "cover"
+                img: assets.seminarImage
               },
               {
                 title: "STI Dashboard & Databank",
                 desc: "A data-driven platform for communicating science, technology, and innovation outputs for national planning and policy coordination.",
                 link: "https://stidashboard.nacetem.gov.ng",
                 external: true,
-                img: assets.stiDashboardPlatformImage,
-                fit: "contain"
+                img: assets.stiDashboardPlatformImage
               }
             ].map((initiative, idx) => (
               <div key={idx} className="bg-white border border-slate-200/80 rounded-2xl group flex flex-col p-5 shadow-sm hover:shadow-md hover:border-emerald-500/30 transition-all duration-300">
-                <div className="image-frame h-48 mb-4 border border-slate-100 rounded-xl bg-slate-50">
-                  <img src={initiative.img} alt={initiative.title} loading="lazy" decoding="async" className={`w-full h-full ${initiative.fit === 'contain' ? 'object-contain' : 'object-cover group-hover:scale-105'} transition-transform duration-700`} />
+                <div className="image-frame aspect-[16/10] mb-4 overflow-hidden rounded-xl border border-slate-100 bg-slate-50 sm:aspect-[4/3] lg:aspect-[16/10]">
+                  <img
+                    src={initiative.img}
+                    alt={initiative.title}
+                    loading="lazy"
+                    decoding="async"
+                    className="h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+                  />
                 </div>
                 <div className="flex-1 flex flex-col pt-2">
                   <h4 className="text-lg font-serif text-slate-900 mb-2">{initiative.title}</h4>

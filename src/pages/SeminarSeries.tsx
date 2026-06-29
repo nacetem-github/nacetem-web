@@ -276,6 +276,36 @@ function formatSeminarDate(value: string) {
   }).format(new Date(Date.UTC(year, month - 1, day)));
 }
 
+function formatDisplayText(value: string) {
+  const minorWords = new Set(['a', 'an', 'and', 'as', 'at', 'by', 'for', 'in', 'of', 'on', 'or', 'the', 'to', 'with']);
+  const acronymWords = new Set(['ai', 'ict', 'r&d', 'rsm', 'sdg', 'sti', 'smmes', 'pp&md']);
+
+  return value
+    .split(/(\s+)/)
+    .map((part, index) => {
+      if (/^\s+$/.test(part)) return part;
+
+      return part
+        .split(/(-)/)
+        .map((segment) => {
+          if (segment === '-') return segment;
+          if (/[a-z]/.test(segment) && !/^[A-Z][a-z]+$/.test(segment)) return segment;
+          if (/^[A-Z]\.(?:[A-Z]\.)*$/i.test(segment)) return segment.toUpperCase();
+          const lower = segment.toLowerCase();
+          const trimmed = lower.replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, '');
+
+          if (!trimmed) return segment;
+          if (acronymWords.has(trimmed)) return segment.toUpperCase();
+          if (trimmed === 'phd' || trimmed === 'ph.d') return segment.replace(/[a-z.]+/i, 'PhD');
+          if (minorWords.has(trimmed) && index !== 0) return lower;
+
+          return lower.replace(/[a-z]/, (char) => char.toUpperCase());
+        })
+        .join('');
+    })
+    .join('');
+}
+
 export default function SeminarSeries() {
   const { seminars: managedSeminars } = useData();
   const seminars: DisplaySeminar[] = managedSeminars
@@ -405,14 +435,14 @@ export default function SeminarSeries() {
                     </div>
                   ) : null}
 
-                  <div className="flex flex-1 flex-col p-6 sm:p-8">
+                  <div className="flex min-h-[480px] flex-1 flex-col p-6 sm:p-8">
                     <div className="flex-1">
                       <div className="mb-6 inline-flex items-center rounded-[4px] border border-emerald-100 bg-white px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-emerald-700">
                         <Calendar className="mr-2 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                         <time dateTime={seminar.date}>{formatSeminarDate(seminar.date)}</time>
                       </div>
-                      <h4 className="mb-5 break-words text-xl font-serif leading-snug text-slate-900 transition-colors group-hover:text-emerald-700">
-                      {seminar.title}
+                      <h4 className="mb-5 break-words text-xl font-serif leading-snug text-slate-900 transition-colors group-hover:text-emerald-700 line-clamp-4">
+                        {formatDisplayText(seminar.title)}
                       </h4>
 
                       {seminar.summary ? (
@@ -425,7 +455,7 @@ export default function SeminarSeries() {
                         </div>
                         <div className="min-w-0">
                           <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">Presented by</p>
-                          <p className="break-words text-sm font-bold leading-5 text-slate-800">{seminar.presenter}</p>
+                          <p className="break-words text-sm font-bold leading-5 text-slate-800">{formatDisplayText(seminar.presenter)}</p>
                         </div>
                       </div>
                     </div>
