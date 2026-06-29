@@ -306,6 +306,13 @@ function formatDisplayText(value: string) {
     .join('');
 }
 
+function getSeminarYearTabClass(year: number) {
+  if (year === 2026) return 'bg-emerald-600';
+  if (year === 2025) return 'bg-[#facc15]';
+  if (year === 2024) return 'bg-[#dc2626]';
+  return 'bg-slate-300';
+}
+
 export default function SeminarSeries() {
   const { seminars: managedSeminars } = useData();
   const seminars: DisplaySeminar[] = managedSeminars
@@ -421,8 +428,13 @@ export default function SeminarSeries() {
                   whileInView="visible"
                   viewport={{ once: true }}
                   variants={fadeInUp}
-                  className="bg-slate-50 border border-slate-200 rounded-[11px] overflow-hidden hover:border-emerald-500 transition-all shadow-sm hover:shadow-md group flex flex-col h-full"
+                  className="relative bg-slate-50 border border-slate-200 rounded-[11px] overflow-hidden hover:border-emerald-500 transition-all shadow-sm hover:shadow-md group flex flex-col h-full"
                 >
+                  <div
+                    className={`absolute inset-x-0 top-0 z-10 h-2 ${getSeminarYearTabClass(seminar.year)}`}
+                    aria-hidden="true"
+                  />
+
                   {seminar.imageUrl ? (
                     <div className="image-frame aspect-[16/9] bg-slate-200">
                       <img
