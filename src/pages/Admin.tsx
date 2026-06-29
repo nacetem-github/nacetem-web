@@ -187,7 +187,7 @@ export function Login() {
 
 export function AdminDashboard() {
   const { logout } = useAuth();
-  const { gallery, addGalleryImage, removeGalleryImage, events, addEvent, updateEvent, removeEvent, isLoading } = useData();
+  const { gallery, addGalleryImage, removeGalleryImage, events, addEvent, updateEvent, removeEvent, publications, isLoading } = useData();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('Overview');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -406,7 +406,7 @@ export function AdminDashboard() {
 
           {activeTab === 'Overview' && (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                 <div className="bg-white p-6 border border-slate-200 flex items-center space-x-4">
                   <div className="h-12 w-12 bg-slate-50 border border-slate-100 text-slate-600 flex items-center justify-center">
                     <FileText className="h-5 w-5" />
@@ -432,6 +432,15 @@ export function AdminDashboard() {
                   <div>
                     <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Active Events</p>
                     <h3 className="text-2xl font-serif text-slate-900">{events.length}</h3>
+                  </div>
+                </div>
+                <div className="bg-white p-6 border border-slate-200 flex items-center space-x-4">
+                  <div className="h-12 w-12 bg-slate-50 border border-slate-100 text-slate-600 flex items-center justify-center">
+                    <Library className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Publications</p>
+                    <h3 className="text-2xl font-serif text-slate-900">{publications.length}</h3>
                   </div>
                 </div>
               </div>
