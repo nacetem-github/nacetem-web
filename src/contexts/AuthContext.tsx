@@ -1,38 +1,79 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { supabase } from '../lib/supabase';
+
+type AuthResult = {
+  ok: boolean;
+  message?: string;
+};
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: (email: string, password: string) => boolean;
-  logout: () => void;
+  isLoading: boolean;
+  login(email: string, password: string): Promise<boolean>;
+  createAccount(email: string, password: string): Promise<AuthResult>;
+  requestPasswordReset(email: string): Promise<AuthResult>;
+  logout(): Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  const login = (email: string, password: string) => {
-    // Hardcoded credentials based on user request
-    if (email === 'adminacetem@gmail.com' && password === 'admin123') {
-      setIsAuthenticated(true);
-      return true;
-    }
-    return false;
+  const [isLoading, setIsLoading] = useState(true);
+  useEffect(() => {
+    if (!supabase) { setIsAuthenticated(sessionStorage.getItem('nacetem-local-admin') === 'true'); setIsLoading(false); return; }
+    supabase.auth.getSession().then(({ data }) => { setIsAuthenticated(Boolean(data.session)); setIsLoading(false); });
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => setIsAuthenticated(Boolean(session)));
+    return () => data.subscription.unsubscribe();
+  }, []);
+  const login = async (email: string, password: string) => {
+    if (supabase) { const { error } = await supabase.auth.signInWithPassword({ email, password }); return !error; }
+    const valid = Boolean(import.meta.env.VITE_ADMIN_EMAIL && import.meta.env.VITE_ADMIN_PASSWORD && email === import.meta.env.VITE_ADMIN_EMAIL && password === import.meta.env.VITE_ADMIN_PASSWORD);
+    if (valid) { sessionStorage.setItem('nacetem-local-admin', 'true'); setIsAuthenticated(true); }
+    return valid;
   };
 
-  const logout = () => setIsAuthenticated(false);
+  const createAccount = async (email: string, password: string) => {
+    if (!supabase) {
+      return {
+        ok: false,
+        message: 'Account creation requires Supabase to be configured for this deployment.',
+      };
+    }
 
-  return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/admin/login`,
+      },
+    });
 
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+    return {
+      ok: !error,
+      message: error?.message || 'Account created. Check your email to confirm access before signing in.',
+    };
+  };
+
+  const requestPasswordReset = async (email: string) => {
+    if (!supabase) {
+      return {
+        ok: false,
+        message: 'Password reset requires Supabase to be configured for this deployment.',
+      };
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/admin/login`,
+    });
+
+    return {
+      ok: !error,
+      message: error?.message || 'Password reset instructions have been sent to your email.',
+    };
+  };
+
+  const logout = async () => { if (supabase) await supabase.auth.signOut(); sessionStorage.removeItem('nacetem-local-admin'); setIsAuthenticated(false); };
+  return <AuthContext.Provider value={{ isAuthenticated, isLoading, login, createAccount, requestPasswordReset, logout }}>{children}</AuthContext.Provider>;
 }
+export function useAuth() { const value = useContext(AuthContext); if (!value) throw new Error('useAuth must be used within an AuthProvider'); return value; }

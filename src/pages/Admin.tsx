@@ -1,42 +1,107 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useData } from '../contexts/DataContext';
+import { useData, type EventItem } from '../contexts/DataContext';
 import { useNavigate } from 'react-router-dom';
-import { Lock, FileText, Users, Settings, LogOut, LayoutDashboard, Search, Bell, Image as ImageIcon, Calendar, Plus, Trash2, Menu, X } from 'lucide-react';
+import { FileText, Settings, LogOut, LayoutDashboard, Search, Bell, Image as ImageIcon, Calendar, Plus, Trash2, Menu, X, Save, Video, Presentation, Library, KeyRound, UserPlus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { CmsManager } from '../components/CmsManager';
 
 export function Login() {
+  const [mode, setMode] = useState<'login' | 'create' | 'reset'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const [notice, setNotice] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { login, createAccount, requestPasswordReset } = useAuth();
   const navigate = useNavigate();
 
-  const handleAuth = (e: React.FormEvent) => {
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (login(email, password)) {
-      navigate('/admin');
-    } else {
-      setError('Invalid email or password access denied.');
+    setError('');
+    setNotice('');
+    setIsSubmitting(true);
+
+    try {
+      if (mode === 'login') {
+        if (await login(email, password)) {
+          if (supabase) window.location.assign('/admin');
+          else navigate('/admin');
+        } else {
+          setError('Invalid email or password access denied.');
+        }
+        return;
+      }
+
+      if (mode === 'create') {
+        if (password.length < 8) {
+          setError('Use at least 8 characters for the password.');
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          setError('Passwords do not match.');
+          return;
+        }
+
+        const result = await createAccount(email, password);
+        if (result.ok) {
+          setNotice(result.message || 'Account created. Check your email to confirm access before signing in.');
+          setMode('login');
+          setPassword('');
+          setConfirmPassword('');
+        } else {
+          setError(result.message || 'Unable to create account.');
+        }
+        return;
+      }
+
+      const result = await requestPasswordReset(email);
+      if (result.ok) {
+        setNotice(result.message || 'Password reset instructions have been sent to your email.');
+        setMode('login');
+      } else {
+        setError(result.message || 'Unable to send password reset instructions.');
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
+
+  const switchMode = (nextMode: 'login' | 'create' | 'reset') => {
+    setMode(nextMode);
+    setError('');
+    setNotice('');
+    setPassword('');
+    setConfirmPassword('');
+  };
+
+  const title = mode === 'login' ? 'Portal Login' : mode === 'create' ? 'Create Account' : 'Reset Password';
+  const subtitle = mode === 'login'
+    ? 'NACETEM Extranet Authorized Access Only'
+    : mode === 'create'
+      ? 'Request administrative portal access'
+      : 'Receive password recovery instructions';
+  const submitLabel = mode === 'login' ? 'Authenticate' : mode === 'create' ? 'Create Account' : 'Send Reset Link';
 
   return (
     <div className="min-h-screen flex flex-col sm:flex-row items-center justify-center bg-slate-50 p-4">
       <div className="bg-white p-8 sm:p-12 w-full max-w-md border border-slate-200">
         <div className="mb-8">
           <span className="text-gold text-[10px] font-bold uppercase tracking-widest mb-2 block">Secure Admin Access</span>
-          <h2 className="text-3xl font-serif text-slate-900 leading-none mb-2">Portal Login</h2>
-          <p className="text-slate-500 text-xs">NACETEM Extranet Authorized Access Only</p>
+          <h2 className="text-3xl font-serif text-slate-900 leading-none mb-2">{title}</h2>
+          <p className="text-slate-500 text-xs">{subtitle}</p>
         </div>
-        
+
         {error && <div className="p-3 bg-red-50 text-red-700 text-xs border border-red-200 mb-6">{error}</div>}
-        
+        {notice && <div className="p-3 bg-emerald-50 text-emerald-700 text-xs border border-emerald-200 mb-6">{notice}</div>}
+
         <form onSubmit={handleAuth} className="space-y-6">
           <div>
             <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-700 mb-2">Email Address</label>
-            <input 
-              type="email" 
+            <input
+              type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-3 border border-slate-300 focus:border-emerald-700 outline-none text-sm bg-slate-50 focus:bg-white transition-colors"
@@ -44,24 +109,74 @@ export function Login() {
               required
             />
           </div>
-          <div>
-            <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-700 mb-2">Password</label>
-            <input 
-              type="password" 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border border-slate-300 focus:border-emerald-700 outline-none text-sm bg-slate-50 focus:bg-white transition-colors"
-              placeholder="••••••••"
-              required
-            />
-          </div>
-          <button 
+
+          {mode !== 'reset' && (
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-700 mb-2">Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-3 border border-slate-300 focus:border-emerald-700 outline-none text-sm bg-slate-50 focus:bg-white transition-colors"
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+          )}
+
+          {mode === 'create' && (
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-700 mb-2">Confirm Password</label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full px-4 py-3 border border-slate-300 focus:border-emerald-700 outline-none text-sm bg-slate-50 focus:bg-white transition-colors"
+                placeholder="Confirm your password"
+                required
+              />
+            </div>
+          )}
+
+          <button
             type="submit"
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-widest py-4 transition-colors"
+            disabled={isSubmitting}
+            className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:cursor-wait disabled:opacity-60 text-white font-bold text-xs uppercase tracking-widest py-4 transition-colors"
           >
-            Authenticate
+            {isSubmitting ? 'Processing...' : submitLabel}
           </button>
         </form>
+
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {mode !== 'create' && (
+            <button
+              type="button"
+              onClick={() => switchMode('create')}
+              className="inline-flex items-center justify-center gap-2 border border-slate-200 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-600 hover:border-emerald-700 hover:text-emerald-700 transition-colors"
+            >
+              <UserPlus className="h-4 w-4" /> Create Account
+            </button>
+          )}
+          {mode !== 'reset' && (
+            <button
+              type="button"
+              onClick={() => switchMode('reset')}
+              className="inline-flex items-center justify-center gap-2 border border-slate-200 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-600 hover:border-emerald-700 hover:text-emerald-700 transition-colors"
+            >
+              <KeyRound className="h-4 w-4" /> Forgot Password
+            </button>
+          )}
+          {mode !== 'login' && (
+            <button
+              type="button"
+              onClick={() => switchMode('login')}
+              className="inline-flex items-center justify-center gap-2 border border-slate-200 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-600 hover:border-emerald-700 hover:text-emerald-700 transition-colors sm:col-span-2"
+            >
+              Back To Login
+            </button>
+          )}
+        </div>
+
         <div className="mt-8 text-center text-[10px] tracking-widest uppercase text-slate-400">
           Protected by FMIST Infrastructure
         </div>
@@ -72,7 +187,7 @@ export function Login() {
 
 export function AdminDashboard() {
   const { logout } = useAuth();
-  const { gallery, addGalleryImage, removeGalleryImage, events, addEvent, removeEvent, isLoading } = useData();
+  const { gallery, addGalleryImage, removeGalleryImage, events, addEvent, updateEvent, removeEvent, publications, isLoading } = useData();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('Overview');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -83,11 +198,19 @@ export function AdminDashboard() {
 
   const [newEventTitle, setNewEventTitle] = useState('');
   const [newEventDate, setNewEventDate] = useState('');
+  const [newEventTime, setNewEventTime] = useState('');
   const [newEventLocation, setNewEventLocation] = useState('');
+  const [newEventFormat, setNewEventFormat] = useState('Hybrid');
+  const [newEventFlyerUrl, setNewEventFlyerUrl] = useState('');
+  const [newEventFee, setNewEventFee] = useState('');
+  const [newEventContactPhones, setNewEventContactPhones] = useState('');
+  const [newEventContactEmail, setNewEventContactEmail] = useState('');
+  const [newEventActionUrl, setNewEventActionUrl] = useState('');
+  const [newEventActionLabel, setNewEventActionLabel] = useState('Register / Join Event');
   const [newEventDescription, setNewEventDescription] = useState('');
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate('/admin/login');
   };
 
@@ -97,7 +220,7 @@ export function AdminDashboard() {
       try {
         setIsUploadingImage(true);
         let imageUrl = '';
-        
+
         if (supabase) {
           const fileExt = newImageFile.name.split('.').pop();
           const fileName = `${Math.random()}.${fileExt}`;
@@ -126,7 +249,7 @@ export function AdminDashboard() {
           url: imageUrl,
           title: newImageTitle,
         });
-        
+
         setNewImageFile(null);
         setNewImageTitle('');
       } catch (error) {
@@ -145,12 +268,28 @@ export function AdminDashboard() {
         id: Date.now().toString(),
         title: newEventTitle,
         date: newEventDate,
+        time: newEventTime || undefined,
         location: newEventLocation,
+        format: newEventFormat || 'Hybrid',
+        flyerUrl: newEventFlyerUrl || undefined,
+        fee: newEventFee || undefined,
+        contactPhones: newEventContactPhones ? newEventContactPhones.split(',').map((phone) => phone.trim()).filter(Boolean) : undefined,
+        contactEmail: newEventContactEmail || undefined,
+        actionUrl: newEventActionUrl || undefined,
+        actionLabel: newEventActionLabel || undefined,
         description: newEventDescription,
       });
       setNewEventTitle('');
       setNewEventDate('');
+      setNewEventTime('');
       setNewEventLocation('');
+      setNewEventFormat('Hybrid');
+      setNewEventFlyerUrl('');
+      setNewEventFee('');
+      setNewEventContactPhones('');
+      setNewEventContactEmail('');
+      setNewEventActionUrl('');
+      setNewEventActionLabel('Register / Join Event');
       setNewEventDescription('');
     }
   };
@@ -160,15 +299,17 @@ export function AdminDashboard() {
     { icon: ImageIcon, label: 'Gallery Manager' },
     { icon: Calendar, label: 'Events Manager' },
     { icon: FileText, label: 'News Manager' },
+    { icon: Presentation, label: 'Seminar Series Manager' },
+    { icon: Library, label: 'Publications Manager' },
     { icon: Settings, label: 'System Settings' },
   ];
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row h-screen overflow-hidden relative">
-      
+
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 md:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
@@ -187,15 +328,15 @@ export function AdminDashboard() {
         </div>
         <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-2">
           {menuItems.map((item, idx) => (
-            <button 
+            <button
               key={idx}
               onClick={() => {
                 setActiveTab(item.label);
                 setIsMobileMenuOpen(false);
               }}
               className={`w-full flex items-center px-4 py-3.5 text-xs font-bold uppercase tracking-wider transition-all duration-200 rounded-[6px] ${
-                activeTab === item.label 
-                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/20' 
+                activeTab === item.label
+                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/20'
                   : 'text-slate-200 hover:bg-slate-800 hover:text-white'
               }`}
             >
@@ -205,7 +346,7 @@ export function AdminDashboard() {
           ))}
         </nav>
         <div className="p-4 border-t border-slate-800 shrink-0">
-          <button 
+          <button
             onClick={handleLogout}
             className="w-full flex items-center px-4 py-3.5 text-xs font-bold uppercase tracking-wider text-slate-300 hover:text-white hover:bg-slate-800 transition-colors rounded-[6px]"
           >
@@ -225,9 +366,9 @@ export function AdminDashboard() {
             </button>
             <div className="relative w-full max-w-sm hidden sm:block">
               <Search className="h-4 w-4 absolute left-3 top-2.5 text-slate-400" />
-              <input 
-                type="text" 
-                placeholder="Search resources..." 
+              <input
+                type="text"
+                placeholder="Search resources..."
                 className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-[6px] text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
               />
             </div>
@@ -265,7 +406,7 @@ export function AdminDashboard() {
 
           {activeTab === 'Overview' && (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                 <div className="bg-white p-6 border border-slate-200 flex items-center space-x-4">
                   <div className="h-12 w-12 bg-slate-50 border border-slate-100 text-slate-600 flex items-center justify-center">
                     <FileText className="h-5 w-5" />
@@ -293,19 +434,28 @@ export function AdminDashboard() {
                     <h3 className="text-2xl font-serif text-slate-900">{events.length}</h3>
                   </div>
                 </div>
+                <div className="bg-white p-6 border border-slate-200 flex items-center space-x-4">
+                  <div className="h-12 w-12 bg-slate-50 border border-slate-100 text-slate-600 flex items-center justify-center">
+                    <Library className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Publications</p>
+                    <h3 className="text-2xl font-serif text-slate-900">{publications.length}</h3>
+                  </div>
+                </div>
               </div>
             </>
           )}
 
-          {activeTab === 'Gallery Manager' && (
+          {false && activeTab === 'Gallery Manager' && (
             <div className="space-y-8">
               <div className="bg-white border border-slate-200 p-6">
                 <h2 className="text-lg font-serif text-slate-900 mb-4">Add New Image</h2>
                 <form onSubmit={handleAddImage} className="flex flex-col sm:flex-row gap-4 items-end">
                   <div className="flex-1 w-full">
                     <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">Upload Photo</label>
-                    <input 
-                      type="file" 
+                    <input
+                      type="file"
                       accept="image/*"
                       onChange={(e) => setNewImageFile(e.target.files?.[0] || null)}
                       className="w-full px-4 py-2 border border-slate-300 text-sm focus:outline-none focus:border-emerald-700 bg-slate-50"
@@ -314,8 +464,8 @@ export function AdminDashboard() {
                   </div>
                   <div className="flex-1 w-full">
                     <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">Image Title</label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       placeholder="Image Title"
                       value={newImageTitle}
                       onChange={(e) => setNewImageTitle(e.target.value)}
@@ -332,12 +482,12 @@ export function AdminDashboard() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {gallery.map((img) => (
                   <div key={img.id} className="bg-white border border-slate-200 group flex flex-col">
-                    <div className="h-48 overflow-hidden border-b border-slate-100">
+                    <div className="image-frame h-48 border-b border-slate-100">
                       <img src={img.url} alt={img.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     </div>
                     <div className="p-4 flex justify-between items-center bg-slate-50 flex-1">
                       <h3 className="font-serif text-slate-900 text-sm truncate pr-4">{img.title}</h3>
-                      <button 
+                      <button
                         onClick={() => removeGalleryImage(img.id)}
                         className="text-slate-400 hover:text-red-600 transition-colors bg-white p-2 border border-slate-200 rounded-full"
                         title="Remove image"
@@ -356,15 +506,15 @@ export function AdminDashboard() {
             </div>
           )}
 
-          {activeTab === 'Events Manager' && (
+          {false && activeTab === 'Events Manager' && (
             <div className="space-y-8">
               <div className="bg-white border border-slate-200 p-6">
                 <h2 className="text-lg font-serif text-slate-900 mb-4">Add New Event</h2>
                 <form onSubmit={handleAddEvent} className="flex flex-col gap-4">
                   <div className="flex flex-col sm:flex-row gap-4">
                     <div className="flex-1">
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         placeholder="Event Title"
                         value={newEventTitle}
                         onChange={(e) => setNewEventTitle(e.target.value)}
@@ -373,8 +523,8 @@ export function AdminDashboard() {
                       />
                     </div>
                     <div className="flex-1">
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         placeholder="Event Date (e.g., August 15, 2026)"
                         value={newEventDate}
                         onChange={(e) => setNewEventDate(e.target.value)}
@@ -383,8 +533,17 @@ export function AdminDashboard() {
                       />
                     </div>
                     <div className="flex-1">
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
+                        placeholder="Event Time (e.g., 10:00am - 2:00pm)"
+                        value={newEventTime}
+                        onChange={(e) => setNewEventTime(e.target.value)}
+                        className="w-full px-4 py-3 border border-slate-300 text-sm focus:outline-none focus:border-emerald-700"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <input
+                        type="text"
                         placeholder="Event Location (e.g., Abuja, Nigeria)"
                         value={newEventLocation}
                         onChange={(e) => setNewEventLocation(e.target.value)}
@@ -392,6 +551,59 @@ export function AdminDashboard() {
                         required
                       />
                     </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <input
+                      type="text"
+                      placeholder="Format (e.g., Hybrid)"
+                      value={newEventFormat}
+                      onChange={(e) => setNewEventFormat(e.target.value)}
+                      className="w-full px-4 py-3 border border-slate-300 text-sm focus:outline-none focus:border-emerald-700"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Fee (optional)"
+                      value={newEventFee}
+                      onChange={(e) => setNewEventFee(e.target.value)}
+                      className="w-full px-4 py-3 border border-slate-300 text-sm focus:outline-none focus:border-emerald-700"
+                    />
+                    <input
+                      type="email"
+                      placeholder="Contact Email (optional)"
+                      value={newEventContactEmail}
+                      onChange={(e) => setNewEventContactEmail(e.target.value)}
+                      className="w-full px-4 py-3 border border-slate-300 text-sm focus:outline-none focus:border-emerald-700"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Contact Phones, comma separated"
+                      value={newEventContactPhones}
+                      onChange={(e) => setNewEventContactPhones(e.target.value)}
+                      className="w-full px-4 py-3 border border-slate-300 text-sm focus:outline-none focus:border-emerald-700"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <input
+                      type="url"
+                      placeholder="Flyer URL (optional)"
+                      value={newEventFlyerUrl}
+                      onChange={(e) => setNewEventFlyerUrl(e.target.value)}
+                      className="w-full px-4 py-3 border border-slate-300 text-sm focus:outline-none focus:border-emerald-700"
+                    />
+                    <input
+                      type="url"
+                      placeholder="Zoom register/join link (optional)"
+                      value={newEventActionUrl}
+                      onChange={(e) => setNewEventActionUrl(e.target.value)}
+                      className="w-full px-4 py-3 border border-slate-300 text-sm focus:outline-none focus:border-emerald-700"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Action label"
+                      value={newEventActionLabel}
+                      onChange={(e) => setNewEventActionLabel(e.target.value)}
+                      className="w-full px-4 py-3 border border-slate-300 text-sm focus:outline-none focus:border-emerald-700"
+                    />
                   </div>
                   <div className="flex flex-col sm:flex-row gap-4 items-start">
                     <textarea
@@ -410,22 +622,12 @@ export function AdminDashboard() {
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {events.map((evt) => (
-                  <div key={evt.id} className="bg-white border border-slate-200 p-6 relative flex flex-col items-start group">
-                    <button 
-                      onClick={() => removeEvent(evt.id)}
-                      className="absolute top-4 right-4 text-slate-400 hover:text-red-600 transition-colors bg-white p-2 border border-slate-200 rounded-full opacity-0 group-hover:opacity-100"
-                      title="Remove event"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                    <div className="flex items-center gap-2 mb-3">
-                      <Calendar className="h-4 w-4 text-emerald-600" />
-                      <span className="text-xs font-bold uppercase tracking-widest text-gold">{evt.date}</span>
-                    </div>
-                    <h3 className="text-lg font-serif text-slate-900 mb-2 truncate w-full pr-8">{evt.title}</h3>
-                    <p className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">{evt.location}</p>
-                    <p className="text-sm text-slate-600 leading-relaxed line-clamp-3">{evt.description}</p>
-                  </div>
+                  <EventAdminCard
+                    key={evt.id}
+                    event={evt}
+                    onSave={updateEvent}
+                    onRemove={removeEvent}
+                  />
                 ))}
                 {events.length === 0 && (
                   <div className="col-span-full py-12 text-center text-slate-500 border border-dashed border-slate-300 bg-white">
@@ -436,21 +638,121 @@ export function AdminDashboard() {
             </div>
           )}
 
-          {activeTab === 'News Manager' && (
-            <div className="bg-white border border-slate-200 p-16 text-center rounded-[11px]">
-              <FileText className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-              <h2 className="text-xl font-serif text-slate-900 mb-2">News Content Manager</h2>
-              <p className="text-sm text-slate-500 max-w-md mx-auto">This module is being set up to allow adding, editing, and managing news articles and publications.</p>
-            </div>
-          )}
+          {activeTab === 'Gallery Manager' && <CmsManager type="gallery" />}
+          {activeTab === 'Events Manager' && <CmsManager type="event" />}
+          {activeTab === 'News Manager' && <CmsManager type="news" />}
+          {activeTab === 'Seminar Series Manager' && <CmsManager type="seminar" />}
+          {activeTab === 'Publications Manager' && <CmsManager type="publication" />}
 
-          {activeTab !== 'Overview' && activeTab !== 'Gallery Manager' && activeTab !== 'Events Manager' && activeTab !== 'News Manager' && (
+          {activeTab !== 'Overview' && activeTab !== 'Gallery Manager' && activeTab !== 'Events Manager' && activeTab !== 'News Manager' && activeTab !== 'Seminar Series Manager' && activeTab !== 'Publications Manager' && (
             <div className="bg-white border border-slate-200 p-12 text-center text-slate-500">
               <p className="text-sm">Module <strong className="text-slate-900 font-serif">{activeTab}</strong> is currently being developed according to the latest administrative directives.</p>
             </div>
           )}
         </div>
       </main>
+    </div>
+  );
+}
+
+function EventAdminCard({ event, onSave, onRemove }: {
+  key?: React.Key;
+  event: EventItem;
+  onSave: (event: EventItem) => Promise<void>;
+  onRemove: (id: string) => Promise<void>;
+}) {
+  const [actionUrl, setActionUrl] = useState(event.actionUrl ?? '');
+  const [actionLabel, setActionLabel] = useState(event.actionLabel ?? 'Register / Join Event');
+  const [saveStatus, setSaveStatus] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    setSaveStatus('');
+
+    let storedActions: Record<string, { actionUrl: string; actionLabel: string }> = {};
+    try {
+      storedActions = JSON.parse(window.localStorage.getItem('nacetem-event-actions') ?? '{}');
+    } catch {
+      storedActions = {};
+    }
+
+    if (actionUrl.trim()) {
+      storedActions[event.id] = {
+        actionUrl: actionUrl.trim(),
+        actionLabel: actionLabel.trim() || 'Register / Join Event',
+      };
+    } else {
+      delete storedActions[event.id];
+    }
+    window.localStorage.setItem('nacetem-event-actions', JSON.stringify(storedActions));
+
+    try {
+      await onSave({
+        ...event,
+        actionUrl: actionUrl.trim() || undefined,
+        actionLabel: actionLabel.trim() || 'Register / Join Event',
+      });
+      setSaveStatus(actionUrl.trim() ? 'Zoom link saved.' : 'Zoom link removed.');
+    } catch {
+      setSaveStatus(actionUrl.trim()
+        ? 'Link saved on this browser. Database sync is unavailable.'
+        : 'Link removed on this browser. Database sync is unavailable.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div className="bg-white border border-slate-200 p-6 relative flex flex-col items-start group">
+      <button
+        type="button"
+        onClick={() => onRemove(event.id)}
+        className="absolute top-4 right-4 text-slate-400 hover:text-red-600 transition-colors bg-white p-2 border border-slate-200 rounded-full opacity-0 group-hover:opacity-100"
+        title="Remove event"
+      >
+        <Trash2 className="w-4 h-4" />
+      </button>
+      <div className="flex items-center gap-2 mb-3">
+        <Calendar className="h-4 w-4 text-emerald-600" />
+        <span className="text-xs font-bold uppercase tracking-widest text-gold">{event.date}</span>
+      </div>
+      <h3 className="text-lg font-serif text-slate-900 mb-2 w-full pr-8">{event.title}</h3>
+      <p className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">{event.location}</p>
+      <p className="text-sm text-slate-600 leading-relaxed line-clamp-3">{event.description}</p>
+
+      <form onSubmit={handleSave} className="mt-6 w-full border-t border-slate-100 pt-5">
+        <div className="mb-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-emerald-700">
+          <Video className="h-4 w-4" /> Manage Zoom Link
+        </div>
+        <div className="space-y-3">
+          <input
+            type="url"
+            value={actionUrl}
+            onChange={(e) => setActionUrl(e.target.value)}
+            placeholder="Paste Zoom registration or meeting link"
+            className="w-full rounded-[6px] border border-slate-300 px-4 py-3 text-sm outline-none focus:border-emerald-700"
+          />
+          <input
+            type="text"
+            value={actionLabel}
+            onChange={(e) => setActionLabel(e.target.value)}
+            placeholder="Button label"
+            className="w-full rounded-[6px] border border-slate-300 px-4 py-3 text-sm outline-none focus:border-emerald-700"
+          />
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <span className="text-xs text-slate-500">{saveStatus || 'Clear the URL and save to remove the link.'}</span>
+            <button
+              type="submit"
+              disabled={isSaving}
+              className="inline-flex items-center rounded-[6px] bg-emerald-700 px-4 py-2.5 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-emerald-800 disabled:cursor-wait disabled:opacity-60"
+            >
+              <Save className="mr-2 h-4 w-4" /> {isSaving ? 'Saving...' : 'Save Link'}
+            </button>
+          </div>
+        </div>
+      </form>
     </div>
   );
 }

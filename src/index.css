@@ -93,6 +93,47 @@ canvas {
   max-width: 100%;
 }
 
+img {
+  display: block;
+}
+
+img[class*="object-cover"],
+img[class*="object-contain"] {
+  background-color: rgb(248 250 252);
+  image-rendering: auto;
+}
+
+img[class*="group-hover:scale"],
+img[class*="hover:scale"] {
+  backface-visibility: hidden;
+  transform-origin: center;
+  will-change: transform;
+}
+
+.image-frame {
+  background: linear-gradient(135deg, rgb(248 250 252), rgb(241 245 249));
+  overflow: hidden;
+  position: relative;
+}
+
+.image-frame > img {
+  height: 100%;
+  width: 100%;
+}
+
+.fullscreen-image {
+  image-rendering: auto;
+  max-height: min(92vh, 1200px);
+  max-width: min(96vw, 1800px);
+  object-fit: contain;
+}
+
+.cms-thumb {
+  background: linear-gradient(135deg, rgb(248 250 252), rgb(241 245 249));
+  display: block;
+  object-fit: cover;
+}
+
 h1,
 h2,
 h3 {
@@ -189,4 +230,30 @@ button {
   .tracking-wider {
     letter-spacing: 0.05em;
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .partner-marquee {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+/* Defer layout and paint work for homepage content well below the fold. */
+main > div > section:nth-of-type(n + 3) {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 760px;
 }

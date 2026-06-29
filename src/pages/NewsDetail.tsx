@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Calendar, Tag } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Calendar, Download, Tag, UserRound } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
-import { getNewsArticleBySlug, newsArticles } from '../data/news';
+import { useData } from '../contexts/DataContext';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 24 },
@@ -10,7 +10,9 @@ const fadeInUp = {
 
 export default function NewsDetail() {
   const { slug } = useParams();
-  const article = getNewsArticleBySlug(slug);
+  const { news } = useData();
+  const newsArticles = news.filter((item) => item.status === 'published');
+  const article = newsArticles.find((item) => item.slug === slug);
 
   if (!article) {
     return (
@@ -64,11 +66,17 @@ export default function NewsDetail() {
               <span className="inline-flex items-center text-slate-200 text-xs font-bold uppercase tracking-widest">
                 <Calendar className="h-4 w-4 mr-2 text-gold" /> {article.date}
               </span>
+              {article.author && (
+                <span className="inline-flex items-center text-slate-200 text-xs font-bold uppercase tracking-widest">
+                  <UserRound className="h-4 w-4 mr-2 text-gold" /> By {article.author}
+                </span>
+              )}
             </div>
 
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif text-white leading-tight max-w-4xl">
               {article.title}
             </h1>
+            {article.sourceFileUrl && <a href={article.sourceFileUrl} target="_blank" rel="noreferrer" className="mt-8 inline-flex items-center rounded-[6px] border border-gold px-5 py-3 text-xs font-bold uppercase tracking-wider text-gold hover:bg-gold hover:text-slate-900"><Download className="mr-2 h-4 w-4" /> View Source File</a>}
           </motion.div>
         </div>
       </section>
@@ -76,11 +84,16 @@ export default function NewsDetail() {
       <section className="py-16 lg:py-20 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}>
-            <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm mb-12">
+            <div className="image-frame rounded-2xl border border-slate-200 shadow-sm mb-12">
               <img src={article.image} alt={article.imageAlt} className="w-full h-[260px] sm:h-[420px] object-cover" />
             </div>
 
             <article className="max-w-3xl mx-auto">
+              {article.author && (
+                <p className="mb-5 text-xs font-bold uppercase tracking-widest text-emerald-700">
+                  Written by {article.author}
+                </p>
+              )}
               <p className="text-xl text-slate-700 leading-relaxed mb-10 font-serif border-l-4 border-gold pl-6">
                 {article.summary}
               </p>
@@ -124,7 +137,7 @@ export default function NewsDetail() {
                 to={`/news/${item.slug}`}
                 className="group bg-white border border-slate-200 rounded-[11px] overflow-hidden hover:border-emerald-500 transition-colors flex flex-col h-full"
               >
-                <div className="h-44 overflow-hidden relative">
+                <div className="image-frame h-44 relative">
                   <img src={item.image} alt={item.imageAlt} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                 </div>
                 <div className="p-6 flex flex-col flex-1">
