@@ -14,6 +14,7 @@ export default function Layout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const [showNewsletterPopup, setShowNewsletterPopup] = useState(false);
   const [newsletterState, setNewsletterState] = useState<NewsletterState>('idle');
   const [newsletterName, setNewsletterName] = useState('');
@@ -24,22 +25,29 @@ export default function Layout() {
   const newsletterNameInputRef = useRef<HTMLInputElement>(null);
   const newsletterSuccessButtonRef = useRef<HTMLButtonElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
+  const lastScrollYRef = useRef(0);
   const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
+      const currentScrollY = window.scrollY;
       const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
       if (totalHeight > 0) {
-        setScrollProgress((window.scrollY / totalHeight) * 100);
+        setScrollProgress((currentScrollY / totalHeight) * 100);
       }
-      setShowScrollTop(window.scrollY > 300);
+      setShowScrollTop(currentScrollY > 300);
+
+      const scrollingUp = currentScrollY < lastScrollYRef.current;
+      const nearTop = currentScrollY < 90;
+      setIsHeaderVisible(nearTop || scrollingUp || isMobileMenuOpen);
+      lastScrollYRef.current = currentScrollY;
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
 
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [location.pathname]);
+  }, [location.pathname, isMobileMenuOpen]);
 
   useEffect(() => {
     if (!location.hash) {
@@ -195,7 +203,12 @@ export default function Layout() {
   return (
     <div className="min-h-screen flex flex-col font-sans text-slate-900 bg-slate-50">
       {/* Main Header */}
-      <header className="sticky top-0 z-50 relative border-b border-slate-200/70 bg-white/85 shadow-[0_8px_30px_rgba(15,23,42,0.04)] backdrop-blur-xl">
+      <header
+        className={cn(
+          "fixed inset-x-0 top-0 z-50 border-b border-slate-200/70 bg-white/90 shadow-[0_8px_30px_rgba(15,23,42,0.04)] backdrop-blur-xl transition-transform duration-300 ease-out",
+          isHeaderVisible ? "translate-y-0" : "-translate-y-full"
+        )}
+      >
         {/* Scroll Progress Bar */}
         <div 
           className="absolute bottom-0 left-0 h-[2px] bg-gold transition-all duration-75 z-50"
@@ -321,7 +334,7 @@ export default function Layout() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col pt-[132px] sm:pt-[148px]">
         <Outlet />
       </main>
 
