@@ -199,7 +199,7 @@ export const capacityPrograms: CapacityProgram[] = [
       'Plan basic drone missions and field activities',
       'Understand responsible and practical drone use cases',
     ],
-    locations: [],
+    locations: ['Ile Ife', 'Lagos Study Centre', 'Abuja Study Centre', 'Bayelsa Study Centre', 'Enugu Study Centre'],
     duration: 'Short-term course',
     format: 'Practical training and certification',
     iconColor: 'text-cyan-500',
