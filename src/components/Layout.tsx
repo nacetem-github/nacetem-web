@@ -201,33 +201,19 @@ export default function Layout() {
           className="absolute bottom-0 left-0 h-[2px] bg-gold transition-all duration-75 z-50"
           style={{ width: `${scrollProgress}%` }}
         />
-        <div className="border-b border-emerald-800 bg-emerald-950 text-white">
-          <div className="mx-auto flex min-h-9 max-w-7xl items-center justify-center gap-2 px-4 py-1.5 text-center text-[11px] sm:justify-end sm:px-6 lg:px-8">
-            <MessageSquareWarning className="h-3.5 w-3.5 shrink-0 text-gold" aria-hidden="true" />
-            <span className="hidden text-white/75 sm:inline">Public or staff concern?</span>
-            <a
-              href="https://nacetem.gov.ng/nacetem_grm/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center font-bold uppercase tracking-wider text-gold transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
-            >
-              Submit a grievance <ExternalLink className="ml-1 h-3 w-3" aria-hidden="true" />
-            </a>
-          </div>
-        </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-24 items-center justify-between sm:h-28">
+          <div className="flex h-24 items-center justify-between gap-8 sm:h-28 lg:gap-14">
             {/* Logo */}
             <Link
               to="/"
               aria-label="NACETEM home"
-              className="group block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-4"
+              className="group block shrink-0 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-4"
             >
               <NacetemLogo size="compact" unframed className="group-hover:-translate-y-0.5" />
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-6">
+            <nav className="hidden md:flex items-center space-x-6 lg:ml-6 xl:ml-10">
               {navigation.map((item) => (
                 <div key={item.name} className="relative group">
                   <Link
@@ -242,7 +228,7 @@ export default function Layout() {
                   >
                     {item.name}
                     {item.children && (
-                      <ChevronDown className="w-3 h-3 ml-1 mb-[2px]" />
+                      <ChevronDown className="w-4 h-4 ml-1.5 mb-[2px] stroke-[2.75]" />
                     )}
                   </Link>
 
@@ -461,12 +447,24 @@ export default function Layout() {
       {showScrollTop && (
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="fixed bottom-6 right-6 z-50 bg-emerald-600 hover:bg-emerald-700 text-white p-3.5 rounded-full shadow-2xl hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-emerald-500/30 transition-all duration-300 transform scale-100 hover:scale-110 active:scale-95 group flex items-center justify-center cursor-pointer"
+          className="fixed bottom-24 right-6 z-50 bg-emerald-600 hover:bg-emerald-700 text-white p-3.5 rounded-full shadow-2xl hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-emerald-500/30 transition-all duration-300 transform scale-100 hover:scale-110 active:scale-95 group flex items-center justify-center cursor-pointer"
           aria-label="Scroll to top"
         >
           <ArrowUp className="h-5 w-5 transform group-hover:-translate-y-0.5 transition-transform" />
         </button>
       )}
+
+      <a
+        href="https://nacetem.gov.ng/nacetem_grm/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-5 right-5 z-50 inline-flex items-center gap-2 rounded-full border border-emerald-700/30 bg-emerald-800 px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-white shadow-2xl shadow-slate-900/20 transition-all hover:-translate-y-0.5 hover:bg-emerald-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+      >
+        <MessageSquareWarning className="h-4 w-4 text-gold" aria-hidden="true" />
+        <span className="hidden sm:inline">Submit a grievance</span>
+        <span className="sm:hidden">Grievance</span>
+        <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+      </a>
 
       {showNewsletterPopup && (
         <div className="fixed inset-0 z-[80] flex items-center justify-center px-4 py-6">

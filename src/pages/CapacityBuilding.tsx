@@ -36,7 +36,7 @@ export default function CapacityBuilding() {
             <h1 className="text-4xl md:text-5xl lg:text-7xl font-serif text-white leading-tight mb-8">
               Capacity Building
             </h1>
-            <p className="text-xl text-slate-100/90 mb-10 leading-relaxed font-light mx-auto max-w-3xl">
+            <p className="text-xl text-slate-100/90 mb-10 font-light mx-auto max-w-[650px] leading-[1.6]">
               Strengthening people, institutions, and systems through practical training for Nigeria's innovation economy.
             </p>
           </motion.div>
@@ -95,12 +95,12 @@ export default function CapacityBuilding() {
                     </div>
                   )}
                 
-                  <div className="pt-8 mt-auto border-t border-slate-100 flex flex-col sm:flex-row gap-4">
-                    <Link to={`/capacity-building/${program.slug}`} className="flex-1 inline-flex items-center justify-center px-6 py-3 bg-slate-50 border border-slate-200 text-slate-900 font-bold text-xs tracking-widest uppercase hover:bg-slate-100 transition-colors rounded-[6px] text-center">
-                      Read More
-                    </Link>
-                    <Link to="#" className="flex-1 inline-flex items-center justify-center px-6 py-3 bg-emerald-600 text-white font-bold text-xs tracking-widest uppercase hover:bg-emerald-700 transition-colors rounded-[6px] text-center shadow-sm">
+                  <div className="pt-8 mt-auto border-t border-slate-100 flex flex-col sm:flex-row gap-3 sm:items-center">
+                    <Link to="#" className="flex-1 inline-flex items-center justify-center px-6 py-3 bg-emerald-700 text-white font-bold text-xs tracking-widest uppercase hover:bg-emerald-800 transition-colors rounded-[6px] text-center shadow-sm">
                       <Download className="w-4 h-4 mr-2" /> Download Form
+                    </Link>
+                    <Link to={`/capacity-building/${program.slug}`} className="flex-1 inline-flex items-center justify-center px-6 py-3 bg-transparent border border-slate-300 text-slate-800 font-bold text-xs tracking-widest uppercase hover:border-emerald-700 hover:text-emerald-700 hover:bg-emerald-50/40 transition-colors rounded-[6px] text-center">
+                      Read More <ChevronRight className="ml-2 h-4 w-4" />
                     </Link>
                   </div>
                 </div>
@@ -128,12 +128,14 @@ export default function CapacityBuilding() {
             </a>
           </div>
 
-          <div className="overflow-hidden rounded-[8px] border border-slate-200 bg-white shadow-sm">
-            <iframe
-              title="Capacity Building brochure PDF viewer"
-              src={brochureUrl}
-              className="h-[560px] w-full bg-slate-100"
-            />
+          <div className="rounded-[8px] border border-slate-200 bg-white p-8 text-center shadow-sm">
+            <a
+              href={brochureUrl}
+              download
+              className="inline-flex items-center justify-center px-8 py-4 bg-emerald-700 text-white font-bold text-xs tracking-widest uppercase hover:bg-emerald-800 transition-colors rounded-[6px] shadow-sm"
+            >
+              <Download className="w-4 h-4 mr-2" /> Download PDF Brochure
+            </a>
           </div>
         </div>
       </section>
