@@ -148,8 +148,8 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="relative mt-12 lg:mt-0 min-w-0 flex justify-center lg:justify-end"
             >
-              <div className="relative z-10 w-full max-w-[560px]">
-                <div className="relative mx-auto aspect-square w-full max-w-[520px]">
+              <div className="relative z-10 w-full max-w-[650px]">
+                <div className="relative mx-auto aspect-square w-full max-w-[610px]">
                   <motion.div
                     key={`orbit-${activeHeroIndex}`}
                     initial={{ rotate: -18 }}
@@ -157,10 +157,10 @@ export default function Home() {
                     transition={{ duration: isHeroPaused || prefersReducedMotion ? 0 : 5, ease: 'linear' }}
                     className="absolute inset-0 rounded-full border border-dashed border-gold/60"
                   />
-                  <div className="absolute inset-8 rounded-full border border-emerald-600/20"></div>
-                  <div className="absolute inset-14 rounded-full bg-white shadow-2xl shadow-slate-900/10"></div>
+                  <div className="absolute inset-5 rounded-full border border-emerald-600/20"></div>
+                  <div className="absolute inset-10 rounded-full bg-white shadow-2xl shadow-slate-900/10"></div>
 
-                  <div className="absolute inset-8 overflow-hidden rounded-full border-[10px] border-white bg-slate-100 shadow-2xl">
+                  <div className="absolute inset-5 overflow-hidden rounded-full border-[8px] border-white bg-slate-100 shadow-2xl">
                     <motion.img
                       key={activeHero.image}
                       src={activeHero.image}
@@ -175,7 +175,7 @@ export default function Home() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/10 to-transparent"></div>
                     <div className="absolute inset-0 rounded-full ring-1 ring-black/10 pointer-events-none"></div>
-                    <div className="absolute bottom-10 left-8 right-8 text-center text-white">
+                    <div className="absolute bottom-12 left-10 right-10 text-center text-white">
                       <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-gold">{activeHero.eyebrow}</p>
                       <h2 className="text-2xl sm:text-3xl font-serif leading-tight">{activeHero.title}</h2>
                     </div>
