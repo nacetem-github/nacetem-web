@@ -1,6 +1,18 @@
 import { motion } from 'framer-motion';
 import type { ComponentType } from 'react';
-import { ArrowLeft, BookOpen, CheckCircle2, ChevronRight, Clock, Download, MapPin, Users } from 'lucide-react';
+import {
+  ArrowLeft,
+  BookOpen,
+  CheckCircle2,
+  ChevronRight,
+  ClipboardCheck,
+  Clock,
+  Download,
+  MapPin,
+  Radar,
+  ShieldCheck,
+  Users,
+} from 'lucide-react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { getCapacityProgram } from '../data/capacityPrograms';
 
@@ -10,6 +22,27 @@ const fadeInUp = {
 };
 
 const brochureUrl = '/uploads/capacity-building/brochures/capacity-building-brochure.pdf';
+
+const droneCourseDetails = [
+  {
+    title: 'Certification & Authority',
+    icon: ShieldCheck,
+    content:
+      'Fully compliant with Nigerian Civil Aviation Authority (NCAA) guidelines. Aligned with international standards from ICAO, EASA, and the FAA. Certified by the Nigeria Civil Aviation Authority and the Oil & Gas Trainers Association.',
+  },
+  {
+    title: 'The Hardware & Tech Stack',
+    icon: Radar,
+    content:
+      'Train on a variety of multi-rotor UAS platforms. Master advanced Detect-and-Avoid (DAA) systems including radar and ADS-B. Learn command and control systems utilizing LTE/5G and C2 link redundancy.',
+  },
+  {
+    title: 'Prerequisites & Entry',
+    icon: ClipboardCheck,
+    content:
+      'For the core VLOS certification, candidates must be 18+ years old, hold a valid NIN, and pass a class 3 medical fitness exam. Advanced BVLOS training requires a prior VLOS certificate and 20+ logged flight hours.',
+  },
+];
 
 export default function CapacityBuildingDetail() {
   const { slug } = useParams();
@@ -57,17 +90,34 @@ export default function CapacityBuildingDetail() {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-10 lg:gap-14">
-            <main>
+            <main className="pb-28">
               <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}>
                 <h2 className="text-xs font-bold text-gold uppercase tracking-widest mb-4">Programme Overview</h2>
                 <h3 className="text-3xl sm:text-4xl font-serif text-slate-900 mb-6">What this programme covers</h3>
-                <p className="text-slate-600 leading-relaxed text-base sm:text-lg mb-12">{program.overview}</p>
+                <p className="text-slate-600 leading-[1.6] text-base sm:text-lg mb-12 max-w-[800px]">{program.overview}</p>
               </motion.div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
                 <InfoPanel title="Who Should Attend" items={program.audience} icon={Users} />
                 <InfoPanel title="Learning Outcomes" items={program.outcomes} icon={CheckCircle2} />
               </div>
+
+              {program.slug === 'training-certification-drone-piloting' && (
+                <section className="mb-12">
+                  <div className="mb-8">
+                    <h3 className="text-2xl sm:text-3xl font-serif text-slate-900 mb-3">Course Details & Requirements</h3>
+                    <p className="text-slate-600 leading-[1.6] max-w-[800px]">
+                      Build practical flight confidence with a certification pathway designed for regulated, high-value UAS operations.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-8 justify-center [&>*]:md:col-span-2 [&>*:last-child:nth-child(odd)]:md:col-start-2 [&>*:last-child:nth-child(odd)]:lg:col-start-auto">
+                    {droneCourseDetails.map((detail) => (
+                      <CourseDetailPanel key={detail.title} {...detail} />
+                    ))}
+                  </div>
+                </section>
+              )}
 
               <motion.div
                 initial="hidden"
@@ -158,9 +208,11 @@ function InfoPanel({ title, items, icon: Icon }: { title: string; items: string[
       whileInView="visible"
       viewport={{ once: true }}
       variants={fadeInUp}
-      className="bg-white border border-slate-200 rounded-[11px] p-7 shadow-sm"
+      className="bg-white rounded-[11px] p-7 shadow-[0_4px_15px_rgba(0,0,0,0.05)] transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-[0_10px_25px_rgba(0,0,0,0.1)]"
     >
-      <Icon className="w-7 h-7 text-emerald-700 mb-6" />
+      <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center mb-6">
+        <Icon className="w-7 h-7 text-emerald-700" />
+      </div>
       <h3 className="text-2xl font-serif text-slate-900 mb-5">{title}</h3>
       <ul className="space-y-3">
         {items.map((item) => (
@@ -170,6 +222,33 @@ function InfoPanel({ title, items, icon: Icon }: { title: string; items: string[
           </li>
         ))}
       </ul>
+    </motion.div>
+  );
+}
+
+function CourseDetailPanel({
+  title,
+  content,
+  icon: Icon,
+}: {
+  title: string;
+  content: string;
+  icon: IconComponent;
+  key?: string;
+}) {
+  return (
+    <motion.div
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true }}
+      variants={fadeInUp}
+      className="bg-white rounded-[11px] p-7 shadow-[0_4px_15px_rgba(0,0,0,0.05)] transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-[0_10px_25px_rgba(0,0,0,0.1)]"
+    >
+      <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center mb-6">
+        <Icon className="w-7 h-7 text-emerald-700" />
+      </div>
+      <h3 className="text-xl font-serif text-slate-900 mb-4 leading-snug">{title}</h3>
+      <p className="text-sm text-slate-600 leading-[1.6]">{content}</p>
     </motion.div>
   );
 }
