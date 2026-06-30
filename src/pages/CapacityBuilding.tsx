@@ -51,7 +51,7 @@ export default function CapacityBuilding() {
             <h3 className="text-3xl sm:text-4xl font-serif text-slate-900">Explore Our Degrees, Diplomas, and Short-Term Courses</h3>
           </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 lg:gap-12 justify-center [&>*]:lg:col-span-2 [&>*:nth-last-child(2):nth-child(3n+1)]:lg:col-start-2">
             {capacityPrograms.map((program) => (
               <motion.div 
                 key={program.slug} 
