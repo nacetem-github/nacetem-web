@@ -61,8 +61,8 @@ export default function CapacityBuilding() {
                 variants={fadeInUp} 
                 className="bg-white border border-slate-200 rounded-[11px] overflow-hidden hover:border-emerald-500 transition-colors group relative flex flex-col h-full shadow-sm hover:shadow-md"
               >
-                <div className="image-frame h-56 sm:h-64 relative">
-                  <img src={program.img} alt={program.title} className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-in-out" />
+                <div className={`image-frame h-56 sm:h-64 relative ${program.imageFit === 'contain' ? 'bg-white p-2' : ''}`}>
+                  <img src={program.cardImg ?? program.img} alt={program.title} className={`w-full h-full ${program.imageFit === 'contain' ? 'object-contain' : 'object-cover'} transform group-hover:scale-105 transition-transform duration-700 ease-in-out`} />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
                   <div className="absolute bottom-4 left-6 flex items-center">
                     <div className={`w-12 h-12 rounded-[8px] flex items-center justify-center bg-white shadow-md`}>
@@ -128,14 +128,22 @@ export default function CapacityBuilding() {
             </a>
           </div>
 
-          <div className="rounded-[8px] border border-slate-200 bg-white p-8 text-center shadow-sm">
-            <a
-              href={brochureUrl}
-              download
-              className="inline-flex items-center justify-center px-8 py-4 bg-emerald-700 text-white font-bold text-xs tracking-widest uppercase hover:bg-emerald-800 transition-colors rounded-[6px] shadow-sm"
-            >
-              <Download className="w-4 h-4 mr-2" /> Download PDF Brochure
-            </a>
+          <div className="overflow-hidden rounded-[8px] border border-slate-200 bg-white shadow-sm">
+            <iframe
+              title="Capacity Building brochure PDF viewer"
+              src={brochureUrl}
+              className="h-[560px] w-full bg-slate-100"
+            />
+            <div className="flex flex-col gap-3 border-t border-slate-200 bg-white p-5 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm text-slate-600">If the preview does not load in your browser, open or download the brochure directly.</p>
+              <a
+                href={brochureUrl}
+                download
+                className="inline-flex items-center justify-center px-6 py-3 bg-emerald-700 text-white font-bold text-xs tracking-widest uppercase hover:bg-emerald-800 transition-colors rounded-[6px] shadow-sm"
+              >
+                <Download className="w-4 h-4 mr-2" /> Download PDF Brochure
+              </a>
+            </div>
           </div>
         </div>
       </section>
