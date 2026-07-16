@@ -21,6 +21,7 @@ export type CapacityProgram = {
   img: string;
   cardImg?: string;
   imageFit?: 'cover' | 'contain';
+  applyUrl?: string;
 };
 
 export const capacityPrograms: CapacityProgram[] = [
@@ -181,6 +182,7 @@ export const capacityPrograms: CapacityProgram[] = [
     img: assets.digitalAcademyImage,
     cardImg: assets.mtechDigitalMarketingImage,
     imageFit: 'contain',
+    applyUrl: 'https://nlplimited.com/online-digital-marketing-course/',
   },
   {
     slug: 'training-certification-drone-piloting',
@@ -214,6 +216,7 @@ export const capacityPrograms: CapacityProgram[] = [
     img: assets.dashboardImage,
     cardImg: assets.droneBannerImage,
     imageFit: 'contain',
+    applyUrl: 'https://drone.nacetem.gov.ng',
   },
 ];
 
