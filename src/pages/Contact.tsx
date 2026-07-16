@@ -69,7 +69,7 @@ const officeLocations = [
   },
   {
     zone: 'South West',
-    address: 'NACETEM South West/Lagos Office, House 10, Subuola Abu Street, Greenland Estate, Lagos State.',
+    address: 'SouthWest Zonal Office, No. 9, Kofo Abayomi Street, Victoria Island, Lagos.',
     lat: 6.479288,
     lng: 3.608023,
   },
@@ -196,8 +196,9 @@ export default function Contact() {
                   </div>
                   <p className="text-slate-600 text-sm leading-relaxed pl-8">
                     National Centre for Technology Management (NACETEM)<br/>
-                    P.M.B. 012, Obafemi Awolowo University<br/>
-                    Ile-Ife, Osun State, Nigeria
+                    SouthWest Zonal Office,<br/>
+                    No. 9, Kofo Abayomi Street,<br/>
+                    Victoria Island, Lagos.
                   </p>
                 </div>
 
@@ -230,7 +231,6 @@ export default function Contact() {
                   </div>
                   <div className="text-slate-600 text-sm leading-relaxed pl-8">
                     <p>Monday – Friday: 8:00 AM – 4:00 PM</p>
-                    <p>Saturday & Sunday: Closed</p>
                   </div>
                 </div>
               </div>
