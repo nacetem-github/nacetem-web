@@ -70,8 +70,8 @@ const officeLocations = [
   {
     zone: 'South West',
     address: 'NACETEM SouthWest Zonal Office,No. 9, Kofo Abayomi Street,Victoria Island,Lagos.',
-    lat: 6.479288,
-    lng: 3.608023,
+    lat: 6.435568,
+    lng: 3.413663,
   },
 ];
 
