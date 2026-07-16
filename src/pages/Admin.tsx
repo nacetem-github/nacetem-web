@@ -1,21 +1,35 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useData, type EventItem } from '../contexts/DataContext';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Settings, LogOut, LayoutDashboard, Search, Bell, Image as ImageIcon, Calendar, Plus, Trash2, Menu, X, Save, Video, Presentation, Library, KeyRound, UserPlus } from 'lucide-react';
+import { FileText, Settings, LogOut, LayoutDashboard, Search, Bell, Image as ImageIcon, Calendar, Plus, Trash2, Menu, X, Save, Video, Presentation, Library, KeyRound, UserPlus, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { CmsManager } from '../components/CmsManager';
 
 export function Login() {
-  const [mode, setMode] = useState<'login' | 'create' | 'reset'>('login');
+  const [mode, setMode] = useState<'login' | 'create' | 'reset' | 'update'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login, createAccount, requestPasswordReset } = useAuth();
+  const { login, createAccount, requestPasswordReset, updatePassword, isPasswordRecovery } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isPasswordRecovery) {
+      setMode('update');
+      setError('');
+      setNotice('Enter and confirm your new password.');
+      setPassword('');
+      setConfirmPassword('');
+      setShowPassword(false);
+      setShowConfirmPassword(false);
+    }
+  }, [isPasswordRecovery]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,6 +71,29 @@ export function Login() {
         return;
       }
 
+      if (mode === 'update') {
+        if (password.length < 8) {
+          setError('Use at least 8 characters for the password.');
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          setError('Passwords do not match.');
+          return;
+        }
+
+        const result = await updatePassword(password);
+        if (result.ok) {
+          setMode('login');
+          setPassword('');
+          setConfirmPassword('');
+          setNotice(result.message || 'Password updated. Sign in with your new password.');
+        } else {
+          setError(result.message || 'Unable to update password.');
+        }
+        return;
+      }
+
       const result = await requestPasswordReset(email);
       if (result.ok) {
         setNotice(result.message || 'Password reset instructions have been sent to your email.');
@@ -75,15 +112,19 @@ export function Login() {
     setNotice('');
     setPassword('');
     setConfirmPassword('');
+    setShowPassword(false);
+    setShowConfirmPassword(false);
   };
 
-  const title = mode === 'login' ? 'Portal Login' : mode === 'create' ? 'Create Account' : 'Reset Password';
+  const title = mode === 'login' ? 'Portal Login' : mode === 'create' ? 'Create Account' : mode === 'update' ? 'Choose New Password' : 'Reset Password';
   const subtitle = mode === 'login'
     ? 'NACETEM Extranet Authorized Access Only'
     : mode === 'create'
       ? 'Request administrative portal access'
+      : mode === 'update'
+        ? 'Secure your account with a new password'
       : 'Receive password recovery instructions';
-  const submitLabel = mode === 'login' ? 'Authenticate' : mode === 'create' ? 'Create Account' : 'Send Reset Link';
+  const submitLabel = mode === 'login' ? 'Authenticate' : mode === 'create' ? 'Create Account' : mode === 'update' ? 'Update Password' : 'Send Reset Link';
 
   return (
     <div className="min-h-screen flex flex-col sm:flex-row items-center justify-center bg-slate-50 p-4">
@@ -98,7 +139,7 @@ export function Login() {
         {notice && <div className="p-3 bg-emerald-50 text-emerald-700 text-xs border border-emerald-200 mb-6">{notice}</div>}
 
         <form onSubmit={handleAuth} className="space-y-6">
-          <div>
+          {mode !== 'update' && <div>
             <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-700 mb-2">Email Address</label>
             <input
               type="email"
@@ -108,33 +149,55 @@ export function Login() {
               placeholder="adminacetem@gmail.com"
               required
             />
-          </div>
+          </div>}
 
           {mode !== 'reset' && (
             <div>
-              <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-700 mb-2">Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-slate-300 focus:border-emerald-700 outline-none text-sm bg-slate-50 focus:bg-white transition-colors"
-                placeholder="Enter your password"
-                required
-              />
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-700 mb-2">{mode === 'update' ? 'New Password' : 'Password'}</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-3 pr-16 border border-slate-300 focus:border-emerald-700 outline-none text-sm bg-slate-50 focus:bg-white transition-colors"
+                  placeholder={mode === 'update' ? 'Enter a new password' : 'Enter your password'}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((visible) => !visible)}
+                  className="absolute inset-y-0 right-0 flex w-16 items-center justify-center text-emerald-700 transition-colors hover:text-emerald-900 focus:outline-none focus:text-emerald-900"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-pressed={showPassword}
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" aria-hidden="true" /> : <Eye className="h-5 w-5" aria-hidden="true" />}
+                </button>
+              </div>
             </div>
           )}
 
-          {mode === 'create' && (
+          {(mode === 'create' || mode === 'update') && (
             <div>
-              <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-700 mb-2">Confirm Password</label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-slate-300 focus:border-emerald-700 outline-none text-sm bg-slate-50 focus:bg-white transition-colors"
-                placeholder="Confirm your password"
-                required
-              />
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-700 mb-2">Confirm {mode === 'update' ? 'New ' : ''}Password</label>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full px-4 py-3 pr-16 border border-slate-300 focus:border-emerald-700 outline-none text-sm bg-slate-50 focus:bg-white transition-colors"
+                  placeholder="Confirm your password"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword((visible) => !visible)}
+                  className="absolute inset-y-0 right-0 flex w-16 items-center justify-center text-emerald-700 transition-colors hover:text-emerald-900 focus:outline-none focus:text-emerald-900"
+                  aria-label={showConfirmPassword ? 'Hide confirmation password' : 'Show confirmation password'}
+                  aria-pressed={showConfirmPassword}
+                >
+                  {showConfirmPassword ? <EyeOff className="h-5 w-5" aria-hidden="true" /> : <Eye className="h-5 w-5" aria-hidden="true" />}
+                </button>
+              </div>
             </div>
           )}
 
@@ -147,7 +210,7 @@ export function Login() {
           </button>
         </form>
 
-        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {mode !== 'update' && <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
           {mode !== 'create' && (
             <button
               type="button"
@@ -175,7 +238,7 @@ export function Login() {
               Back To Login
             </button>
           )}
-        </div>
+        </div>}
 
         <div className="mt-8 text-center text-[10px] tracking-widest uppercase text-slate-400">
           Protected by FMIST Infrastructure

@@ -96,9 +96,15 @@ export default function CapacityBuilding() {
                   )}
                 
                   <div className="pt-8 mt-auto border-t border-slate-100 flex flex-col sm:flex-row gap-3 sm:items-center">
-                    <Link to="#" className="flex-1 inline-flex items-center justify-center px-6 py-3 bg-emerald-700 text-white font-bold text-xs tracking-widest uppercase hover:bg-emerald-800 transition-colors rounded-[6px] text-center shadow-sm">
-                      <Download className="w-4 h-4 mr-2" /> Apply Here
-                    </Link>
+                    {program.applyUrl ? (
+                      <a href={program.applyUrl} target="_blank" rel="noopener noreferrer" className="flex-1 inline-flex items-center justify-center px-6 py-3 bg-emerald-700 text-white font-bold text-xs tracking-widest uppercase hover:bg-emerald-800 transition-colors rounded-[6px] text-center shadow-sm">
+                        <Download className="w-4 h-4 mr-2" /> Apply Here
+                      </a>
+                    ) : (
+                      <Link to="#" className="flex-1 inline-flex items-center justify-center px-6 py-3 bg-emerald-700 text-white font-bold text-xs tracking-widest uppercase hover:bg-emerald-800 transition-colors rounded-[6px] text-center shadow-sm">
+                        <Download className="w-4 h-4 mr-2" /> Apply Here
+                      </Link>
+                    )}
                     <Link to={`/capacity-building/${program.slug}`} className="flex-1 inline-flex items-center justify-center px-6 py-3 bg-transparent border border-slate-300 text-slate-800 font-bold text-xs tracking-widest uppercase hover:border-emerald-700 hover:text-emerald-700 hover:bg-emerald-50/40 transition-colors rounded-[6px] text-center">
                       Read More <ChevronRight className="ml-2 h-4 w-4" />
                     </Link>
