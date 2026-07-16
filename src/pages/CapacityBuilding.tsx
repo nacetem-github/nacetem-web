@@ -129,11 +129,12 @@ export default function CapacityBuilding() {
           </div>
 
           <div className="overflow-hidden rounded-[8px] border border-slate-200 bg-white shadow-sm">
-            <iframe
-              title="Capacity Building brochure PDF viewer"
-              src={brochureUrl}
-              className="h-[560px] w-full bg-slate-100"
-            />
+            <div className="pdf-container">
+              <iframe
+                title="Capacity Building brochure PDF viewer"
+                src={brochureUrl}
+              />
+            </div>
             <div className="flex flex-col gap-3 border-t border-slate-200 bg-white p-5 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-sm text-slate-600">If the preview does not load in your browser, open or download the brochure directly.</p>
               <a

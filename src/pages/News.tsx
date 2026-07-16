@@ -50,6 +50,20 @@ const galleryEvents = [
 ];
 type GalleryAlbum = (typeof galleryEvents)[number];
 
+const responsiveGalleryImage = (src: string) => {
+  const isLocalGalleryImage = src.startsWith('/uploads/events/gallery/') && /\.(?:jpe?g|png)$/i.test(src);
+  if (!isLocalGalleryImage) return { src };
+
+  const webpSrc = src.replace(/\.(?:jpe?g|png)$/i, '.webp');
+  const base = webpSrc.slice(0, -'.webp'.length);
+
+  return {
+    src: webpSrc,
+    srcSet: [480, 960, 1440].map((width) => `${base}-${width}w.webp ${width}w`).join(', '),
+    sizes: '(min-width: 1280px) 680px, (min-width: 1024px) 60vw, 100vw',
+  };
+};
+
 export default function News() {
   const { events, news, gallery } = useData();
   const newsArticles = news.filter((article) => article.status === 'published');
@@ -97,7 +111,7 @@ export default function News() {
       if (!image?.src) return;
       const preload = new Image();
       preload.decoding = 'async';
-      preload.src = image.src;
+      preload.src = responsiveGalleryImage(image.src).src;
     });
   }, [activeImage, nextImage, previousImage]);
 
@@ -518,11 +532,10 @@ export default function News() {
                     <AnimatePresence mode="wait">
                       <motion.img
                         key={`${activeGallery.id}-${activeImageIndex}`}
-                        src={activeImage.src}
+                        {...responsiveGalleryImage(activeImage.src)}
                         alt={activeImage.alt}
-                        loading="eager"
+                        loading="lazy"
                         decoding="async"
-                        fetchPriority="high"
                         initial={{ opacity: 0, scale: 1.02 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.98 }}
@@ -576,11 +589,10 @@ export default function News() {
                           }`}
                         >
                           <img
-                            src={image.src}
+                            {...responsiveGalleryImage(image.src)}
                             alt={image.alt}
-                            loading={index < 3 ? 'eager' : 'lazy'}
+                            loading="lazy"
                             decoding="async"
-                            fetchPriority={isSelected ? 'high' : 'low'}
                             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                           />
                           <span className="absolute bottom-2 left-2 rounded-sm bg-slate-950/70 px-2 py-1 text-[10px] font-bold text-white">
@@ -631,9 +643,9 @@ export default function News() {
             <X className="h-5 w-5" />
           </button>
           <img
-            src={activeGallery.images[lightboxImageIndex].src}
+            {...responsiveGalleryImage(activeGallery.images[lightboxImageIndex].src)}
             alt={activeGallery.images[lightboxImageIndex].alt}
-            loading="eager"
+            loading="lazy"
             decoding="async"
             className="fullscreen-image h-auto w-auto rounded-[10px] object-contain shadow-2xl"
           />
