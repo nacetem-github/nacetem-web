@@ -57,6 +57,7 @@ export default function Home() {
   const prefersReducedMotion = useReducedMotion();
   const [activeStoryIndex, setActiveStoryIndex] = useState(0);
   const [activeVideoIndex, setActiveVideoIndex] = useState(0);
+  const [activeEventIndex, setActiveEventIndex] = useState(0);
   const activeHero = heroSlides[activeHeroIndex];
   const nextHero = heroSlides[(activeHeroIndex + 1) % heroSlides.length];
   const displayedGallery = [
@@ -67,7 +68,8 @@ export default function Home() {
   const storyPool = featuredStories.length ? featuredStories : news.filter((article) => article.status === 'published');
   const displayedStories = Array.from({ length: Math.min(3, storyPool.length) }, (_, index) => storyPool[(activeStoryIndex + index) % storyPool.length]);
   const homepageEvents = splitEventsByStatus(events.filter((event) => event.status === 'published')).upcomingEvents
-    .sort((a, b) => a.startDate.localeCompare(b.startDate)).slice(0, 2);
+    .sort((a, b) => a.startDate.localeCompare(b.startDate)).slice(0, 5);
+  const activeEvent = homepageEvents.length ? homepageEvents[activeEventIndex % homepageEvents.length] : null;
 
   useEffect(() => {
     if (isHeroPaused || prefersReducedMotion) return;
@@ -78,11 +80,43 @@ export default function Home() {
     return () => window.clearInterval(timer);
   }, [isHeroPaused, prefersReducedMotion]);
 
+  useEffect(() => {
+    if (homepageEvents.length && activeEventIndex >= homepageEvents.length) setActiveEventIndex(0);
+  }, [activeEventIndex, homepageEvents.length]);
+
+  const showPreviousEvent = () => {
+    if (!homepageEvents.length) return;
+    setActiveEventIndex((current) => (current - 1 + homepageEvents.length) % homepageEvents.length);
+  };
+
+  const showNextEvent = () => {
+    if (!homepageEvents.length) return;
+    setActiveEventIndex((current) => (current + 1) % homepageEvents.length);
+  };
+
   return (
     <div className="flex-1">
       {/* Hero Section */}
       <section className="relative bg-slate-50 border-b border-slate-200 text-slate-900 overflow-hidden">
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
+        <motion.div
+          className="pointer-events-none absolute inset-0 opacity-[0.72]"
+          style={{
+            backgroundImage:
+              'linear-gradient(rgba(0,102,51,0.13) 1px, transparent 1px), linear-gradient(90deg, rgba(15,23,42,0.10) 1px, transparent 1px)',
+            backgroundSize: '44px 44px',
+          }}
+          animate={prefersReducedMotion ? undefined : { backgroundPosition: ['0px 0px', '44px 44px'] }}
+          transition={prefersReducedMotion ? undefined : { duration: 18, ease: 'linear', repeat: Infinity }}
+          aria-hidden="true"
+        />
+        <motion.div
+          className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/2 bg-gradient-to-r from-transparent via-emerald-500/10 to-transparent blur-sm"
+          animate={prefersReducedMotion ? undefined : { x: ['0%', '280%'] }}
+          transition={prefersReducedMotion ? undefined : { duration: 9, ease: 'easeInOut', repeat: Infinity, repeatDelay: 2 }}
+          aria-hidden="true"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_78%_32%,rgba(0,102,51,0.13),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.58),rgba(248,250,252,0.82))]" aria-hidden="true"></div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center min-w-0">
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
@@ -114,8 +148,8 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="relative mt-12 lg:mt-0 min-w-0 flex justify-center lg:justify-end"
             >
-              <div className="relative z-10 w-full max-w-[560px]">
-                <div className="relative mx-auto aspect-square w-full max-w-[520px]">
+              <div className="relative z-10 w-full max-w-[650px]">
+                <div className="relative mx-auto aspect-square w-full max-w-[610px]">
                   <motion.div
                     key={`orbit-${activeHeroIndex}`}
                     initial={{ rotate: -18 }}
@@ -123,10 +157,10 @@ export default function Home() {
                     transition={{ duration: isHeroPaused || prefersReducedMotion ? 0 : 5, ease: 'linear' }}
                     className="absolute inset-0 rounded-full border border-dashed border-gold/60"
                   />
-                  <div className="absolute inset-8 rounded-full border border-emerald-600/20"></div>
-                  <div className="absolute inset-14 rounded-full bg-white shadow-2xl shadow-slate-900/10"></div>
+                  <div className="absolute inset-5 rounded-full border border-emerald-600/20"></div>
+                  <div className="absolute inset-10 rounded-full bg-white shadow-2xl shadow-slate-900/10"></div>
 
-                  <div className="absolute inset-8 overflow-hidden rounded-full border-[10px] border-white bg-slate-100 shadow-2xl">
+                  <div className="absolute inset-5 overflow-hidden rounded-full border-[8px] border-white bg-slate-100 shadow-2xl">
                     <motion.img
                       key={activeHero.image}
                       src={activeHero.image}
@@ -141,7 +175,7 @@ export default function Home() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/10 to-transparent"></div>
                     <div className="absolute inset-0 rounded-full ring-1 ring-black/10 pointer-events-none"></div>
-                    <div className="absolute bottom-10 left-8 right-8 text-center text-white">
+                    <div className="absolute bottom-12 left-10 right-10 text-center text-white">
                       <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-gold">{activeHero.eyebrow}</p>
                       <h2 className="text-2xl sm:text-3xl font-serif leading-tight">{activeHero.title}</h2>
                     </div>
@@ -543,15 +577,35 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="flex flex-col md:flex-row justify-between items-end mb-12"
+            className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between mb-12"
           >
             <div className="max-w-2xl">
               <h2 className="text-3xl sm:text-4xl font-serif text-slate-900 mb-4">Upcoming Events</h2>
               <p className="text-sm text-slate-600">Join our workshops, conferences, and capacity-building sessions focusing on science, technology, and innovation management.</p>
             </div>
-            <Link to="/events" className="hidden md:inline-flex items-center text-xs font-bold uppercase tracking-widest text-emerald-600 hover:text-emerald-700 border-b border-transparent hover:border-emerald-700 pb-1">
-              View All Events <ArrowRight className="ml-1 h-3 w-3" />
-            </Link>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={showPreviousEvent}
+                disabled={homepageEvents.length <= 1}
+                className="flex h-11 w-11 items-center justify-center rounded-sm border border-slate-200 bg-white text-slate-700 shadow-sm transition-colors hover:border-emerald-600/40 hover:text-emerald-700 disabled:cursor-not-allowed disabled:opacity-40"
+                aria-label="Show previous homepage event"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <button
+                type="button"
+                onClick={showNextEvent}
+                disabled={homepageEvents.length <= 1}
+                className="flex h-11 w-11 items-center justify-center rounded-sm border border-slate-200 bg-white text-slate-700 shadow-sm transition-colors hover:border-emerald-600/40 hover:text-emerald-700 disabled:cursor-not-allowed disabled:opacity-40"
+                aria-label="Show next homepage event"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+              <Link to="/News" className="hidden md:inline-flex items-center text-xs font-bold uppercase tracking-widest text-emerald-600 hover:text-emerald-700 border-b border-transparent hover:border-emerald-700 pb-1">
+                View All Events <ArrowRight className="ml-1 h-3 w-3" />
+              </Link>
+            </div>
           </motion.div>
 
           <motion.div 
@@ -559,37 +613,78 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.7, delay: 0.1, ease: "easeOut" }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-6"
+            className="relative"
           >
-            {homepageEvents.map((event) => (
-              <div key={event.id} className="bg-white border border-slate-200 p-8 hover:border-emerald-600 transition-all group flex flex-col md:flex-row gap-6">
-                {event.flyerUrl ? (
-                  <div className="image-frame h-40 md:h-auto md:w-32 bg-slate-100 border border-slate-200 shrink-0">
-                    <img src={event.flyerUrl} alt={`${event.title} flyer`} loading="lazy" decoding="async" className="h-full w-full object-contain object-center" />
+            {activeEvent ? (
+              <div key={activeEvent.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all hover:border-emerald-600 hover:shadow-lg">
+                <div className="grid grid-cols-1 lg:grid-cols-[0.82fr_1.18fr]">
+                  <div className="image-frame min-h-[280px] bg-slate-100">
+                    {activeEvent.flyerUrl ? (
+                      <img src={activeEvent.flyerUrl} alt={`${activeEvent.title} flyer`} loading="lazy" decoding="async" className="h-full w-full object-contain object-center" />
+                    ) : (
+                      <div className="relative h-full min-h-[280px] w-full overflow-hidden bg-slate-950">
+                        <img src={assets.capacityImage} alt="" aria-hidden="true" className="h-full w-full object-cover opacity-20" />
+                        <div className="absolute inset-0 flex flex-col items-center justify-center px-8 text-center text-white">
+                          <CalendarIcon className="mb-4 h-12 w-12 text-gold" />
+                          <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-gold">NACETEM Event</p>
+                          <p className="mt-3 font-serif text-2xl">Flyer Coming Soon</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center bg-slate-50 border border-slate-100 p-4 shrink-0 min-w-24">
-                    <CalendarIcon className="h-6 w-6 text-emerald-600 mb-2" />
-                    <span className="text-xs font-bold uppercase tracking-widest text-gold text-center">{event.date.split(' ')[0]}</span>
-                    <span className="text-2xl font-serif text-slate-900 leading-none mt-1">{event.date.split(' ')[1]?.replace(',', '') || ''}</span>
+                  <div className="flex min-h-[360px] flex-col justify-center p-7 sm:p-10">
+                    <div className="mb-5 flex flex-wrap gap-2">
+                      <span className="inline-flex items-center bg-slate-100 px-3 py-1.5 text-[10px] uppercase tracking-widest font-bold text-emerald-700">
+                        <CalendarIcon className="h-3.5 w-3.5 mr-1.5" /> {activeEvent.date}{activeEvent.time ? ` | ${activeEvent.time}` : ''}
+                      </span>
+                      <span className="inline-flex items-center bg-slate-100 px-3 py-1.5 text-[10px] uppercase tracking-widest font-bold text-slate-500">
+                        <MapPin className="h-3.5 w-3.5 mr-1.5" /> {activeEvent.location}
+                      </span>
+                      {activeEvent.fee && <span className="inline-flex items-center bg-slate-100 px-3 py-1.5 text-[10px] uppercase tracking-widest font-bold text-slate-500">Fee: {activeEvent.fee}</span>}
+                    </div>
+                    <h3 className="mb-4 font-serif text-2xl leading-tight text-slate-900 transition-colors hover:text-emerald-700 sm:text-3xl">{activeEvent.title}</h3>
+                    <p className="mb-6 text-sm leading-7 text-slate-600">{activeEvent.description}</p>
+                    <Link to={`/events/${getEventSlug(activeEvent)}`} className="inline-flex items-center self-start text-xs font-bold uppercase tracking-widest text-slate-900 hover:text-emerald-700 border-b border-transparent hover:border-emerald-700 pb-1">
+                      Event Details <ArrowRight className="ml-1 h-3 w-3" />
+                    </Link>
                   </div>
-                )}
-                <div className="flex flex-col flex-1 justify-center">
-                  <div className="mb-3 inline-flex items-center self-start bg-slate-100 px-2 py-1 text-[10px] uppercase tracking-widest font-bold text-emerald-700">
-                    <CalendarIcon className="h-3 w-3 mr-1" /> {event.date}{event.time ? ` | ${event.time}` : ''}
-                  </div>
-                  <h3 className="text-xl font-serif text-slate-900 mb-2 group-hover:text-emerald-700 transition-colors">{event.title}</h3>
-                  <div className="flex items-center text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-3 gap-2 flex-wrap">
-                    <span className="flex items-center bg-slate-100 px-2 py-1"><MapPin className="h-3 w-3 mr-1" /> {event.location}</span>
-                    {event.fee && <span className="flex items-center bg-slate-100 px-2 py-1">Fee: {event.fee}</span>}
-                  </div>
-                  <p className="text-xs text-slate-600 leading-relaxed mb-4">{event.description}</p>
-                  <Link to={`/events/${getEventSlug(event)}`} className="inline-flex items-center text-[10px] font-bold uppercase tracking-widest text-slate-900 hover:text-emerald-700 mt-auto border-b border-transparent hover:border-emerald-700 pb-1 self-start">
-                    Event Details <ArrowRight className="ml-1 h-3 w-3" />
-                  </Link>
+                </div>
+                <div className="flex items-center justify-center gap-2 border-t border-slate-200 bg-slate-50 px-6 py-4">
+                  {homepageEvents.map((event, index) => (
+                    <button
+                      key={event.id}
+                      type="button"
+                      onClick={() => setActiveEventIndex(index)}
+                      className={`h-2 rounded-full transition-all ${index === activeEventIndex ? 'w-8 bg-emerald-600' : 'w-2.5 bg-slate-300 hover:bg-slate-400'}`}
+                      aria-label={`Show ${event.title}`}
+                    />
+                  ))}
                 </div>
               </div>
-            ))}
+            ) : (
+              <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-950 shadow-xl">
+                <div
+                  className="relative min-h-[360px] px-6 py-14 text-center text-white sm:px-10"
+                  style={{
+                    backgroundImage:
+                      'linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)',
+                    backgroundSize: '34px 34px',
+                  }}
+                >
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,102,51,0.35),transparent_38%)]"></div>
+                  <div className="relative mx-auto flex max-w-2xl flex-col items-center">
+                    <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-gold/40 bg-gold/10 text-gold">
+                      <CalendarIcon className="h-8 w-8" />
+                    </div>
+                    <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.28em] text-gold">Upcoming Events</p>
+                    <h3 className="mb-5 font-serif text-3xl leading-tight sm:text-4xl">There is no upcoming event at the moment.</h3>
+                    <p className="text-sm leading-7 text-slate-200">
+                      New NACETEM workshops, stakeholder engagements, and public programmes will appear here as soon as they are published.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </motion.div>
           
           <div className="mt-8 text-center md:hidden">

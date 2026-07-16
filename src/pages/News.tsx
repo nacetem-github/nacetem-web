@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, Calendar, Camera, ChevronLeft, ChevronRight, Clock, FileText, Images, Mail, MapPin, Phone, Video, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -89,6 +89,17 @@ export default function News() {
   const availableGalleries = managedGalleryEvents.length ? managedGalleryEvents : galleryEvents;
   const activeGallery = availableGalleries.find((event) => event.id === activeGalleryId) ?? availableGalleries[0];
   const activeImage = activeGallery.images[activeImageIndex] ?? activeGallery.images[0];
+  const nextImage = activeGallery.images[(activeImageIndex + 1) % activeGallery.images.length];
+  const previousImage = activeGallery.images[(activeImageIndex - 1 + activeGallery.images.length) % activeGallery.images.length];
+
+  useEffect(() => {
+    [activeImage, nextImage, previousImage].forEach((image) => {
+      if (!image?.src) return;
+      const preload = new Image();
+      preload.decoding = 'async';
+      preload.src = image.src;
+    });
+  }, [activeImage, nextImage, previousImage]);
 
   const handleLoadMore = () => {
     setVisibleArticles((current) => Math.min(current + 3, newsArticles.length));
@@ -496,8 +507,8 @@ export default function News() {
             </div>
 
             <div className="image-frame rounded-[11px] border border-slate-200 bg-slate-50 shadow-sm">
-              <div className="grid grid-cols-1 xl:h-[560px] xl:grid-cols-[1.35fr_0.65fr]">
-                <div className="image-frame relative min-h-[420px] bg-slate-900 xl:h-full xl:min-h-0">
+              <div className="grid grid-cols-1 xl:h-[680px] xl:grid-cols-[1.55fr_0.45fr]">
+                <div className="image-frame relative min-h-[540px] bg-slate-950 xl:h-full xl:min-h-0">
                   <button
                     type="button"
                     onClick={() => setLightboxImageIndex(activeImageIndex)}
@@ -509,11 +520,14 @@ export default function News() {
                         key={`${activeGallery.id}-${activeImageIndex}`}
                         src={activeImage.src}
                         alt={activeImage.alt}
+                        loading="eager"
+                        decoding="async"
+                        fetchPriority="high"
                         initial={{ opacity: 0, scale: 1.02 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.98 }}
                         transition={{ duration: 0.35 }}
-                        className="absolute inset-0 h-full w-full object-cover"
+                        className="absolute inset-0 h-full w-full object-contain"
                       />
                     </AnimatePresence>
                     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/85 to-transparent p-5 sm:p-6 text-white">
@@ -561,7 +575,14 @@ export default function News() {
                             isSelected ? 'border-emerald-600 ring-2 ring-emerald-600/20' : 'border-slate-200 hover:border-emerald-300'
                           }`}
                         >
-                          <img src={image.src} alt={image.alt} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                          <img
+                            src={image.src}
+                            alt={image.alt}
+                            loading={index < 3 ? 'eager' : 'lazy'}
+                            decoding="async"
+                            fetchPriority={isSelected ? 'high' : 'low'}
+                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
                           <span className="absolute bottom-2 left-2 rounded-sm bg-slate-950/70 px-2 py-1 text-[10px] font-bold text-white">
                             {String(index + 1).padStart(2, '0')}
                           </span>
@@ -612,6 +633,8 @@ export default function News() {
           <img
             src={activeGallery.images[lightboxImageIndex].src}
             alt={activeGallery.images[lightboxImageIndex].alt}
+            loading="eager"
+            decoding="async"
             className="fullscreen-image h-auto w-auto rounded-[10px] object-contain shadow-2xl"
           />
         </div>

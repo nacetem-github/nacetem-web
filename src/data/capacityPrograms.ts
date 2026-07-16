@@ -19,6 +19,8 @@ export type CapacityProgram = {
   format: string;
   iconColor: string;
   img: string;
+  cardImg?: string;
+  imageFit?: 'cover' | 'contain';
 };
 
 export const capacityPrograms: CapacityProgram[] = [
@@ -109,11 +111,13 @@ export const capacityPrograms: CapacityProgram[] = [
     format: 'Hybrid',
     iconColor: 'text-blue-500',
     img: assets.capacityImage,
+    cardImg: assets.mtechTechnologyManagementImage,
+    imageFit: 'contain',
   },
   {
     slug: 'professional-mtech-nanoscience-nanotechnology',
     icon: Microscope,
-    title: 'Professional M.Tech. in Nanoscience / Nanotechnology',
+    title: 'Professional Master in Nanoscience/Nanotechnology (M.Tech.)',
     category: 'Professional Master Programme',
     description:
       'An advanced professional programme focused on nanoscience, nanotechnology applications, and emerging technology-driven development.',
@@ -141,11 +145,13 @@ export const capacityPrograms: CapacityProgram[] = [
     format: 'Hybrid',
     iconColor: 'text-purple-500',
     img: assets.seminarImage,
+    cardImg: assets.mtechNanotechnologyImage,
+    imageFit: 'contain',
   },
   {
     slug: 'professional-mtech-digital-marketing-strategy',
     icon: Globe,
-    title: 'Professional M.Tech. in Digital Marketing and Strategy',
+    title: 'Professional Master in Digital Marketing and Strategy (M.Tech.)',
     category: 'Professional Master Programme',
     description:
       'A professional programme that develops advanced knowledge and practical expertise in digital channels, marketing strategy, innovation, and technology-driven business growth.',
@@ -173,11 +179,13 @@ export const capacityPrograms: CapacityProgram[] = [
     format: 'Hybrid',
     iconColor: 'text-orange-500',
     img: assets.digitalAcademyImage,
+    cardImg: assets.mtechDigitalMarketingImage,
+    imageFit: 'contain',
   },
   {
     slug: 'training-certification-drone-piloting',
     icon: Drone,
-    title: 'Training and Certification in Drone Piloting',
+    title: 'Training, Certification and Licensing in Drone Piloting',
     category: 'Short-Term Course',
     description:
       'A short-term practical course designed to build competence in drone operation, safety procedures, flight planning, and responsible use of unmanned aerial systems.',
@@ -199,11 +207,13 @@ export const capacityPrograms: CapacityProgram[] = [
       'Plan basic drone missions and field activities',
       'Understand responsible and practical drone use cases',
     ],
-    locations: [],
+    locations: ['Ile Ife', 'Lagos Study Centre', 'Abuja Study Centre', 'Bayelsa Study Centre', 'Enugu Study Centre'],
     duration: 'Short-term course',
     format: 'Practical training and certification',
     iconColor: 'text-cyan-500',
     img: assets.dashboardImage,
+    cardImg: assets.droneBannerImage,
+    imageFit: 'contain',
   },
 ];
 

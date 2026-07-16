@@ -38,7 +38,15 @@ export default function EventDetail() {
     <div className="min-h-screen bg-slate-50 font-sans">
       <section className="relative overflow-hidden bg-slate-900 pb-20 pt-32 lg:pt-40">
         <div className="absolute inset-0">
-          <img src={eventImage} alt="" className="h-full w-full object-cover opacity-25 mix-blend-overlay" aria-hidden="true" />
+          <img
+            src={eventImage}
+            alt=""
+            className="h-full w-full object-cover opacity-25 mix-blend-overlay"
+            aria-hidden="true"
+            loading="eager"
+            decoding="async"
+            fetchPriority="high"
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/85 to-slate-900/40"></div>
         </div>
 
@@ -58,7 +66,13 @@ export default function EventDetail() {
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="image-frame rounded-[11px] border border-slate-200 bg-slate-900">
             {event.flyerUrl ? (
-              <img src={event.flyerUrl} alt={`${event.title} flyer`} className="h-full max-h-[760px] w-full object-contain object-top" />
+              <img
+                src={event.flyerUrl}
+                alt={`${event.title} flyer`}
+                className="h-full max-h-[760px] w-full object-contain object-top"
+                loading="lazy"
+                decoding="async"
+              />
             ) : (
               <div className="flex min-h-[460px] flex-col items-center justify-center bg-emerald-950 px-8 text-center text-white">
                 <Calendar className="mb-5 h-12 w-12 text-gold" />

@@ -9,6 +9,9 @@ type Field = { name: string; label: string; type?: string; required?: boolean; a
 type FileMap = Record<string, File[]>;
 const slugify = (v: string) => v.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 const today = () => new Date().toISOString().slice(0, 10);
+const IMAGE_MAX_WIDTH = 1800;
+const IMAGE_MAX_HEIGHT = 1400;
+const IMAGE_QUALITY = 0.82;
 
 const config: Record<CmsContentType, { title: string; help: string; fields: Field[] }> = {
   news: { title: 'News & Featured Stories', help: 'The image and source document are stored with this story, so they stay correctly paired everywhere.', fields: [
@@ -24,20 +27,48 @@ const config: Record<CmsContentType, { title: string; help: string; fields: Fiel
     {name:'title',label:'Event name',required:true},{name:'location',label:'Location',required:true},{name:'eventDate',label:'Event date',type:'date',required:true},
     {name:'imageUrl',label:'Images from the event',type:'file',accept:'image/*',multiple:true,required:true}]},
   seminar: { title: 'Seminar Series', help: 'Seminars are grouped into the current year, two prior years, and the archive from their date.', fields: [
-    {name:'title',label:'Seminar title',required:true},{name:'presenter',label:'Presenter',required:true},{name:'seminarDate',label:'Seminar date',type:'date',required:true},{name:'summary',label:'Summary',type:'textarea'},
+    {name:'title',label:'Seminar title',required:true},{name:'presenter',label:'Presenter',required:true},{name:'seminarDate',label:'Seminar date',type:'date',required:true},{name:'category',label:'Category'},{name:'presentationSize',label:'Presentation size (e.g. 2.4 MB)'},{name:'summary',label:'Summary',type:'textarea'},
     {name:'registrationUrl',label:'Registration URL',type:'url'},{name:'meetingUrl',label:'Meeting URL',type:'url'},{name:'presentationUrl',label:'Presentation/paper',type:'file',accept:'.pdf,.ppt,.pptx,.doc,.docx'},
     {name:'videoUrl',label:'Recording URL',type:'url'},{name:'imageUrl',label:'Webinar image',type:'file',accept:'image/*'}]},
   publication: { title: 'Publications', help: 'Manage policy briefs, technical reports, newsletters, and other knowledge products.', fields: [
     {name:'title',label:'Publication title',required:true},{name:'type',label:'Type',type:'select',options:['policy-brief','technical-report','newsletter','other'],required:true},{name:'year',label:'Year',type:'number',required:true},
-    {name:'author',label:'Author(s)'},{name:'summary',label:'Summary',type:'textarea',required:true},{name:'fileUrl',label:'Publication file',type:'file',accept:'.pdf,.doc,.docx',required:true},{name:'coverImageUrl',label:'Cover image',type:'file',accept:'image/*'}]},
+    {name:'author',label:'Author(s)'},{name:'fileSize',label:'File size (e.g. 2.4 MB)'},{name:'summary',label:'Summary',type:'textarea',required:true},{name:'fileUrl',label:'Publication file',type:'file',accept:'.pdf,.doc,.docx',required:true},{name:'coverImageUrl',label:'Cover image',type:'file',accept:'image/*'}]},
 };
 
+async function optimizeImage(file: File) {
+  if (!file.type.startsWith('image/') || file.type === 'image/svg+xml') return file;
+
+  try {
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, IMAGE_MAX_WIDTH / bitmap.width, IMAGE_MAX_HEIGHT / bitmap.height);
+    const width = Math.max(1, Math.round(bitmap.width * scale));
+    const height = Math.max(1, Math.round(bitmap.height * scale));
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext('2d');
+    if (!context) return file;
+
+    context.drawImage(bitmap, 0, 0, width, height);
+    bitmap.close();
+
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/jpeg', IMAGE_QUALITY));
+    if (!blob || blob.size >= file.size) return file;
+
+    const optimizedName = file.name.replace(/\.[^.]+$/, '') + '.jpg';
+    return new File([blob], optimizedName, { type: 'image/jpeg', lastModified: Date.now() });
+  } catch {
+    return file;
+  }
+}
+
 async function upload(file: File, type: CmsContentType, id: string) {
-  if (!supabase) return await new Promise<string>((resolve, reject) => { const r = new FileReader(); r.onload=()=>resolve(String(r.result)); r.onerror=reject; r.readAsDataURL(file); });
-  const name = file.name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-');
+  const uploadFile = await optimizeImage(file);
+  if (!supabase) return await new Promise<string>((resolve, reject) => { const r = new FileReader(); r.onload=()=>resolve(String(r.result)); r.onerror=reject; r.readAsDataURL(uploadFile); });
+  const name = uploadFile.name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-');
   const unique = typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const path = `${type}/${new Date().getFullYear()}/${id}/${unique}-${name}`;
-  const { error } = await supabase.storage.from('content-media').upload(path, file);
+  const { error } = await supabase.storage.from('content-media').upload(path, uploadFile, { contentType: uploadFile.type });
   if (error) throw error;
   return supabase.storage.from('content-media').getPublicUrl(path).data.publicUrl;
 }
@@ -58,8 +89,8 @@ export function CmsManager({ type }: { type: CmsContentType }) {
     if(type==='news')await data.saveNews({...common,slug:slugify(String(values.title)),category:String(values.category),author:String(values.author||'')||undefined,summary:String(values.summary),content:String(values.content).split(/\n\s*\n/).filter(Boolean),image:firstMedia('image'),imageAlt:String(values.imageAlt),sourceFileUrl:firstMedia('sourceFileUrl')||undefined});
     if(type==='event'){const date=String(values.startDate)+(values.endDate?` to ${values.endDate}`:'');await data.saveEvent({...common,slug:slugify(String(values.title)),startDate:String(values.startDate),endDate:String(values.endDate||'')||undefined,displayDate:date,date,time:String(values.time||'')||undefined,description:String(values.description),location:String(values.location),format:String(values.format||'Hybrid'),flyerUrl:firstMedia('flyerUrl')||undefined,fee:String(values.fee||'')||undefined,contactEmail:String(values.contactEmail||'')||undefined,contactPhones:String(values.contactPhones||'').split(',').map(x=>x.trim()).filter(Boolean),actionUrl:String(values.actionUrl||'')||undefined,actionLabel:String(values.actionLabel||'')||undefined,sourceFileUrl:firstMedia('sourceFileUrl')||undefined})}
     if(type==='gallery'){const currentItem=collections.gallery.find((item:any)=>item.id===editing);const previousImages=Array.isArray(currentItem?.images)?currentItem.images:[];const imageUrls=media.imageUrl?.length?media.imageUrl:(previousImages.length?previousImages.map((image:any)=>String(image.src)).filter(Boolean):String(values.imageUrl||'')?[String(values.imageUrl)]:[]);if(!imageUrls.length)throw new Error('Choose at least one photo.');const album=String(values.title);const location=String(values.location);const imageAltBase=[album,location].filter(Boolean).join(' - ');const images=imageUrls.map((src,index)=>({src,alt:previousImages[index]?.alt||`${imageAltBase || album} photo ${index+1}`}));await data.saveGalleryItem({...common,imageUrl:images[0].src,url:images[0].src,imageAlt:images[0].alt,album,images,eventDate:String(values.eventDate||'')||undefined,location:location||undefined})}
-    if(type==='seminar')await data.saveSeminar({...common,presenter:String(values.presenter),seminarDate:String(values.seminarDate),year:new Date(String(values.seminarDate)).getFullYear(),summary:String(values.summary||'')||undefined,registrationUrl:String(values.registrationUrl||'')||undefined,meetingUrl:String(values.meetingUrl||'')||undefined,presentationUrl:firstMedia('presentationUrl')||undefined,videoUrl:String(values.videoUrl||'')||undefined,imageUrl:firstMedia('imageUrl')||undefined});
-    if(type==='publication')await data.savePublication({...common,type:String(values.type) as PublicationItem['type'],year:Number(values.year),author:String(values.author||'')||undefined,summary:String(values.summary),fileUrl:firstMedia('fileUrl')||undefined,coverImageUrl:firstMedia('coverImageUrl')||undefined});
+    if(type==='seminar')await data.saveSeminar({...common,presenter:String(values.presenter),seminarDate:String(values.seminarDate),year:new Date(String(values.seminarDate)).getFullYear(),category:String(values.category||'')||undefined,presentationSize:String(values.presentationSize||'')||undefined,summary:String(values.summary||'')||undefined,registrationUrl:String(values.registrationUrl||'')||undefined,meetingUrl:String(values.meetingUrl||'')||undefined,presentationUrl:firstMedia('presentationUrl')||undefined,videoUrl:String(values.videoUrl||'')||undefined,imageUrl:firstMedia('imageUrl')||undefined});
+    if(type==='publication')await data.savePublication({...common,type:String(values.type) as PublicationItem['type'],year:Number(values.year),author:String(values.author||'')||undefined,fileSize:String(values.fileSize||'')||undefined,summary:String(values.summary),fileUrl:firstMedia('fileUrl')||undefined,coverImageUrl:firstMedia('coverImageUrl')||undefined});
     setMessage(type==='gallery'?`Saved gallery event with ${media.imageUrl?.length||1} photo${(media.imageUrl?.length||1)===1?'':'s'}.`:'Saved. The public site now uses this record and its attached media.');reset();
   }catch(err){setMessage(err instanceof Error?err.message:'Unable to save.')}finally{setSaving(false)}}
 

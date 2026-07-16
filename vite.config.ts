@@ -4,6 +4,8 @@ import path from 'path';
 import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
+  const apiProxyTarget = process.env.VITE_DEV_API_TARGET || process.env.APP_URL;
+
   return {
     plugins: [react(), tailwindcss()],
     resolve: {
@@ -31,13 +33,15 @@ export default defineConfig(() => {
       hmr: process.env.DISABLE_HMR !== 'true',
       // Disable file watching when DISABLE_HMR is true to save CPU during agent edits.
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
-      proxy: {
-        '/api': {
-          target: 'http://localhost:4173',
-          changeOrigin: true,
-          secure: false,
-        },
-      },
+      proxy: apiProxyTarget
+        ? {
+            '/api': {
+              target: apiProxyTarget,
+              changeOrigin: true,
+              secure: false,
+            },
+          }
+        : undefined,
     },
   };
 });

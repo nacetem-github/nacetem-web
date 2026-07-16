@@ -11,8 +11,12 @@ import policyImage from './assets/images/pages/policy-research.optimized.jpg';
 import psrImage from './assets/images/pages/psr-test.optimized.jpg';
 import aiEcosystemImage from './assets/images/pages/ai-ecosystem.jpeg';
 import digitalAcademyImage from './assets/images/pages/digital-academy.optimized.jpg';
+import mtechDigitalMarketingImage from './assets/images/pages/mtech-digital-marketing.optimized.jpg';
+import mtechTechnologyManagementImage from './assets/images/pages/mtech-technology-management.optimized.jpg';
+import mtechNanotechnologyImage from './assets/images/pages/mtech-nanotechnology.optimized.jpg';
 import weldingImage from './assets/images/pages/welding.optimized.jpg';
 import dashboardImage from './assets/images/pages/dashboard.optimized.jpg';
+import droneBannerImage from './assets/images/pages/drone-banner.optimized.jpg';
 import bayelsaNewsImage from './assets/images/news/bayelsa-news.jpeg';
 import ntaImage from './assets/images/pages/nta.png';
 
@@ -37,8 +41,12 @@ export const assets = {
   psrImage,
   aiEcosystemImage,
   digitalAcademyImage,
+  mtechDigitalMarketingImage,
+  mtechTechnologyManagementImage,
+  mtechNanotechnologyImage,
   weldingImage,
   dashboardImage,
+  droneBannerImage,
   bayelsaNewsImage,
   news1Image: bayelsaNewsImage,
   ntaImage,

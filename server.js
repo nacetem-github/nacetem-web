@@ -11,6 +11,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const app = express();
 const port = process.env.PORT || 4173;
+const host = process.env.HOST || '0.0.0.0';
 const contactRecipient = process.env.CONTACT_RECIPIENT || 'info@nacetem.gov.ng';
 const newsletterRecipient = process.env.NEWSLETTER_RECIPIENT || contactRecipient;
 
@@ -125,8 +126,8 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' });
 });
 
-app.listen(port, () => {
-  console.log(`Contact fallback server running on http://localhost:${port}`);
+app.listen(port, host, () => {
+  console.log(`Contact fallback server listening on ${host}:${port}`);
   if (!mailTransporter) {
     console.log('SMTP is not configured. Contact submissions will be stored locally in server-logs/contact-fallback.log.');
   }

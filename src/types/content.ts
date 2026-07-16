@@ -62,10 +62,12 @@ export interface SeminarItem extends ManagedFields {
   presenter: string;
   seminarDate: string;
   year: number;
+  category?: string;
   summary?: string;
   registrationUrl?: string;
   meetingUrl?: string;
   presentationUrl?: string;
+  presentationSize?: string;
   videoUrl?: string;
   imageUrl?: string;
 }
@@ -79,6 +81,7 @@ export interface PublicationItem extends ManagedFields {
   summary: string;
   author?: string;
   fileUrl?: string;
+  fileSize?: string;
   coverImageUrl?: string;
 }
 
