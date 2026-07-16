@@ -9,9 +9,11 @@ type AuthResult = {
 interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
+  isPasswordRecovery: boolean;
   login(email: string, password: string): Promise<boolean>;
   createAccount(email: string, password: string): Promise<AuthResult>;
   requestPasswordReset(email: string): Promise<AuthResult>;
+  updatePassword(password: string): Promise<AuthResult>;
   logout(): Promise<void>;
 }
 
@@ -20,10 +22,15 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
   useEffect(() => {
     if (!supabase) { setIsAuthenticated(sessionStorage.getItem('nacetem-local-admin') === 'true'); setIsLoading(false); return; }
     supabase.auth.getSession().then(({ data }) => { setIsAuthenticated(Boolean(data.session)); setIsLoading(false); });
-    const { data } = supabase.auth.onAuthStateChange((_event, session) => setIsAuthenticated(Boolean(session)));
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsAuthenticated(Boolean(session));
+      if (event === 'PASSWORD_RECOVERY') setIsPasswordRecovery(true);
+      if (event === 'SIGNED_OUT') setIsPasswordRecovery(false);
+    });
     return () => data.subscription.unsubscribe();
   }, []);
   const login = async (email: string, password: string) => {
@@ -73,7 +80,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   };
 
+  const updatePassword = async (password: string) => {
+    if (!supabase || !isPasswordRecovery) {
+      return {
+        ok: false,
+        message: 'This password recovery link is invalid or has expired. Request a new link and try again.',
+      };
+    }
+
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) return { ok: false, message: error.message };
+
+    await supabase.auth.signOut();
+    setIsPasswordRecovery(false);
+    return { ok: true, message: 'Password updated. Sign in with your new password.' };
+  };
+
   const logout = async () => { if (supabase) await supabase.auth.signOut(); sessionStorage.removeItem('nacetem-local-admin'); setIsAuthenticated(false); };
-  return <AuthContext.Provider value={{ isAuthenticated, isLoading, login, createAccount, requestPasswordReset, logout }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ isAuthenticated, isLoading, isPasswordRecovery, login, createAccount, requestPasswordReset, updatePassword, logout }}>{children}</AuthContext.Provider>;
 }
 export function useAuth() { const value = useContext(AuthContext); if (!value) throw new Error('useAuth must be used within an AuthProvider'); return value; }
