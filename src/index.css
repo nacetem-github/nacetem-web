@@ -162,6 +162,22 @@ button {
   will-change: transform;
 }
 
+.pdf-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding-top: 141.4%;
+}
+
+.pdf-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
 .group\/partners:hover .partner-marquee {
   animation-play-state: paused;
 }
