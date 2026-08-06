@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Download, MapPin, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { assets } from '../assets';
 import { capacityPrograms } from '../data/capacityPrograms';
+import ProgramInterestModal from '../components/ProgramInterestModal';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -13,6 +14,8 @@ const fadeInUp = {
 const brochureUrl = "/uploads/capacity-building/brochures/capacity-building-brochure.pdf";
 
 export default function CapacityBuilding() {
+  const [interestProgram, setInterestProgram] = useState<{ title: string; locations: string[] } | null>(null);
+
   return (
     <div className="bg-slate-50 min-h-screen font-sans overflow-hidden">
       {/* Hero Section */}
@@ -101,9 +104,13 @@ export default function CapacityBuilding() {
                         <Download className="w-4 h-4 mr-2" /> Apply Here
                       </a>
                     ) : (
-                      <Link to="#" className="flex-1 inline-flex items-center justify-center px-6 py-3 bg-emerald-700 text-white font-bold text-xs tracking-widest uppercase hover:bg-emerald-800 transition-colors rounded-[6px] text-center shadow-sm">
+                      <button
+                        type="button"
+                        onClick={() => setInterestProgram({ title: program.title, locations: program.locations })}
+                        className="flex-1 inline-flex items-center justify-center px-6 py-3 bg-emerald-700 text-white font-bold text-xs tracking-widest uppercase hover:bg-emerald-800 transition-colors rounded-[6px] text-center shadow-sm"
+                      >
                         <Download className="w-4 h-4 mr-2" /> Apply Here
-                      </Link>
+                      </button>
                     )}
                     <Link to={`/capacity-building/${program.slug}`} className="flex-1 inline-flex items-center justify-center px-6 py-3 bg-transparent border border-slate-300 text-slate-800 font-bold text-xs tracking-widest uppercase hover:border-emerald-700 hover:text-emerald-700 hover:bg-emerald-50/40 transition-colors rounded-[6px] text-center">
                       Read More <ChevronRight className="ml-2 h-4 w-4" />
@@ -168,7 +175,13 @@ export default function CapacityBuilding() {
            </Link>
         </div>
       </section>
-      
+
+      <ProgramInterestModal
+        isOpen={!!interestProgram}
+        onClose={() => setInterestProgram(null)}
+        programTitle={interestProgram?.title ?? ''}
+        studyCentres={interestProgram?.locations ?? []}
+      />
     </div>
   );
 }

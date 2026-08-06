@@ -47,6 +47,8 @@ const galleryFallbacks = [
 ];
 
 const impactVideos = [
+  { id: 'D1IlaQF0DzI', title: 'NACETEM impact video' },
+  { id: 'il3STHCjnPk', title: 'NACETEM impact short' },
   { id: 'ca28dtNXL64', title: 'NACETEM impact across Nigeria' },
   { id: 'GM0ETQvVHKI', title: 'NACETEM impact short video' },
 ];
@@ -345,13 +347,13 @@ export default function Home() {
               }
             ].map((initiative, idx) => (
               <div key={idx} className="bg-white border border-slate-200/80 rounded-2xl group flex flex-col p-5 shadow-sm hover:shadow-md hover:border-emerald-500/30 transition-all duration-300">
-                <div className="image-frame aspect-[16/10] mb-4 overflow-hidden rounded-xl border border-slate-100 bg-slate-50 sm:aspect-[4/3] lg:aspect-[16/10]">
+                <div className="image-frame aspect-[16/10] mb-4 overflow-hidden rounded-xl border border-slate-100 bg-white p-2 sm:aspect-[4/3] sm:p-3 lg:aspect-[16/10]">
                   <img
                     src={initiative.img}
                     alt={initiative.title}
                     loading="lazy"
                     decoding="async"
-                    className="h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+                    className="h-full w-full object-contain object-center transition-transform duration-700 ease-out group-hover:scale-105"
                   />
                 </div>
                 <div className="flex-1 flex flex-col pt-2">

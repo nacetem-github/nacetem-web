@@ -1,7 +1,8 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Award, CheckCircle2, ChevronRight, Download, HardHat, ShieldCheck, Target } from 'lucide-react';
 import { assets } from '../assets';
+import ProgramInterestModal from '../components/ProgramInterestModal';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -46,6 +47,8 @@ const applicants = [
 ];
 
 export default function WeldingInitiative() {
+  const [showInterestForm, setShowInterestForm] = useState(false);
+
   return (
     <div className="bg-slate-50 min-h-screen font-sans overflow-hidden">
       {/* Hero Section */}
@@ -141,12 +144,13 @@ export default function WeldingInitiative() {
                 and certification requirements.
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
-                <Link
-                  to="/contact"
+                <button
+                  type="button"
+                  onClick={() => setShowInterestForm(true)}
                   className="flex-1 inline-flex items-center justify-center px-6 py-3 bg-emerald-700 text-white font-bold text-xs tracking-widest uppercase hover:bg-emerald-800 transition-colors rounded-[6px] text-center shadow-sm"
                 >
                   Apply Now <ChevronRight className="ml-2 w-4 h-4" />
-                </Link>
+                </button>
                 <a
                   href={curriculumUrl}
                   download
@@ -159,6 +163,12 @@ export default function WeldingInitiative() {
           </div>
         </div>
       </section>
+
+      <ProgramInterestModal
+        isOpen={showInterestForm}
+        onClose={() => setShowInterestForm(false)}
+        programTitle="NACETEM Welding Initiative"
+      />
     </div>
   );
 }

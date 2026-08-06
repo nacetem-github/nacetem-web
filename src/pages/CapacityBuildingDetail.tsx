@@ -14,8 +14,10 @@ import {
   ShieldCheck,
   Users,
 } from 'lucide-react';
+import { useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { getCapacityProgram } from '../data/capacityPrograms';
+import ProgramInterestModal from '../components/ProgramInterestModal';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -48,6 +50,7 @@ const droneCourseDetails = [
 export default function CapacityBuildingDetail() {
   const { slug } = useParams();
   const program = getCapacityProgram(slug);
+  const [showInterestForm, setShowInterestForm] = useState(false);
 
   if (!program) {
     return <Navigate to="/capacity-building" replace />;
@@ -192,20 +195,37 @@ export default function CapacityBuildingDetail() {
                       <Download className="w-4 h-4 mr-2" /> View Brochure
                     </a>
                   </div>
-                  <a
-                    href="https://nlplimited.com/online-digital-marketing-course/"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex w-full items-center justify-center px-6 py-3 bg-gold text-slate-900 font-bold text-xs tracking-widest uppercase hover:bg-amber-400 transition-colors rounded-[6px] shadow-sm"
-                  >
-                    NLP Limited Digital Marketing Course <ExternalLink className="w-4 h-4 ml-2" />
-                  </a>
+                  {program.secondaryCta?.type === 'register' ? (
+                    <button
+                      type="button"
+                      onClick={() => setShowInterestForm(true)}
+                      className="inline-flex w-full items-center justify-center px-6 py-3 bg-gold text-slate-900 font-bold text-xs tracking-widest uppercase hover:bg-amber-400 transition-colors rounded-[6px] shadow-sm"
+                    >
+                      {program.secondaryCta.label} <ChevronRight className="w-4 h-4 ml-2" />
+                    </button>
+                  ) : program.secondaryCta?.type === 'external' ? (
+                    <a
+                      href={program.applyUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex w-full items-center justify-center px-6 py-3 bg-gold text-slate-900 font-bold text-xs tracking-widest uppercase hover:bg-amber-400 transition-colors rounded-[6px] shadow-sm"
+                    >
+                      {program.secondaryCta.label} <ExternalLink className="w-4 h-4 ml-2" />
+                    </a>
+                  ) : null}
                 </div>
               </div>
             </aside>
           </div>
         </div>
       </section>
+
+      <ProgramInterestModal
+        isOpen={showInterestForm}
+        onClose={() => setShowInterestForm(false)}
+        programTitle={program.title}
+        studyCentres={program.locations}
+      />
     </div>
   );
 }
