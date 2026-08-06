@@ -7,6 +7,7 @@ import { useData } from '../contexts/DataContext';
 import { archivedPastEvents } from '../data/pastEvents';
 import { getArchivedEventReportByTitle } from '../data/eventReports';
 import { eventFallbackImages, getEventSlug, splitEventsByStatus } from '../utils/eventUtils';
+import { EventCountdownBadge } from '../components/EventCountdownBadge';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -173,7 +174,7 @@ export default function News() {
         </div>
       </section>
 
-      <section id="upcoming-events" className="py-24 bg-white border-b border-slate-200">
+      <section id="upcoming-events" className="scroll-mt-[132px] py-24 bg-white border-b border-slate-200 sm:scroll-mt-[148px]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-xs font-bold text-gold uppercase tracking-widest mb-4">Programmes & Conferences</h2>
@@ -241,6 +242,7 @@ export default function News() {
                         <Video className="h-4 w-4 text-slate-400 shrink-0" />
                         {event.format ?? 'Hybrid'}
                       </span>
+                      <EventCountdownBadge startDate={event.startDate} />
                     </div>
                     <h4 className="text-xl font-serif text-slate-900 mb-4 pr-4 leading-tight">{event.title}</h4>
                     <div className="flex items-start text-sm font-bold text-slate-500 mb-4">
