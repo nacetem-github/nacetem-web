@@ -176,6 +176,7 @@ export default function Layout() {
       ]
     },
     { name: 'Capacity Building', href: '/capacity-building' },
+    { name: 'Welding Initiative', href: '/welding-initiative' },
     { name: 'PSR Test', href: '/psr-test' },
     {
       name: 'News & Gallery',

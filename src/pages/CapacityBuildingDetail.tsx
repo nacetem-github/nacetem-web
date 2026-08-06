@@ -8,6 +8,7 @@ import {
   ClipboardCheck,
   Clock,
   Download,
+  ExternalLink,
   MapPin,
   Radar,
   ShieldCheck,
@@ -174,20 +175,30 @@ export default function CapacityBuildingDetail() {
                   )}
                 </div>
 
-                <div className="space-y-3">
-                  <Link
-                    to="/contact"
-                    className="inline-flex w-full items-center justify-center px-6 py-3 bg-emerald-700 text-white font-bold text-xs tracking-widest uppercase hover:bg-emerald-800 transition-colors rounded-[6px]"
-                  >
-                    Contact Admissions <ChevronRight className="w-4 h-4 ml-2" />
-                  </Link>
+                <div className="flex flex-col gap-3">
+                  <div className="flex flex-row gap-3">
+                    <Link
+                      to="/contact"
+                      className="inline-flex flex-1 items-center justify-center px-6 py-3 bg-emerald-700 text-white font-bold text-xs tracking-widest uppercase hover:bg-emerald-800 transition-colors rounded-[6px]"
+                    >
+                      Contact Admissions <ChevronRight className="w-4 h-4 ml-2" />
+                    </Link>
+                    <a
+                      href={brochureUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex flex-1 items-center justify-center px-6 py-3 bg-white border border-slate-200 text-slate-900 font-bold text-xs tracking-widest uppercase hover:border-emerald-600 hover:text-emerald-700 transition-colors rounded-[6px]"
+                    >
+                      <Download className="w-4 h-4 mr-2" /> View Brochure
+                    </a>
+                  </div>
                   <a
-                    href={brochureUrl}
+                    href="https://nlplimited.com/online-digital-marketing-course/"
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex w-full items-center justify-center px-6 py-3 bg-white border border-slate-200 text-slate-900 font-bold text-xs tracking-widest uppercase hover:border-emerald-600 hover:text-emerald-700 transition-colors rounded-[6px]"
+                    className="inline-flex w-full items-center justify-center px-6 py-3 bg-gold text-slate-900 font-bold text-xs tracking-widest uppercase hover:bg-amber-400 transition-colors rounded-[6px] shadow-sm"
                   >
-                    <Download className="w-4 h-4 mr-2" /> View Brochure
+                    NLP Limited Digital Marketing Course <ExternalLink className="w-4 h-4 ml-2" />
                   </a>
                 </div>
               </div>
