@@ -729,7 +729,7 @@ export default function Home() {
               >
                 <div className="image-frame relative h-56 mb-6 border border-slate-100 rounded-xl shrink-0">
                   <img src={article.image} alt={article.imageAlt} loading="lazy" decoding="async" className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" />
-                  <div className="absolute top-4 left-4 bg-slate-900 text-white text-[10px] font-bold px-3 py-1.5 uppercase tracking-widest">{article.category}</div>
+                  <div className="absolute top-0 left-3 max-w-[85%] truncate rounded-sm bg-slate-900 text-white text-[10px] font-bold px-2.5 py-1 uppercase tracking-widest">{article.category}</div>
                 </div>
                 <p className="text-xs text-gold mb-3 font-bold uppercase tracking-widest">{article.date}</p>
                 <h3 className="text-xl font-serif text-slate-900 mb-4 group-hover:text-emerald-700 transition-colors leading-tight line-clamp-3">{article.title}</h3>
