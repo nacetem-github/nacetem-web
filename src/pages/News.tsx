@@ -415,7 +415,7 @@ export default function News() {
                   <Link to={`/news/${article.slug}`} className="flex flex-col h-full">
                     <div className="image-frame h-48 sm:h-56 relative shrink-0">
                       <img src={article.image} alt={article.imageAlt} className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-in-out" />
-                      <div className="absolute top-4 left-4 bg-gold text-slate-900 text-[10px] font-bold uppercase tracking-widest px-3 py-1 pb-1">{article.category}</div>
+                      <div className="absolute top-0 left-3 max-w-[85%] truncate rounded-sm bg-gold text-slate-900 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1">{article.category}</div>
                     </div>
                     <div className="p-6 flex-1 flex flex-col">
                       <div className="text-xs text-slate-500 mb-3 font-bold tracking-widest uppercase">{article.date}</div>
