@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useData } from '../contexts/DataContext';
 import { assets } from '../assets';
 import { NewsletterSubscribe } from '../components/NewsletterSubscribe';
+import { UpcomingEventCountdown } from '../components/UpcomingEventCountdown';
 import { getEventSlug, splitEventsByStatus } from '../utils/eventUtils';
 import { officialMandates, officialMission, officialVision } from '../data/institutionalProfile';
 
@@ -96,6 +97,8 @@ export default function Home() {
 
   return (
     <div className="flex-1">
+      <UpcomingEventCountdown events={events.filter((event) => event.status === 'published')} />
+
       {/* Hero Section */}
       <section className="relative bg-slate-50 border-b border-slate-200 text-slate-900 overflow-hidden">
         <motion.div
@@ -569,7 +572,7 @@ export default function Home() {
       </section>
 
       {/* Events Section */}
-      <section className="py-20 bg-slate-50 relative">
+      <section id="upcoming-events" className="scroll-mt-[132px] py-20 bg-slate-50 relative sm:scroll-mt-[148px]">
         <div className="absolute top-0 left-1/2 h-px w-[min(78rem,calc(100%-2rem))] -translate-x-1/2 bg-gradient-to-r from-transparent via-slate-200 to-transparent"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div 
