@@ -227,13 +227,13 @@ export default function Layout() {
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-6 lg:ml-6 xl:ml-10">
+            <nav className="hidden md:flex items-center space-x-3 lg:space-x-5 xl:space-x-6 lg:ml-6 xl:ml-10">
               {navigation.map((item) => (
-                <div key={item.name} className="relative group">
+                <div key={item.name} className="relative group shrink-0">
                   <Link
                     to={item.href}
                     className={cn(
-                      'text-xs font-bold uppercase tracking-wider transition-colors inline-flex items-center',
+                      'text-xs font-bold uppercase tracking-wider transition-colors inline-flex items-center whitespace-nowrap',
                       'py-2 border-b-2',
                       isActive(item.href)
                         ? 'border-emerald-600 text-slate-900 opacity-100'
