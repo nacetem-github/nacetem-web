@@ -38,7 +38,7 @@ export function UpcomingEventCountdown({ events }: { events: EventItem[] }) {
         onClick={handleClick}
         className="group mx-auto flex max-w-7xl flex-col flex-wrap items-center justify-center gap-x-6 gap-y-3 px-4 py-7 text-white transition-colors hover:bg-black/10 sm:flex-row sm:justify-between sm:px-6 sm:py-9 lg:px-8"
       >
-        <div className="flex min-w-0 items-center gap-3">
+        <div className="flex w-full min-w-0 items-center gap-3 sm:w-auto">
           <span className="inline-flex shrink-0 items-center rounded-full bg-gold/15 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-gold">
             Upcoming Event
           </span>
