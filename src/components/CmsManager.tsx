@@ -3,6 +3,8 @@ import { Download, FileText, Pencil, Plus, Trash2, Upload } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useData } from '../contexts/DataContext';
 import type { CmsContentType, PublicationItem } from '../types/content';
+import { capacityPrograms } from '../data/capacityPrograms';
+import { getVideoEmbedUrl } from '../utils/videoUtils';
 
 type Values = Record<string, string | boolean>;
 type Field = { name: string; label: string; type?: string; required?: boolean; accept?: string; options?: string[]; multiple?: boolean };
@@ -33,6 +35,13 @@ const config: Record<CmsContentType, { title: string; help: string; fields: Fiel
   publication: { title: 'Publications', help: 'Manage policy briefs, technical reports, newsletters, and other knowledge products.', fields: [
     {name:'title',label:'Publication title',required:true},{name:'type',label:'Type',type:'select',options:['policy-brief','technical-report','newsletter','other'],required:true},{name:'year',label:'Year',type:'number',required:true},
     {name:'author',label:'Author(s)'},{name:'fileSize',label:'File size (e.g. 2.4 MB)'},{name:'summary',label:'Summary',type:'textarea',required:true},{name:'fileUrl',label:'Publication file',type:'file',accept:'.pdf,.doc,.docx',required:true},{name:'coverImageUrl',label:'Cover image',type:'file',accept:'image/*'}]},
+  video: { title: 'Videos & Webinars', help: 'Use a YouTube or Vimeo link and choose where the recording should appear. Programme webinars are matched to the selected capacity-building page.', fields: [
+    {name:'title',label:'Video title',required:true},{name:'videoUrl',label:'YouTube or Vimeo URL',type:'url',required:true},{name:'description',label:'Short description',type:'textarea'},
+    {name:'videoType',label:'Display destination',type:'select',options:['impact','programme-webinar','both'],required:true},{name:'programSlug',label:'Capacity-building programme',type:'select',options:['', ...capacityPrograms.map((program) => program.slug)]},
+    {name:'webinarDate',label:'Webinar date',type:'date'},{name:'presenter',label:'Presenter / facilitator'},{name:'displayOrder',label:'Display order',type:'number'},{name:'thumbnailUrl',label:'Optional thumbnail',type:'file',accept:'image/*'}]},
+  announcement: { title: 'Homepage Announcements', help: 'Announcements appear only while published and within their scheduled start and end times. Times use the administrator’s local timezone.', fields: [
+    {name:'title',label:'Headline',required:true},{name:'category',label:'Category',type:'select',options:['scholarship','admission','event','general'],required:true},{name:'message',label:'Supporting message',type:'textarea',required:true},
+    {name:'actionLabel',label:'Button label'},{name:'actionUrl',label:'Button destination'},{name:'startsAt',label:'Starts at',type:'datetime-local',required:true},{name:'endsAt',label:'Ends at',type:'datetime-local',required:true},{name:'priority',label:'Priority',type:'number'}]},
 };
 
 async function optimizeImage(file: File) {
@@ -75,12 +84,12 @@ async function upload(file: File, type: CmsContentType, id: string) {
 
 export function CmsManager({ type }: { type: CmsContentType }) {
   const data = useData(); const c = config[type];
-  const collections: any = {news:data.news,event:data.events,gallery:data.gallery,seminar:data.seminars,publication:data.publications};
-  const removers: any = {news:data.removeNews,event:data.removeEvent,gallery:data.removeGalleryImage,seminar:data.removeSeminar,publication:data.removePublication};
-  const initial = () => ({status:'published',featured:false,publishedAt:today(),format:'Hybrid',actionLabel:'Register / Join Event',type:'policy-brief',year:String(new Date().getFullYear())});
+  const collections: any = {news:data.news,event:data.events,gallery:data.gallery,seminar:data.seminars,publication:data.publications,video:data.videos,announcement:data.announcements};
+  const removers: any = {news:data.removeNews,event:data.removeEvent,gallery:data.removeGalleryImage,seminar:data.removeSeminar,publication:data.removePublication,video:data.removeVideo,announcement:data.removeAnnouncement};
+  const initial = () => ({status:'published',featured:false,publishedAt:today(),format:'Hybrid',actionLabel:type==='announcement'?'Learn more':'Register / Join Event',type:'policy-brief',videoType:'impact',category:'general',displayOrder:'0',priority:'0',year:String(new Date().getFullYear())});
   const [values,setValues]=useState<Values>(initial); const [files,setFiles]=useState<FileMap>({}); const [editing,setEditing]=useState<string|null>(null); const [saving,setSaving]=useState(false); const [message,setMessage]=useState('');
   const reset=()=>{setValues(initial());setFiles({});setEditing(null)};
-  const edit=(item:any)=>{const v:Values={};Object.entries(item).forEach(([k,x])=>v[k]=Array.isArray(x)?x.join(', '):typeof x==='boolean'?x:String(x??''));setValues(v);setEditing(item.id);window.scrollTo({top:0,behavior:'smooth'})};
+  const edit=(item:any)=>{const v:Values={};Object.entries(item).forEach(([k,x])=>{if((k==='startsAt'||k==='endsAt')&&x){const date=new Date(String(x));const local=new Date(date.getTime()-date.getTimezoneOffset()*60_000).toISOString().slice(0,16);v[k]=local}else v[k]=Array.isArray(x)?x.join(', '):typeof x==='boolean'?x:String(x??'')});setValues(v);setEditing(item.id);window.scrollTo({top:0,behavior:'smooth'})};
 
   async function submit(e:FormEvent){e.preventDefault();setSaving(true);setMessage('');try{
     const id=editing??`${type}-${slugify(String(values.title))}-${Date.now()}`;const media:Record<string,string[]>={};for(const [k,selected] of Object.entries(files) as [string, File[]][]){media[k]=[];for(const f of selected)media[k].push(await upload(f,type,id));}
@@ -91,6 +100,8 @@ export function CmsManager({ type }: { type: CmsContentType }) {
     if(type==='gallery'){const currentItem=collections.gallery.find((item:any)=>item.id===editing);const previousImages=Array.isArray(currentItem?.images)?currentItem.images:[];const imageUrls=media.imageUrl?.length?media.imageUrl:(previousImages.length?previousImages.map((image:any)=>String(image.src)).filter(Boolean):String(values.imageUrl||'')?[String(values.imageUrl)]:[]);if(!imageUrls.length)throw new Error('Choose at least one photo.');const album=String(values.title);const location=String(values.location);const imageAltBase=[album,location].filter(Boolean).join(' - ');const images=imageUrls.map((src,index)=>({src,alt:previousImages[index]?.alt||`${imageAltBase || album} photo ${index+1}`}));await data.saveGalleryItem({...common,imageUrl:images[0].src,url:images[0].src,imageAlt:images[0].alt,album,images,eventDate:String(values.eventDate||'')||undefined,location:location||undefined})}
     if(type==='seminar')await data.saveSeminar({...common,presenter:String(values.presenter),seminarDate:String(values.seminarDate),year:new Date(String(values.seminarDate)).getFullYear(),category:String(values.category||'')||undefined,presentationSize:String(values.presentationSize||'')||undefined,summary:String(values.summary||'')||undefined,registrationUrl:String(values.registrationUrl||'')||undefined,meetingUrl:String(values.meetingUrl||'')||undefined,presentationUrl:firstMedia('presentationUrl')||undefined,videoUrl:String(values.videoUrl||'')||undefined,imageUrl:firstMedia('imageUrl')||undefined});
     if(type==='publication')await data.savePublication({...common,type:String(values.type) as PublicationItem['type'],year:Number(values.year),author:String(values.author||'')||undefined,fileSize:String(values.fileSize||'')||undefined,summary:String(values.summary),fileUrl:firstMedia('fileUrl')||undefined,coverImageUrl:firstMedia('coverImageUrl')||undefined});
+    if(type==='video'){const videoType=String(values.videoType) as 'impact'|'programme-webinar'|'both';const programSlug=String(values.programSlug||'')||undefined;const videoUrl=String(values.videoUrl);if(!getVideoEmbedUrl(videoUrl))throw new Error('Use a valid YouTube or Vimeo video URL.');if(videoType!=='impact'&&!programSlug)throw new Error('Choose the capacity-building programme for this webinar.');await data.saveVideo({...common,description:String(values.description||'')||undefined,videoUrl,thumbnailUrl:firstMedia('thumbnailUrl')||undefined,videoType,programSlug,webinarDate:String(values.webinarDate||'')||undefined,presenter:String(values.presenter||'')||undefined,displayOrder:Number(values.displayOrder||0)})}
+    if(type==='announcement'){const startsAt=new Date(String(values.startsAt));const endsAt=new Date(String(values.endsAt));const actionUrl=String(values.actionUrl||'');if(Number.isNaN(startsAt.getTime())||Number.isNaN(endsAt.getTime()))throw new Error('Enter valid announcement start and end times.');if(endsAt<=startsAt)throw new Error('The announcement end time must be after its start time.');if(actionUrl&&!actionUrl.startsWith('/')&&!/^https?:\/\//i.test(actionUrl))throw new Error('Use a site path beginning with / or a full http(s) link for the button destination.');await data.saveAnnouncement({...common,category:String(values.category) as 'scholarship'|'admission'|'event'|'general',message:String(values.message),actionLabel:String(values.actionLabel||'')||undefined,actionUrl:actionUrl||undefined,startsAt:startsAt.toISOString(),endsAt:endsAt.toISOString(),priority:Number(values.priority||0)})}
     setMessage(type==='gallery'?`Saved gallery event with ${media.imageUrl?.length||1} photo${(media.imageUrl?.length||1)===1?'':'s'}.`:'Saved. The public site now uses this record and its attached media.');reset();
   }catch(err){setMessage(err instanceof Error?err.message:'Unable to save.')}finally{setSaving(false)}}
 

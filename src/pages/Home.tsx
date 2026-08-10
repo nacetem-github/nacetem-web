@@ -8,6 +8,9 @@ import { NewsletterSubscribe } from '../components/NewsletterSubscribe';
 import { UpcomingEventCountdown } from '../components/UpcomingEventCountdown';
 import { getEventSlug, splitEventsByStatus } from '../utils/eventUtils';
 import { officialMandates, officialMission, officialVision } from '../data/institutionalProfile';
+import { AnnouncementSlider } from '../components/AnnouncementSlider';
+import { VideoShowcase } from '../components/VideoShowcase';
+import type { VideoItem } from '../types/content';
 
 const heroSlides = [
   {
@@ -46,20 +49,19 @@ const galleryFallbacks = [
   { id: 'fallback-6', url: assets.ntaImage, title: 'Media Engagement' },
 ];
 
-const impactVideos = [
-  { id: 'D1IlaQF0DzI', title: 'NACETEM impact video' },
-  { id: 'il3STHCjnPk', title: 'NACETEM impact short' },
-  { id: 'ca28dtNXL64', title: 'NACETEM impact across Nigeria' },
-  { id: 'GM0ETQvVHKI', title: 'NACETEM impact short video' },
+const impactVideos: VideoItem[] = [
+  { id: 'impact-D1IlaQF0DzI', title: 'NACETEM impact video', videoUrl: 'https://www.youtube.com/watch?v=D1IlaQF0DzI', videoType: 'impact', displayOrder: 1, status: 'published', featured: false, publishedAt: '2026-01-01' },
+  { id: 'impact-il3STHCjnPk', title: 'NACETEM impact short', videoUrl: 'https://www.youtube.com/watch?v=il3STHCjnPk', videoType: 'impact', displayOrder: 2, status: 'published', featured: false, publishedAt: '2026-01-01' },
+  { id: 'impact-ca28dtNXL64', title: 'NACETEM impact across Nigeria', videoUrl: 'https://www.youtube.com/watch?v=ca28dtNXL64', videoType: 'impact', displayOrder: 3, status: 'published', featured: false, publishedAt: '2026-01-01' },
+  { id: 'impact-GM0ETQvVHKI', title: 'NACETEM impact short video', videoUrl: 'https://www.youtube.com/watch?v=GM0ETQvVHKI', videoType: 'impact', displayOrder: 4, status: 'published', featured: false, publishedAt: '2026-01-01' },
 ];
 
 export default function Home() {
-  const { gallery, events, news } = useData();
+  const { gallery, events, news, videos, announcements } = useData();
   const [activeHeroIndex, setActiveHeroIndex] = useState(0);
   const [isHeroPaused, setIsHeroPaused] = useState(false);
   const prefersReducedMotion = useReducedMotion();
   const [activeStoryIndex, setActiveStoryIndex] = useState(0);
-  const [activeVideoIndex, setActiveVideoIndex] = useState(0);
   const [activeEventIndex, setActiveEventIndex] = useState(0);
   const activeHero = heroSlides[activeHeroIndex];
   const nextHero = heroSlides[(activeHeroIndex + 1) % heroSlides.length];
@@ -73,6 +75,7 @@ export default function Home() {
   const homepageEvents = splitEventsByStatus(events.filter((event) => event.status === 'published')).upcomingEvents
     .sort((a, b) => a.startDate.localeCompare(b.startDate)).slice(0, 5);
   const activeEvent = homepageEvents.length ? homepageEvents[activeEventIndex % homepageEvents.length] : null;
+  const managedImpactVideos = videos.filter((video) => video.status === 'published' && (video.videoType === 'impact' || video.videoType === 'both'));
 
   useEffect(() => {
     if (isHeroPaused || prefersReducedMotion) return;
@@ -100,6 +103,7 @@ export default function Home() {
   return (
     <div className="flex-1">
       <UpcomingEventCountdown events={events.filter((event) => event.status === 'published')} />
+      <AnnouncementSlider announcements={announcements} />
 
       {/* Hero Section */}
       <section className="relative bg-slate-50 border-b border-slate-200 text-slate-900 overflow-hidden">
@@ -827,24 +831,7 @@ export default function Home() {
             <h2 className="text-3xl font-serif text-slate-900 mb-4">Watch Our Impact</h2>
             <p className="text-slate-600">Discover how NACETEM is shaping the STI landscape across the nation.</p>
           </div>
-          <div className="relative w-full aspect-video rounded-[11px] overflow-hidden shadow-2xl border-[2.11px] border-slate-200 bg-slate-900">
-            <iframe 
-              key={impactVideos[activeVideoIndex].id}
-              loading="lazy"
-              className="absolute top-0 left-0 w-full h-full" 
-              src={`https://www.youtube.com/embed/${impactVideos[activeVideoIndex].id}`}
-              title={impactVideos[activeVideoIndex].title}
-              frameBorder="0" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-              referrerPolicy="strict-origin-when-cross-origin" 
-              allowFullScreen
-            ></iframe>
-          </div>
-          <div className="mt-6 flex items-center justify-center gap-4">
-            <button type="button" onClick={() => setActiveVideoIndex((current) => (current - 1 + impactVideos.length) % impactVideos.length)} className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 transition-colors hover:border-emerald-600 hover:text-emerald-700" aria-label="Show previous impact video"><ChevronLeft className="h-5 w-5" /></button>
-            <span className="min-w-20 text-center text-xs font-bold uppercase tracking-wider text-slate-500">{activeVideoIndex + 1} of {impactVideos.length}</span>
-            <button type="button" onClick={() => setActiveVideoIndex((current) => (current + 1) % impactVideos.length)} className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 transition-colors hover:border-emerald-600 hover:text-emerald-700" aria-label="Show next impact video"><ChevronRight className="h-5 w-5" /></button>
-          </div>
+          <VideoShowcase videos={managedImpactVideos.length ? managedImpactVideos : impactVideos} label="impact video" />
         </div>
       </section>
     </div>

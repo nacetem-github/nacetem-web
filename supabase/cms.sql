@@ -1,7 +1,7 @@
 -- Run once in the Supabase SQL editor, then create an admin in Authentication > Users.
 create table if not exists public.cms_entries (
   id text primary key,
-  type text not null check (type in ('news', 'event', 'gallery', 'seminar', 'publication')),
+  type text not null check (type in ('news', 'event', 'gallery', 'seminar', 'publication', 'video', 'announcement')),
   data jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
