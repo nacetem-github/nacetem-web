@@ -112,6 +112,14 @@ export default function CapacityBuildingDetail() {
                   <p className="text-xs font-bold uppercase tracking-widest text-amber-700">Promotional scholarship offer</p>
                   <h3 id="scholarship-offer-title" className="mt-2 text-2xl font-serif text-slate-900">Apply by 20 August 2026</h3>
                   <p className="mt-2 text-sm leading-6 text-slate-700">Classes for the Professional Master in Digital Marketing and Strategy commence on 29 August 2026.</p>
+                  <a
+                    href="https://forms.gle/8cY8X3nFC4yuRr2v9"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-5 inline-flex w-full items-center justify-center rounded-[6px] bg-emerald-700 px-6 py-3 text-center text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 sm:w-auto"
+                  >
+                    Register Now <ExternalLink className="ml-2 h-4 w-4 shrink-0" aria-hidden="true" />
+                  </a>
                 </section>
               )}
 

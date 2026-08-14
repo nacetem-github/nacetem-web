@@ -23,7 +23,7 @@ export function AnnouncementSlider({ announcements }: { announcements: Announcem
 
   if (!active.length) return null;
   const item = active[activeIndex];
-  const actionClass = 'inline-flex shrink-0 items-center justify-center rounded-md bg-white px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-emerald-900 transition-colors hover:bg-amber-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white';
+  const actionClass = 'inline-flex w-full shrink-0 items-center justify-center rounded-md bg-white px-5 py-2.5 text-center text-xs font-bold uppercase tracking-wider text-emerald-900 transition-colors hover:bg-amber-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:w-auto';
   const action = item.actionUrl && item.actionLabel ? item.actionUrl.startsWith('/')
     ? <Link to={item.actionUrl} className={actionClass}>{item.actionLabel}</Link>
     : <a href={item.actionUrl} target="_blank" rel="noreferrer" className={actionClass}>{item.actionLabel}</a> : null;
@@ -38,7 +38,7 @@ export function AnnouncementSlider({ announcements }: { announcements: Announcem
           <p className="mt-1 text-sm leading-6 text-emerald-50">{item.message}</p>
         </div>
       </div>
-      <div className="flex items-center gap-2 self-start lg:self-center">
+      <div className="flex w-full flex-wrap items-center gap-2 self-start sm:w-auto lg:self-center">
         {action}
         {active.length > 1 && <>
           <button type="button" onClick={() => setActiveIndex((current) => (current - 1 + active.length) % active.length)} className="rounded-full p-2 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-white" aria-label="Previous announcement"><ChevronLeft className="h-5 w-5" /></button>
