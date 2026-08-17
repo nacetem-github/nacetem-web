@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Download, MapPin, ChevronRight } from 'lucide-react';
+import { Download, MapPin, ChevronRight, Monitor } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { assets } from '../assets';
 import { capacityPrograms } from '../data/capacityPrograms';
@@ -47,14 +47,14 @@ export default function CapacityBuilding() {
       </section>
 
       {/* Programs List */}
-      <section className="py-24 bg-white relative">
+      <section className="py-16 sm:py-20 bg-white relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
             <h2 className="text-xs font-bold text-gold uppercase tracking-widest mb-4">Academic & Professional Programmes</h2>
             <h3 className="text-3xl sm:text-4xl font-serif text-slate-900">Explore Our Degrees, Diplomas, and Short-Term Courses</h3>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 lg:gap-12 justify-center [&>*]:lg:col-span-2 [&>*:nth-last-child(2):nth-child(3n+1)]:lg:col-start-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 lg:gap-8 justify-center [&>*]:lg:col-span-2 [&>*:nth-last-child(2):nth-child(3n+1)]:lg:col-start-2">
             {capacityPrograms.map((program) => (
               <motion.div 
                 key={program.slug} 
@@ -62,29 +62,36 @@ export default function CapacityBuilding() {
                 whileInView="visible" 
                 viewport={{ once: true }} 
                 variants={fadeInUp} 
-                className="bg-white border border-slate-200 rounded-[11px] overflow-hidden hover:border-emerald-500 transition-colors group relative flex flex-col h-full shadow-sm hover:shadow-md"
+                className="bg-white border border-slate-200 rounded-[11px] overflow-hidden hover:border-emerald-500 transition-all duration-300 ease-in-out group relative flex flex-col h-full shadow-sm hover:-translate-y-1 hover:shadow-lg focus-within:-translate-y-1 focus-within:border-emerald-500 focus-within:shadow-lg"
               >
-                <div className={`image-frame h-56 sm:h-64 relative ${program.imageFit === 'contain' ? 'bg-white p-2' : ''}`}>
+                <div className={`image-frame h-44 sm:h-48 relative overflow-hidden ${program.imageFit === 'contain' ? 'bg-white p-2' : ''}`}>
                   <img src={program.cardImg ?? program.img} alt={program.title} className={`w-full h-full ${program.imageFit === 'contain' ? 'object-contain' : 'object-cover'} transform group-hover:scale-105 transition-transform duration-700 ease-in-out`} />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
-                  <div className="absolute bottom-4 left-6 flex items-center">
-                    <div className={`w-12 h-12 rounded-[8px] flex items-center justify-center bg-white shadow-md`}>
-                      <program.icon className={`w-6 h-6 ${program.iconColor}`} />
+                  <div className="absolute bottom-3 left-5 flex items-center">
+                    <div className="w-10 h-10 rounded-[8px] flex items-center justify-center bg-white shadow-md">
+                      <program.icon className={`w-5 h-5 ${program.iconColor}`} />
                     </div>
                   </div>
                 </div>
 
-                <div className="flex-1 p-6 sm:p-8 flex flex-col">
-                  <h4 className="text-2xl font-serif text-slate-900 mb-4 leading-snug group-hover:text-emerald-700 transition-colors">
+                <div className="flex-1 p-4 sm:p-5 flex flex-col">
+                  <h4 className="text-xl font-serif text-slate-900 mb-2.5 leading-snug group-hover:text-emerald-700 transition-all duration-300 ease-in-out">
                     {program.title}
                   </h4>
-                  <p className="text-slate-600 text-[15px] leading-relaxed mb-6">
+                  <p className="text-slate-600 text-sm leading-relaxed mb-4 line-clamp-3">
                     {program.description}
                   </p>
                   
-                  {program.locations.length > 0 && (
-                    <div className="mb-8 p-4 bg-slate-50 border border-slate-100 rounded-[6px]">
-                      <div className="flex items-center text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">
+                  {program.slug === 'professional-mtech-digital-marketing-strategy' ? (
+                    <div className="max-h-0 -translate-y-2 overflow-hidden opacity-0 transition-all duration-300 ease-in-out group-hover:mb-4 group-hover:max-h-12 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:mb-4 group-focus-within:max-h-12 group-focus-within:translate-y-0 group-focus-within:opacity-100">
+                      <span className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-emerald-800 shadow-sm">
+                        <Monitor className="h-3.5 w-3.5" aria-hidden="true" />
+                        Fully Virtual
+                      </span>
+                    </div>
+                  ) : program.locations.length > 0 && (
+                    <div className="max-h-0 -translate-y-2 overflow-hidden border border-transparent bg-slate-50 p-0 opacity-0 transition-all duration-300 ease-in-out group-hover:mb-4 group-hover:max-h-40 group-hover:translate-y-0 group-hover:border-slate-100 group-hover:p-3 group-hover:opacity-100 group-focus-within:mb-4 group-focus-within:max-h-40 group-focus-within:translate-y-0 group-focus-within:border-slate-100 group-focus-within:p-3 group-focus-within:opacity-100 rounded-[6px]">
+                      <div className="flex items-center text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">
                         <MapPin className="w-3.5 h-3.5 mr-2" />
                         Study Centres
                       </div>
@@ -98,22 +105,22 @@ export default function CapacityBuilding() {
                     </div>
                   )}
                 
-                  <div className="pt-8 mt-auto border-t border-slate-100 flex flex-col sm:flex-row gap-3 sm:items-center">
+                  <div className="pt-4 mt-auto border-t border-slate-100 flex flex-col sm:flex-row gap-2.5 sm:items-center">
                     {program.applyUrl ? (
-                      <a href={program.applyUrl} target="_blank" rel="noopener noreferrer" className="flex-1 inline-flex items-center justify-center px-6 py-3 bg-emerald-700 text-white font-bold text-xs tracking-widest uppercase hover:bg-emerald-800 transition-colors rounded-[6px] text-center shadow-sm">
+                      <a href={program.applyUrl} target="_blank" rel="noopener noreferrer" className="flex-1 inline-flex items-center justify-center px-5 py-3 bg-gradient-to-r from-emerald-800 via-emerald-700 to-emerald-500 text-white font-bold text-xs tracking-widest uppercase rounded-[6px] text-center shadow-[0_6px_18px_rgba(0,102,51,0.38)] transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-[0_9px_26px_rgba(0,102,51,0.58)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2">
                         <Download className="w-4 h-4 mr-2" /> Apply Here
                       </a>
                     ) : (
                       <button
                         type="button"
                         onClick={() => setInterestProgram({ title: program.title, locations: program.locations })}
-                        className="flex-1 inline-flex items-center justify-center px-6 py-3 bg-emerald-700 text-white font-bold text-xs tracking-widest uppercase hover:bg-emerald-800 transition-colors rounded-[6px] text-center shadow-sm"
+                        className="flex-1 inline-flex items-center justify-center px-5 py-3 bg-gradient-to-r from-emerald-800 via-emerald-700 to-emerald-500 text-white font-bold text-xs tracking-widest uppercase rounded-[6px] text-center shadow-[0_6px_18px_rgba(0,102,51,0.38)] transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-[0_9px_26px_rgba(0,102,51,0.58)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
                       >
                         <Download className="w-4 h-4 mr-2" /> Apply Here
                       </button>
                     )}
-                    <Link to={`/capacity-building/${program.slug}`} className="flex-1 inline-flex items-center justify-center px-6 py-3 bg-transparent border border-slate-300 text-slate-800 font-bold text-xs tracking-widest uppercase hover:border-emerald-700 hover:text-emerald-700 hover:bg-emerald-50/40 transition-colors rounded-[6px] text-center">
-                      Read More <ChevronRight className="ml-2 h-4 w-4" />
+                    <Link to={`/capacity-building/${program.slug}`} className="flex-1 group/read-more inline-flex items-center justify-center px-4 py-3 bg-transparent border border-slate-400 text-slate-800 font-bold text-xs tracking-widest uppercase rounded-[6px] text-center transition-all duration-300 ease-in-out hover:border-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2">
+                      Read More <ChevronRight className="ml-1.5 h-4 w-4 transition-all duration-300 ease-in-out group-hover/read-more:translate-x-[5px]" />
                     </Link>
                   </div>
                 </div>
