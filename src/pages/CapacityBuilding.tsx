@@ -54,7 +54,7 @@ export default function CapacityBuilding() {
             <h3 className="text-3xl sm:text-4xl font-serif text-slate-900">Explore Our Degrees, Diplomas, and Short-Term Courses</h3>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 lg:gap-8 justify-center [&>*]:lg:col-span-2 [&>*:nth-last-child(2):nth-child(3n+1)]:lg:col-start-2">
+          <div className="grid grid-cols-1 items-start md:grid-cols-2 lg:grid-cols-6 gap-6 lg:gap-8 justify-center [&>*]:lg:col-span-2 [&>*:nth-last-child(2):nth-child(3n+1)]:lg:col-start-2">
             {capacityPrograms.map((program) => (
               <motion.div 
                 key={program.slug} 
@@ -62,10 +62,10 @@ export default function CapacityBuilding() {
                 whileInView="visible" 
                 viewport={{ once: true }} 
                 variants={fadeInUp} 
-                className="bg-white border border-slate-200 rounded-[11px] overflow-hidden hover:border-emerald-500 transition-all duration-300 ease-in-out group relative flex flex-col h-full shadow-sm hover:-translate-y-1 hover:shadow-lg focus-within:-translate-y-1 focus-within:border-emerald-500 focus-within:shadow-lg"
+                className="bg-white border border-slate-200 rounded-[11px] overflow-hidden hover:border-emerald-500 transition-all duration-300 ease-in-out group/card relative flex flex-col self-start shadow-sm hover:-translate-y-1 hover:shadow-lg focus-within:-translate-y-1 focus-within:border-emerald-500 focus-within:shadow-lg"
               >
                 <div className={`image-frame h-44 sm:h-48 relative overflow-hidden ${program.imageFit === 'contain' ? 'bg-white p-2' : ''}`}>
-                  <img src={program.cardImg ?? program.img} alt={program.title} className={`w-full h-full ${program.imageFit === 'contain' ? 'object-contain' : 'object-cover'} transform group-hover:scale-105 transition-transform duration-700 ease-in-out`} />
+                  <img src={program.cardImg ?? program.img} alt={program.title} className={`w-full h-full ${program.imageFit === 'contain' ? 'object-contain' : 'object-cover'} transform group-hover/card:scale-105 transition-transform duration-700 ease-in-out`} />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
                   <div className="absolute bottom-3 left-5 flex items-center">
                     <div className="w-10 h-10 rounded-[8px] flex items-center justify-center bg-white shadow-md">
@@ -75,7 +75,7 @@ export default function CapacityBuilding() {
                 </div>
 
                 <div className="flex-1 p-4 sm:p-5 flex flex-col">
-                  <h4 className="text-xl font-serif text-slate-900 mb-2.5 leading-snug group-hover:text-emerald-700 transition-all duration-300 ease-in-out">
+                  <h4 className="text-xl font-serif text-slate-900 mb-2.5 leading-snug group-hover/card:text-emerald-700 transition-all duration-300 ease-in-out">
                     {program.title}
                   </h4>
                   <p className="text-slate-600 text-sm leading-relaxed mb-4 line-clamp-3">
@@ -83,14 +83,14 @@ export default function CapacityBuilding() {
                   </p>
                   
                   {program.slug === 'professional-mtech-digital-marketing-strategy' ? (
-                    <div className="max-h-0 -translate-y-2 overflow-hidden opacity-0 transition-all duration-300 ease-in-out group-hover:mb-4 group-hover:max-h-12 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:mb-4 group-focus-within:max-h-12 group-focus-within:translate-y-0 group-focus-within:opacity-100">
+                    <div className="max-h-0 -translate-y-2 overflow-hidden opacity-0 transition-all duration-300 ease-in-out group-hover/card:mb-4 group-hover/card:max-h-12 group-hover/card:translate-y-0 group-hover/card:opacity-100 group-focus-within/card:mb-4 group-focus-within/card:max-h-12 group-focus-within/card:translate-y-0 group-focus-within/card:opacity-100">
                       <span className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-emerald-800 shadow-sm">
                         <Monitor className="h-3.5 w-3.5" aria-hidden="true" />
                         Fully Virtual
                       </span>
                     </div>
                   ) : program.locations.length > 0 && (
-                    <div className="max-h-0 -translate-y-2 overflow-hidden border border-transparent bg-slate-50 p-0 opacity-0 transition-all duration-300 ease-in-out group-hover:mb-4 group-hover:max-h-40 group-hover:translate-y-0 group-hover:border-slate-100 group-hover:p-3 group-hover:opacity-100 group-focus-within:mb-4 group-focus-within:max-h-40 group-focus-within:translate-y-0 group-focus-within:border-slate-100 group-focus-within:p-3 group-focus-within:opacity-100 rounded-[6px]">
+                    <div className="max-h-0 -translate-y-2 overflow-hidden border border-transparent bg-slate-50 p-0 opacity-0 transition-all duration-300 ease-in-out group-hover/card:mb-4 group-hover/card:max-h-40 group-hover/card:translate-y-0 group-hover/card:border-slate-100 group-hover/card:p-3 group-hover/card:opacity-100 group-focus-within/card:mb-4 group-focus-within/card:max-h-40 group-focus-within/card:translate-y-0 group-focus-within/card:border-slate-100 group-focus-within/card:p-3 group-focus-within/card:opacity-100 rounded-[6px]">
                       <div className="flex items-center text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">
                         <MapPin className="w-3.5 h-3.5 mr-2" />
                         Study Centres

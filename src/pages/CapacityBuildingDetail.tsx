@@ -191,14 +191,14 @@ export default function CapacityBuildingDetail() {
 
                 <div className="space-y-5 mb-8">
                   <DetailItem icon={Clock} label="Duration" value={program.duration} />
-                  <DetailItem icon={BookOpen} label="Format" value={program.format} />
+                  <DetailItem icon={BookOpen} label="Format" value="Fully Virtual" />
                   <div>
                     <div className="flex items-center text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">
                       <MapPin className="w-4 h-4 mr-2" /> Study Centres
                     </div>
                     <div className="flex flex-wrap gap-2">
                       <span className="text-xs bg-white border border-slate-200 text-slate-700 px-2.5 py-1 rounded-sm">
-                        FULLY VIRTUAL
+                        NONE
                       </span>
                     </div>
                   </div>
