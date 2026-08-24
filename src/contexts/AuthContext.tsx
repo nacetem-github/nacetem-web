@@ -34,11 +34,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => data.subscription.unsubscribe();
   }, []);
   const login = async (email: string, password: string) => {
-    if (supabase) { const { error } = await supabase.auth.signInWithPassword({ email, password }); return !error; }
-    const valid = Boolean(import.meta.env.VITE_ADMIN_EMAIL && import.meta.env.VITE_ADMIN_PASSWORD && email === import.meta.env.VITE_ADMIN_EMAIL && password === import.meta.env.VITE_ADMIN_PASSWORD);
-    if (valid) { sessionStorage.setItem('nacetem-local-admin', 'true'); setIsAuthenticated(true); }
-    return valid;
-  };
+  if (supabase) {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password,
+    });
+
+    if (error) {
+      console.error('SUPABASE LOGIN ERROR:', error.message);
+      alert(`Login failed: ${error.message}`);
+      return false;
+    }
+
+    console.log('LOGIN SUCCESSFUL:', data.user);
+    setIsAuthenticated(true);
+    return true;
+  }
+
+  const valid = Boolean(
+    import.meta.env.VITE_ADMIN_EMAIL &&
+    import.meta.env.VITE_ADMIN_PASSWORD &&
+    email.trim() === import.meta.env.VITE_ADMIN_EMAIL &&
+    password === import.meta.env.VITE_ADMIN_PASSWORD
+  );
+
+  if (valid) {
+    sessionStorage.setItem('nacetem-local-admin', 'true');
+    setIsAuthenticated(true);
+  }
+
+  return valid;
+};
 
   const createAccount = async (email: string, password: string) => {
     if (!supabase) {
