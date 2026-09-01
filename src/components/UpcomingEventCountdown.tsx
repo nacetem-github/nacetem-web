@@ -5,7 +5,7 @@ import { COUNTDOWN_WINDOW_MS, formatCountdownUnits, parseEventStartTimestamp, us
 
 function getSoonestUpcomingEvent(events: EventItem[], referenceTime: number) {
   return events
-    .map((event) => ({ event, startTimestamp: parseEventStartTimestamp(event.startDate) }))
+    .map((event) => ({ event, startTimestamp: parseEventStartTimestamp(event.startDate, event.time) }))
     .filter((entry): entry is { event: EventItem; startTimestamp: number } => typeof entry.startTimestamp === 'number')
     .map((entry) => ({ ...entry.event, startTimestamp: entry.startTimestamp }))
     .filter((event) => {

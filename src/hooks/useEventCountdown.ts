@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react';
 
 export const COUNTDOWN_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
 
-export function parseEventStartTimestamp(startDate?: string) {
+export function parseEventStartTimestamp(startDate?: string, startTime?: string) {
   if (!startDate) return null;
-  const timestamp = Date.parse(startDate);
+  const normalizedTime = startTime?.match(/^(\d{2}):(\d{2})$/)?.slice(1).join(':');
+  const timestamp = Date.parse(normalizedTime ? `${startDate}T${normalizedTime}:00+01:00` : startDate);
   return Number.isNaN(timestamp) ? null : timestamp;
 }
 
@@ -35,8 +36,8 @@ export function useCountdownNow(enabled: boolean) {
 }
 
 /** Live countdown to a single event's start time. Returns null once the window has passed or the event is more than 14 days out. */
-export function useEventCountdown(startDate?: string) {
-  const startTimestamp = parseEventStartTimestamp(startDate);
+export function useEventCountdown(startDate?: string, startTime?: string) {
+  const startTimestamp = parseEventStartTimestamp(startDate, startTime);
   const now = useCountdownNow(startTimestamp !== null);
 
   if (startTimestamp === null) return null;

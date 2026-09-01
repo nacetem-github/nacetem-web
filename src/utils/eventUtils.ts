@@ -30,6 +30,16 @@ export function getEventSlug(event: EventItem) {
   return slugifyEventTitle(event.id || event.title);
 }
 
+export function formatEventTime(value?: string) {
+  if (!value) return '';
+  const match = value.match(/^(\d{2}):(\d{2})$/);
+  if (!match) return value;
+  const hour = Number(match[1]);
+  const minute = match[2];
+  const period = hour >= 12 ? 'PM' : 'AM';
+  return `${hour % 12 || 12}:${minute} ${period}`;
+}
+
 function getStartOfDay(date: Date) {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }

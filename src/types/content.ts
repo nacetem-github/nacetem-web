@@ -47,6 +47,9 @@ export interface EventItem extends ManagedFields {
   time?: string;
   description: string;
   location: string;
+  host?: string;
+  facilitator?: string;
+  partners?: string[];
   format?: string;
   flyerUrl?: string;
   fee?: string;
@@ -54,6 +57,9 @@ export interface EventItem extends ManagedFields {
   contactEmail?: string;
   actionUrl?: string;
   actionLabel?: string;
+  onlineViewingUrl?: string;
+  onlineMeetingId?: string;
+  onlinePasscode?: string;
   sourceFileUrl?: string;
 }
 

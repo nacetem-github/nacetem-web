@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Search, Landmark, GraduationCap, Layers, MapPin, Calendar as CalendarIcon, Pause, Play, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, Search, Landmark, GraduationCap, Layers, MapPin, Calendar as CalendarIcon, MonitorPlay, Pause, Play, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, useReducedMotion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { useData } from '../contexts/DataContext';
 import { assets } from '../assets';
 import { NewsletterSubscribe } from '../components/NewsletterSubscribe';
 import { UpcomingEventCountdown } from '../components/UpcomingEventCountdown';
-import { getEventSlug, splitEventsByStatus } from '../utils/eventUtils';
+import { formatEventTime, getEventSlug, splitEventsByStatus } from '../utils/eventUtils';
 import { officialMandates, officialMission, officialVision } from '../data/institutionalProfile';
 import { AnnouncementSlider } from '../components/AnnouncementSlider';
 import { VideoShowcase } from '../components/VideoShowcase';
@@ -644,18 +644,21 @@ export default function Home() {
                   <div className="flex min-h-[360px] flex-col justify-center p-7 sm:p-10">
                     <div className="mb-5 flex flex-wrap gap-2">
                       <span className="inline-flex items-center bg-slate-100 px-3 py-1.5 text-[10px] uppercase tracking-widest font-bold text-emerald-700">
-                        <CalendarIcon className="h-3.5 w-3.5 mr-1.5" /> {activeEvent.date}{activeEvent.time ? ` | ${activeEvent.time}` : ''}
+                        <CalendarIcon className="h-3.5 w-3.5 mr-1.5" /> {activeEvent.date}{activeEvent.time ? ` | ${formatEventTime(activeEvent.time)}` : ''}
                       </span>
-                      <span className="inline-flex items-center bg-slate-100 px-3 py-1.5 text-[10px] uppercase tracking-widest font-bold text-slate-500">
-                        <MapPin className="h-3.5 w-3.5 mr-1.5" /> {activeEvent.location}
+                      <span className="inline-flex max-w-full items-start bg-slate-100 px-3 py-1.5 text-[10px] uppercase tracking-widest font-bold text-slate-500">
+                        <MapPin className="mr-1.5 mt-0.5 h-3.5 w-3.5 shrink-0" /> <span className="min-w-0 break-words">{activeEvent.location}</span>
                       </span>
                       {activeEvent.fee && <span className="inline-flex items-center bg-slate-100 px-3 py-1.5 text-[10px] uppercase tracking-widest font-bold text-slate-500">Fee: {activeEvent.fee}</span>}
                     </div>
                     <h3 className="mb-4 font-serif text-2xl leading-tight text-slate-900 transition-colors hover:text-emerald-700 sm:text-3xl">{activeEvent.title}</h3>
                     <p className="mb-6 text-sm leading-7 text-slate-600">{activeEvent.description}</p>
-                    <Link to={`/events/${getEventSlug(activeEvent)}`} className="inline-flex items-center self-start text-xs font-bold uppercase tracking-widest text-slate-900 hover:text-emerald-700 border-b border-transparent hover:border-emerald-700 pb-1">
-                      Event Details <ArrowRight className="ml-1 h-3 w-3" />
-                    </Link>
+                    <div className="grid grid-cols-1 gap-3 sm:flex sm:flex-wrap sm:items-center">
+                      <Link to={`/events/${getEventSlug(activeEvent)}`} className="inline-flex min-h-11 w-full items-center justify-center rounded-[6px] border border-slate-300 px-4 text-center text-xs font-bold uppercase tracking-widest text-slate-900 hover:border-emerald-700 hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2 sm:w-auto">
+                        Event Details <ArrowRight aria-hidden="true" className="ml-1 h-3 w-3" />
+                      </Link>
+                      {activeEvent.onlineViewingUrl && <a href={activeEvent.onlineViewingUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 w-full items-center justify-center rounded-[6px] border border-sky-700 px-4 text-center text-xs font-bold uppercase tracking-widest text-sky-900 transition-colors hover:bg-sky-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-700 focus-visible:ring-offset-2 sm:w-auto" aria-label={`Watch ${activeEvent.title} online as a view-only attendee`}><MonitorPlay aria-hidden="true" className="mr-2 h-4 w-4" /> Watch Online</a>}
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center justify-center gap-2 border-t border-slate-200 bg-slate-50 px-6 py-4">

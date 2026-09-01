@@ -227,7 +227,7 @@ export default function Layout() {
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-3 lg:space-x-5 xl:space-x-6 lg:ml-6 xl:ml-10">
+            <nav className="hidden items-center space-x-6 xl:ml-10 xl:flex">
               {navigation.map((item) => (
                 <div key={item.name} className="relative group shrink-0">
                   <Link
@@ -266,7 +266,7 @@ export default function Layout() {
             </nav>
 
             {/* Mobile menu button */}
-            <div className="md:hidden flex items-center">
+            <div className="flex items-center xl:hidden">
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-emerald-600/25 hover:bg-emerald-50 hover:text-emerald-700"
@@ -280,7 +280,7 @@ export default function Layout() {
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <div className="md:hidden bg-white border-b border-slate-200">
+          <div className="border-b border-slate-200 bg-white xl:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               {navigation.map((item) => (
                 <div key={item.name}>
