@@ -1,0 +1,68 @@
+{
+  "source_dir": "C:\\Users\\NAC\\OneDrive\\Desktop\\PSR Chapter 2",
+  "total_questions": 587,
+  "files": [
+    {
+      "file": "Chapter2_Section1.xlsx",
+      "sheet": "Chapter2_Section1",
+      "questions": 36
+    },
+    {
+      "file": "Chapter2_Section2.xlsx",
+      "sheet": "Chapter2_Section2",
+      "questions": 58
+    },
+    {
+      "file": "Chapter2_Section3.xlsx",
+      "sheet": "Chapter2_Section3",
+      "questions": 34
+    },
+    {
+      "file": "Chapter2_Section4.xlsx",
+      "sheet": "Chapter2_Section4",
+      "questions": 80
+    },
+    {
+      "file": "Chapter2_Section5.xlsx",
+      "sheet": "Chapter2_Section5",
+      "questions": 46
+    },
+    {
+      "file": "Chapter2_Section6.xlsx",
+      "sheet": "Chapter2_Section6",
+      "questions": 42
+    },
+    {
+      "file": "Chapter2_Section7.xlsx",
+      "sheet": "Chapter2_Section7",
+      "questions": 42
+    },
+    {
+      "file": "Chapter2_Section8.xlsx",
+      "sheet": "Chapter2_Section8",
+      "questions": 69
+    },
+    {
+      "file": "Chapter2_Section9.xlsx",
+      "sheet": "Chapter2_Section9",
+      "questions": 56
+    },
+    {
+      "file": "Chapter2_Section10.xlsx",
+      "sheet": "Chapter2_Section10",
+      "questions": 34
+    },
+    {
+      "file": "Chapter2_Section11.xlsx",
+      "sheet": "Chapter2_Section11",
+      "questions": 29
+    },
+    {
+      "file": "Chapter2_Section12.xlsx",
+      "sheet": "Chapter2_Section12",
+      "questions": 61
+    }
+  ],
+  "issues": [],
+  "text_issues": []
+}
