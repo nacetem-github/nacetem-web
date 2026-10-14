@@ -6,7 +6,7 @@ import { assets } from '../assets';
 import { useData } from '../contexts/DataContext';
 import { archivedPastEvents } from '../data/pastEvents';
 import { getArchivedEventReportByTitle } from '../data/eventReports';
-import { eventFallbackImages, formatEventTime, getEventSlug, splitEventsByStatus } from '../utils/eventUtils';
+import { eventFallbackImages, formatEventTime, getEventSlug, sortByNewestFirst, splitEventsByStatus } from '../utils/eventUtils';
 import { EventCountdownBadge } from '../components/EventCountdownBadge';
 
 const fadeInUp = {
@@ -49,7 +49,9 @@ const galleryEvents = [
     ],
   },
 ];
-type GalleryAlbum = (typeof galleryEvents)[number];
+type GalleryAlbum = (typeof galleryEvents)[number] & {
+  sortDate?: string | null;
+};
 
 const responsiveGalleryImage = (src: string) => {
   const isLocalGalleryImage = src.startsWith('/uploads/events/gallery/') && /\.(?:jpe?g|png)$/i.test(src);
@@ -85,22 +87,26 @@ export default function News() {
   const loadedAdditionalArticles = currentArticles.slice(3);
   const hasMoreArticles = visibleArticles < newsArticles.length;
   const { upcomingEvents, pastEvents } = splitEventsByStatus(events.filter((event) => event.status === 'published'));
-  const managedGalleryEvents = Object.values(gallery.filter((item) => item.status === 'published').reduce<Record<string, GalleryAlbum>>((albums, item) => {
-    const title = item.album || item.title;
-    const id = item.id || title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    const meta = [item.location, item.eventDate].filter(Boolean).join(' | ');
-    const eventImages = item.images?.length ? item.images : [{ src: item.imageUrl, alt: item.imageAlt }];
+  const managedGalleryEvents = sortByNewestFirst(
+    Object.values(gallery.filter((item) => item.status === 'published').reduce<Record<string, GalleryAlbum>>((albums, item) => {
+      const title = item.album || item.title;
+      const id = item.id || title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const sortDate = item.eventDate || item.publishedAt || null;
+      const meta = [item.location, item.eventDate].filter(Boolean).join(' | ');
+      const eventImages = item.images?.length ? item.images : [{ src: item.imageUrl, alt: item.imageAlt }];
 
-    if (item.images?.length) {
-      albums[id] = { id, title, meta, folder: '', images: eventImages };
+      if (item.images?.length) {
+        albums[id] = { id, title, meta, folder: '', images: eventImages, sortDate };
+        return albums;
+      }
+
+      const legacyId = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      if (!albums[legacyId]) albums[legacyId] = { id: legacyId, title, meta, folder: '', images: [], sortDate };
+      albums[legacyId].images.push(...eventImages);
       return albums;
-    }
-
-    const legacyId = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    if (!albums[legacyId]) albums[legacyId] = { id: legacyId, title, meta, folder: '', images: [] };
-    albums[legacyId].images.push(...eventImages);
-    return albums;
-  }, {})) as GalleryAlbum[];
+    }, {})) as GalleryAlbum[],
+    (event) => event.sortDate ?? event.meta ?? event.title
+  );
   const availableGalleries = managedGalleryEvents.length ? managedGalleryEvents : galleryEvents;
   const activeGallery = availableGalleries.find((event) => event.id === activeGalleryId) ?? availableGalleries[0];
   const activeImage = activeGallery.images[activeImageIndex] ?? activeGallery.images[0];
