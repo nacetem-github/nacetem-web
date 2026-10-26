@@ -1,13 +1,16 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Search, Landmark, GraduationCap, Layers, MapPin, Calendar as CalendarIcon, Pause, Play, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, Search, Landmark, GraduationCap, Layers, MapPin, Calendar as CalendarIcon, MonitorPlay, Pause, Play, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, useReducedMotion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { useData } from '../contexts/DataContext';
 import { assets } from '../assets';
 import { NewsletterSubscribe } from '../components/NewsletterSubscribe';
 import { UpcomingEventCountdown } from '../components/UpcomingEventCountdown';
-import { getEventSlug, splitEventsByStatus } from '../utils/eventUtils';
+import { formatEventTime, getEventSlug, splitEventsByStatus } from '../utils/eventUtils';
 import { officialMandates, officialMission, officialVision } from '../data/institutionalProfile';
+import { AnnouncementSlider } from '../components/AnnouncementSlider';
+import { VideoShowcase } from '../components/VideoShowcase';
+import type { VideoItem } from '../types/content';
 
 const heroSlides = [
   {
@@ -46,18 +49,19 @@ const galleryFallbacks = [
   { id: 'fallback-6', url: assets.ntaImage, title: 'Media Engagement' },
 ];
 
-const impactVideos = [
-  { id: 'ca28dtNXL64', title: 'NACETEM impact across Nigeria' },
-  { id: 'GM0ETQvVHKI', title: 'NACETEM impact short video' },
+const impactVideos: VideoItem[] = [
+  { id: 'impact-D1IlaQF0DzI', title: 'NACETEM impact video', videoUrl: 'https://www.youtube.com/watch?v=D1IlaQF0DzI', videoType: 'impact', displayOrder: 1, status: 'published', featured: false, publishedAt: '2026-01-01' },
+  { id: 'impact-il3STHCjnPk', title: 'NACETEM impact short', videoUrl: 'https://www.youtube.com/watch?v=il3STHCjnPk', videoType: 'impact', displayOrder: 2, status: 'published', featured: false, publishedAt: '2026-01-01' },
+  { id: 'impact-ca28dtNXL64', title: 'NACETEM impact across Nigeria', videoUrl: 'https://www.youtube.com/watch?v=ca28dtNXL64', videoType: 'impact', displayOrder: 3, status: 'published', featured: false, publishedAt: '2026-01-01' },
+  { id: 'impact-GM0ETQvVHKI', title: 'NACETEM impact short video', videoUrl: 'https://www.youtube.com/watch?v=GM0ETQvVHKI', videoType: 'impact', displayOrder: 4, status: 'published', featured: false, publishedAt: '2026-01-01' },
 ];
 
 export default function Home() {
-  const { gallery, events, news } = useData();
+  const { gallery, events, news, videos, announcements } = useData();
   const [activeHeroIndex, setActiveHeroIndex] = useState(0);
   const [isHeroPaused, setIsHeroPaused] = useState(false);
   const prefersReducedMotion = useReducedMotion();
   const [activeStoryIndex, setActiveStoryIndex] = useState(0);
-  const [activeVideoIndex, setActiveVideoIndex] = useState(0);
   const [activeEventIndex, setActiveEventIndex] = useState(0);
   const activeHero = heroSlides[activeHeroIndex];
   const nextHero = heroSlides[(activeHeroIndex + 1) % heroSlides.length];
@@ -71,6 +75,7 @@ export default function Home() {
   const homepageEvents = splitEventsByStatus(events.filter((event) => event.status === 'published')).upcomingEvents
     .sort((a, b) => a.startDate.localeCompare(b.startDate)).slice(0, 5);
   const activeEvent = homepageEvents.length ? homepageEvents[activeEventIndex % homepageEvents.length] : null;
+  const managedImpactVideos = videos.filter((video) => video.status === 'published' && (video.videoType === 'impact' || video.videoType === 'both'));
 
   useEffect(() => {
     if (isHeroPaused || prefersReducedMotion) return;
@@ -98,6 +103,7 @@ export default function Home() {
   return (
     <div className="flex-1">
       <UpcomingEventCountdown events={events.filter((event) => event.status === 'published')} />
+      <AnnouncementSlider announcements={announcements} />
 
       {/* Hero Section */}
       <section className="relative bg-slate-50 border-b border-slate-200 text-slate-900 overflow-hidden">
@@ -345,13 +351,13 @@ export default function Home() {
               }
             ].map((initiative, idx) => (
               <div key={idx} className="bg-white border border-slate-200/80 rounded-2xl group flex flex-col p-5 shadow-sm hover:shadow-md hover:border-emerald-500/30 transition-all duration-300">
-                <div className="image-frame aspect-[16/10] mb-4 overflow-hidden rounded-xl border border-slate-100 bg-slate-50 sm:aspect-[4/3] lg:aspect-[16/10]">
+                <div className="image-frame aspect-[16/10] mb-4 overflow-hidden rounded-xl border border-slate-100 bg-white p-2 sm:aspect-[4/3] sm:p-3 lg:aspect-[16/10]">
                   <img
                     src={initiative.img}
                     alt={initiative.title}
                     loading="lazy"
                     decoding="async"
-                    className="h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+                    className="h-full w-full object-contain object-center transition-transform duration-700 ease-out group-hover:scale-105"
                   />
                 </div>
                 <div className="flex-1 flex flex-col pt-2">
@@ -638,18 +644,21 @@ export default function Home() {
                   <div className="flex min-h-[360px] flex-col justify-center p-7 sm:p-10">
                     <div className="mb-5 flex flex-wrap gap-2">
                       <span className="inline-flex items-center bg-slate-100 px-3 py-1.5 text-[10px] uppercase tracking-widest font-bold text-emerald-700">
-                        <CalendarIcon className="h-3.5 w-3.5 mr-1.5" /> {activeEvent.date}{activeEvent.time ? ` | ${activeEvent.time}` : ''}
+                        <CalendarIcon className="h-3.5 w-3.5 mr-1.5" /> {activeEvent.date}{activeEvent.time ? ` | ${formatEventTime(activeEvent.time)}` : ''}
                       </span>
-                      <span className="inline-flex items-center bg-slate-100 px-3 py-1.5 text-[10px] uppercase tracking-widest font-bold text-slate-500">
-                        <MapPin className="h-3.5 w-3.5 mr-1.5" /> {activeEvent.location}
+                      <span className="inline-flex max-w-full items-start bg-slate-100 px-3 py-1.5 text-[10px] uppercase tracking-widest font-bold text-slate-500">
+                        <MapPin className="mr-1.5 mt-0.5 h-3.5 w-3.5 shrink-0" /> <span className="min-w-0 break-words">{activeEvent.location}</span>
                       </span>
                       {activeEvent.fee && <span className="inline-flex items-center bg-slate-100 px-3 py-1.5 text-[10px] uppercase tracking-widest font-bold text-slate-500">Fee: {activeEvent.fee}</span>}
                     </div>
                     <h3 className="mb-4 font-serif text-2xl leading-tight text-slate-900 transition-colors hover:text-emerald-700 sm:text-3xl">{activeEvent.title}</h3>
                     <p className="mb-6 text-sm leading-7 text-slate-600">{activeEvent.description}</p>
-                    <Link to={`/events/${getEventSlug(activeEvent)}`} className="inline-flex items-center self-start text-xs font-bold uppercase tracking-widest text-slate-900 hover:text-emerald-700 border-b border-transparent hover:border-emerald-700 pb-1">
-                      Event Details <ArrowRight className="ml-1 h-3 w-3" />
-                    </Link>
+                    <div className="grid grid-cols-1 gap-3 sm:flex sm:flex-wrap sm:items-center">
+                      <Link to={`/events/${getEventSlug(activeEvent)}`} className="inline-flex min-h-11 w-full items-center justify-center rounded-[6px] border border-slate-300 px-4 text-center text-xs font-bold uppercase tracking-widest text-slate-900 hover:border-emerald-700 hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2 sm:w-auto">
+                        Event Details <ArrowRight aria-hidden="true" className="ml-1 h-3 w-3" />
+                      </Link>
+                      {activeEvent.onlineViewingUrl && <a href={activeEvent.onlineViewingUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 w-full items-center justify-center rounded-[6px] border border-sky-700 px-4 text-center text-xs font-bold uppercase tracking-widest text-sky-900 transition-colors hover:bg-sky-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-700 focus-visible:ring-offset-2 sm:w-auto" aria-label={`Watch ${activeEvent.title} online as a view-only attendee`}><MonitorPlay aria-hidden="true" className="mr-2 h-4 w-4" /> Watch Online</a>}
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center justify-center gap-2 border-t border-slate-200 bg-slate-50 px-6 py-4">
@@ -729,7 +738,7 @@ export default function Home() {
               >
                 <div className="image-frame relative h-56 mb-6 border border-slate-100 rounded-xl shrink-0">
                   <img src={article.image} alt={article.imageAlt} loading="lazy" decoding="async" className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" />
-                  <div className="absolute top-0 left-3 max-w-[85%] truncate rounded-sm bg-slate-900 text-white text-[10px] font-bold px-2.5 py-1 uppercase tracking-widest">{article.category}</div>
+                  <div className="absolute top-0 left-3 max-w-[85%] truncate rounded-sm bg-gold text-slate-900 text-[10px] font-bold px-2.5 py-1 uppercase tracking-widest">{article.category}</div>
                 </div>
                 <p className="text-xs text-gold mb-3 font-bold uppercase tracking-widest">{article.date}</p>
                 <h3 className="text-xl font-serif text-slate-900 mb-4 group-hover:text-emerald-700 transition-colors leading-tight line-clamp-3">{article.title}</h3>
@@ -825,24 +834,7 @@ export default function Home() {
             <h2 className="text-3xl font-serif text-slate-900 mb-4">Watch Our Impact</h2>
             <p className="text-slate-600">Discover how NACETEM is shaping the STI landscape across the nation.</p>
           </div>
-          <div className="relative w-full aspect-video rounded-[11px] overflow-hidden shadow-2xl border-[2.11px] border-slate-200 bg-slate-900">
-            <iframe 
-              key={impactVideos[activeVideoIndex].id}
-              loading="lazy"
-              className="absolute top-0 left-0 w-full h-full" 
-              src={`https://www.youtube.com/embed/${impactVideos[activeVideoIndex].id}`}
-              title={impactVideos[activeVideoIndex].title}
-              frameBorder="0" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-              referrerPolicy="strict-origin-when-cross-origin" 
-              allowFullScreen
-            ></iframe>
-          </div>
-          <div className="mt-6 flex items-center justify-center gap-4">
-            <button type="button" onClick={() => setActiveVideoIndex((current) => (current - 1 + impactVideos.length) % impactVideos.length)} className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 transition-colors hover:border-emerald-600 hover:text-emerald-700" aria-label="Show previous impact video"><ChevronLeft className="h-5 w-5" /></button>
-            <span className="min-w-20 text-center text-xs font-bold uppercase tracking-wider text-slate-500">{activeVideoIndex + 1} of {impactVideos.length}</span>
-            <button type="button" onClick={() => setActiveVideoIndex((current) => (current + 1) % impactVideos.length)} className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 transition-colors hover:border-emerald-600 hover:text-emerald-700" aria-label="Show next impact video"><ChevronRight className="h-5 w-5" /></button>
-          </div>
+          <VideoShowcase videos={managedImpactVideos.length ? managedImpactVideos : impactVideos} label="impact video" />
         </div>
       </section>
     </div>

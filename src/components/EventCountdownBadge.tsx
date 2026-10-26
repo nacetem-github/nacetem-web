@@ -1,8 +1,8 @@
 import { Timer } from 'lucide-react';
 import { useEventCountdown } from '../hooks/useEventCountdown';
 
-export function EventCountdownBadge({ startDate }: { startDate?: string }) {
-  const countdown = useEventCountdown(startDate);
+export function EventCountdownBadge({ startDate, startTime }: { startDate?: string; startTime?: string }) {
+  const countdown = useEventCountdown(startDate, startTime);
   if (!countdown) return null;
 
   return (

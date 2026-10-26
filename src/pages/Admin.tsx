@@ -364,6 +364,8 @@ export function AdminDashboard() {
     { icon: FileText, label: 'News Manager' },
     { icon: Presentation, label: 'Seminar Series Manager' },
     { icon: Library, label: 'Publications Manager' },
+    { icon: Video, label: 'Video Manager' },
+    { icon: Bell, label: 'Announcement Manager' },
     { icon: Settings, label: 'System Settings' },
   ];
 
@@ -706,8 +708,10 @@ export function AdminDashboard() {
           {activeTab === 'News Manager' && <CmsManager type="news" />}
           {activeTab === 'Seminar Series Manager' && <CmsManager type="seminar" />}
           {activeTab === 'Publications Manager' && <CmsManager type="publication" />}
+          {activeTab === 'Video Manager' && <CmsManager type="video" />}
+          {activeTab === 'Announcement Manager' && <CmsManager type="announcement" />}
 
-          {activeTab !== 'Overview' && activeTab !== 'Gallery Manager' && activeTab !== 'Events Manager' && activeTab !== 'News Manager' && activeTab !== 'Seminar Series Manager' && activeTab !== 'Publications Manager' && (
+          {activeTab !== 'Overview' && activeTab !== 'Gallery Manager' && activeTab !== 'Events Manager' && activeTab !== 'News Manager' && activeTab !== 'Seminar Series Manager' && activeTab !== 'Publications Manager' && activeTab !== 'Video Manager' && activeTab !== 'Announcement Manager' && (
             <div className="bg-white border border-slate-200 p-12 text-center text-slate-500">
               <p className="text-sm">Module <strong className="text-slate-900 font-serif">{activeTab}</strong> is currently being developed according to the latest administrative directives.</p>
             </div>

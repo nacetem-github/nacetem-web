@@ -47,6 +47,9 @@ export interface EventItem extends ManagedFields {
   time?: string;
   description: string;
   location: string;
+  host?: string;
+  facilitator?: string;
+  partners?: string[];
   format?: string;
   flyerUrl?: string;
   fee?: string;
@@ -54,6 +57,9 @@ export interface EventItem extends ManagedFields {
   contactEmail?: string;
   actionUrl?: string;
   actionLabel?: string;
+  onlineViewingUrl?: string;
+  onlineMeetingId?: string;
+  onlinePasscode?: string;
   sourceFileUrl?: string;
 }
 
@@ -85,4 +91,31 @@ export interface PublicationItem extends ManagedFields {
   coverImageUrl?: string;
 }
 
-export type CmsContentType = 'news' | 'event' | 'gallery' | 'seminar' | 'publication';
+export type VideoType = 'impact' | 'programme-webinar' | 'both';
+
+export interface VideoItem extends ManagedFields {
+  title: string;
+  description?: string;
+  videoUrl: string;
+  thumbnailUrl?: string;
+  videoType: VideoType;
+  programSlug?: string;
+  webinarDate?: string;
+  presenter?: string;
+  displayOrder: number;
+}
+
+export type AnnouncementCategory = 'scholarship' | 'admission' | 'event' | 'general';
+
+export interface AnnouncementItem extends ManagedFields {
+  title: string;
+  message: string;
+  category: AnnouncementCategory;
+  actionLabel?: string;
+  actionUrl?: string;
+  startsAt: string;
+  endsAt: string;
+  priority: number;
+}
+
+export type CmsContentType = 'news' | 'event' | 'gallery' | 'seminar' | 'publication' | 'video' | 'announcement';

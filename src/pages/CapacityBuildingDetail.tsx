@@ -14,8 +14,12 @@ import {
   ShieldCheck,
   Users,
 } from 'lucide-react';
+import { useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { getCapacityProgram } from '../data/capacityPrograms';
+import ProgramInterestModal from '../components/ProgramInterestModal';
+import { useData } from '../contexts/DataContext';
+import { VideoShowcase } from '../components/VideoShowcase';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -48,10 +52,15 @@ const droneCourseDetails = [
 export default function CapacityBuildingDetail() {
   const { slug } = useParams();
   const program = getCapacityProgram(slug);
+  const [showInterestForm, setShowInterestForm] = useState(false);
+  const { videos } = useData();
 
   if (!program) {
     return <Navigate to="/capacity-building" replace />;
   }
+
+  const programmeWebinars = videos.filter((video) => video.status === 'published' && video.programSlug === program.slug && (video.videoType === 'programme-webinar' || video.videoType === 'both'));
+  const isDigitalMarketingProgramme = program.slug === 'professional-mtech-digital-marketing-strategy';
 
   return (
     <div className="bg-slate-50 min-h-screen font-sans overflow-hidden">
@@ -97,6 +106,33 @@ export default function CapacityBuildingDetail() {
                 <h3 className="text-3xl sm:text-4xl font-serif text-slate-900 mb-6">What this programme covers</h3>
                 <p className="text-slate-600 leading-[1.6] text-base sm:text-lg mb-12 max-w-[800px]">{program.overview}</p>
               </motion.div>
+
+              {isDigitalMarketingProgramme && (
+                <section className="mb-12 rounded-[11px] border border-amber-200 bg-amber-50 p-6 sm:p-8" aria-labelledby="scholarship-offer-title">
+                  <p className="text-xs font-bold uppercase tracking-widest text-amber-700">Promotional scholarship offer</p>
+                  <h3 id="scholarship-offer-title" className="mt-2 text-2xl font-serif text-slate-900">Apply by 20 August 2026</h3>
+                  <p className="mt-2 text-sm leading-6 text-slate-700">Classes for the Professional Master in Digital Marketing and Strategy commence on 29 August 2026.</p>
+                  <a
+                    href="https://forms.gle/8cY8X3nFC4yuRr2v9"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-5 inline-flex w-full items-center justify-center rounded-[6px] bg-emerald-700 px-6 py-3 text-center text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 sm:w-auto"
+                  >
+                    Register Now <ExternalLink className="ml-2 h-4 w-4 shrink-0" aria-hidden="true" />
+                  </a>
+                </section>
+              )}
+
+              {programmeWebinars.length > 0 && (
+                <section className="mb-14" aria-labelledby="programme-webinar-title">
+                  <div className="mb-7">
+                    <p className="text-xs font-bold uppercase tracking-widest text-gold">Webinar recording</p>
+                    <h2 id="programme-webinar-title" className="mt-2 text-3xl sm:text-4xl font-serif text-slate-900">Watch the Webinar</h2>
+                    <p className="mt-3 max-w-3xl text-slate-600">Watch the programme briefing and learn more about its structure, outcomes, and application process.</p>
+                  </div>
+                  <VideoShowcase videos={programmeWebinars} label="webinar" />
+                </section>
+              )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
                 <InfoPanel title="Who Should Attend" items={program.audience} icon={Users} />
@@ -155,24 +191,17 @@ export default function CapacityBuildingDetail() {
 
                 <div className="space-y-5 mb-8">
                   <DetailItem icon={Clock} label="Duration" value={program.duration} />
-                  <DetailItem icon={BookOpen} label="Format" value={program.format} />
-                  {program.locations.length > 0 && (
-                    <div>
-                      <div className="flex items-center text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">
-                        <MapPin className="w-4 h-4 mr-2" /> Study Centres
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {program.locations.map((location) => (
-                          <span
-                            key={location}
-                            className="text-xs bg-white border border-slate-200 text-slate-700 px-2.5 py-1 rounded-sm"
-                          >
-                            {location}
-                          </span>
-                        ))}
-                      </div>
+                  <DetailItem icon={BookOpen} label="Format" value="Fully Virtual" />
+                  <div>
+                    <div className="flex items-center text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">
+                      <MapPin className="w-4 h-4 mr-2" /> Study Centres
                     </div>
-                  )}
+                    <div className="flex flex-wrap gap-2">
+                      <span className="text-xs bg-white border border-slate-200 text-slate-700 px-2.5 py-1 rounded-sm">
+                        NONE
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="flex flex-col gap-3">
@@ -192,20 +221,37 @@ export default function CapacityBuildingDetail() {
                       <Download className="w-4 h-4 mr-2" /> View Brochure
                     </a>
                   </div>
-                  <a
-                    href="https://nlplimited.com/online-digital-marketing-course/"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex w-full items-center justify-center px-6 py-3 bg-gold text-slate-900 font-bold text-xs tracking-widest uppercase hover:bg-amber-400 transition-colors rounded-[6px] shadow-sm"
-                  >
-                    NLP Limited Digital Marketing Course <ExternalLink className="w-4 h-4 ml-2" />
-                  </a>
+                  {program.secondaryCta?.type === 'register' ? (
+                    <button
+                      type="button"
+                      onClick={() => setShowInterestForm(true)}
+                      className="inline-flex w-full items-center justify-center px-6 py-3 bg-gold text-slate-900 font-bold text-xs tracking-widest uppercase hover:bg-amber-400 transition-colors rounded-[6px] shadow-sm"
+                    >
+                      {program.secondaryCta.label} <ChevronRight className="w-4 h-4 ml-2" />
+                    </button>
+                  ) : program.secondaryCta?.type === 'external' ? (
+                    <a
+                      href={program.applyUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex w-full items-center justify-center px-6 py-3 bg-gold text-slate-900 font-bold text-xs tracking-widest uppercase hover:bg-amber-400 transition-colors rounded-[6px] shadow-sm"
+                    >
+                      {program.secondaryCta.label} <ExternalLink className="w-4 h-4 ml-2" />
+                    </a>
+                  ) : null}
                 </div>
               </div>
             </aside>
           </div>
         </div>
       </section>
+
+      <ProgramInterestModal
+        isOpen={showInterestForm}
+        onClose={() => setShowInterestForm(false)}
+        programTitle={program.title}
+        studyCentres={program.locations}
+      />
     </div>
   );
 }

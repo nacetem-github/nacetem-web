@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, Calendar, Camera, ChevronLeft, ChevronRight, Clock, FileText, Images, Mail, MapPin, Phone, Video, X } from 'lucide-react';
+import { ArrowRight, Calendar, Camera, ChevronLeft, ChevronRight, Clock, FileText, Images, Mail, MapPin, MonitorPlay, Phone, Video, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { assets } from '../assets';
 import { useData } from '../contexts/DataContext';
 import { archivedPastEvents } from '../data/pastEvents';
 import { getArchivedEventReportByTitle } from '../data/eventReports';
-import { eventFallbackImages, getEventSlug, splitEventsByStatus } from '../utils/eventUtils';
+import { eventFallbackImages, formatEventTime, getEventSlug, sortByNewestFirst, splitEventsByStatus } from '../utils/eventUtils';
 import { EventCountdownBadge } from '../components/EventCountdownBadge';
 
 const fadeInUp = {
@@ -49,7 +49,9 @@ const galleryEvents = [
     ],
   },
 ];
-type GalleryAlbum = (typeof galleryEvents)[number];
+type GalleryAlbum = (typeof galleryEvents)[number] & {
+  sortDate?: string | null;
+};
 
 const responsiveGalleryImage = (src: string) => {
   const isLocalGalleryImage = src.startsWith('/uploads/events/gallery/') && /\.(?:jpe?g|png)$/i.test(src);
@@ -85,22 +87,26 @@ export default function News() {
   const loadedAdditionalArticles = currentArticles.slice(3);
   const hasMoreArticles = visibleArticles < newsArticles.length;
   const { upcomingEvents, pastEvents } = splitEventsByStatus(events.filter((event) => event.status === 'published'));
-  const managedGalleryEvents = Object.values(gallery.filter((item) => item.status === 'published').reduce<Record<string, GalleryAlbum>>((albums, item) => {
-    const title = item.album || item.title;
-    const id = item.id || title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    const meta = [item.location, item.eventDate].filter(Boolean).join(' | ');
-    const eventImages = item.images?.length ? item.images : [{ src: item.imageUrl, alt: item.imageAlt }];
+  const managedGalleryEvents = sortByNewestFirst(
+    Object.values(gallery.filter((item) => item.status === 'published').reduce<Record<string, GalleryAlbum>>((albums, item) => {
+      const title = item.album || item.title;
+      const id = item.id || title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const sortDate = item.eventDate || item.publishedAt || null;
+      const meta = [item.location, item.eventDate].filter(Boolean).join(' | ');
+      const eventImages = item.images?.length ? item.images : [{ src: item.imageUrl, alt: item.imageAlt }];
 
-    if (item.images?.length) {
-      albums[id] = { id, title, meta, folder: '', images: eventImages };
+      if (item.images?.length) {
+        albums[id] = { id, title, meta, folder: '', images: eventImages, sortDate };
+        return albums;
+      }
+
+      const legacyId = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      if (!albums[legacyId]) albums[legacyId] = { id: legacyId, title, meta, folder: '', images: [], sortDate };
+      albums[legacyId].images.push(...eventImages);
       return albums;
-    }
-
-    const legacyId = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    if (!albums[legacyId]) albums[legacyId] = { id: legacyId, title, meta, folder: '', images: [] };
-    albums[legacyId].images.push(...eventImages);
-    return albums;
-  }, {})) as GalleryAlbum[];
+    }, {})) as GalleryAlbum[],
+    (event) => event.sortDate ?? event.meta ?? event.title
+  );
   const availableGalleries = managedGalleryEvents.length ? managedGalleryEvents : galleryEvents;
   const activeGallery = availableGalleries.find((event) => event.id === activeGalleryId) ?? availableGalleries[0];
   const activeImage = activeGallery.images[activeImageIndex] ?? activeGallery.images[0];
@@ -235,14 +241,14 @@ export default function News() {
                       {event.time && (
                         <span className="inline-flex items-center gap-2 bg-white px-3 py-2 border border-slate-100 rounded-[6px] text-xs font-bold uppercase tracking-widest text-slate-600">
                           <Clock className="h-4 w-4 text-slate-400 shrink-0" />
-                          {event.time}
+                          {formatEventTime(event.time)}
                         </span>
                       )}
                       <span className="inline-flex items-center gap-2 bg-white px-3 py-2 border border-slate-100 rounded-[6px] text-xs font-bold uppercase tracking-widest text-slate-600">
                         <Video className="h-4 w-4 text-slate-400 shrink-0" />
                         {event.format ?? 'Hybrid'}
                       </span>
-                      <EventCountdownBadge startDate={event.startDate} />
+                      <EventCountdownBadge startDate={event.startDate} startTime={event.time} />
                     </div>
                     <h4 className="text-xl font-serif text-slate-900 mb-4 pr-4 leading-tight">{event.title}</h4>
                     <div className="flex items-start text-sm font-bold text-slate-500 mb-4">
@@ -265,8 +271,8 @@ export default function News() {
                         </p>
                       )}
                     </div>
-                    <div className="mt-auto flex flex-wrap items-center gap-3">
-                      <Link to={`/events/${getEventSlug(event)}`} className="inline-flex items-center justify-center rounded-[6px] border border-emerald-700 px-4 py-3 text-xs font-bold uppercase tracking-widest text-emerald-800 transition-colors hover:bg-emerald-50">
+                    <div className="mt-auto grid grid-cols-1 gap-3 sm:flex sm:flex-wrap sm:items-center">
+                      <Link to={`/events/${getEventSlug(event)}`} className="inline-flex min-h-11 w-full items-center justify-center rounded-[6px] border border-emerald-700 px-4 py-3 text-center text-xs font-bold uppercase tracking-widest text-emerald-800 transition-colors hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2 sm:w-auto">
                         View Details <ArrowRight className="h-3 w-3 ml-1" />
                       </Link>
                       {event.actionUrl && (
@@ -274,9 +280,14 @@ export default function News() {
                           href={event.actionUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex items-center justify-center rounded-[6px] bg-emerald-700 px-4 py-3 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-emerald-800"
+                          className="inline-flex min-h-11 w-full items-center justify-center rounded-[6px] bg-emerald-700 px-4 py-3 text-center text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2 sm:w-auto"
                         >
                           <Video className="mr-2 h-4 w-4" /> {event.actionLabel ?? 'Register / Join'}
+                        </a>
+                      )}
+                      {event.onlineViewingUrl && (
+                        <a href={event.onlineViewingUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 w-full items-center justify-center rounded-[6px] border border-sky-700 bg-white px-4 py-3 text-center text-xs font-bold uppercase tracking-widest text-sky-900 transition-colors hover:bg-sky-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-700 focus-visible:ring-offset-2 sm:w-auto" aria-label={`Watch ${event.title} online as a view-only attendee`}>
+                          <MonitorPlay aria-hidden="true" className="mr-2 h-4 w-4" /> Watch Online
                         </a>
                       )}
                     </div>

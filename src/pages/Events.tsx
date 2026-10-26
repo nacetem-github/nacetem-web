@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Calendar, Clock, Mail, MapPin, Phone, Video, ArrowRight, FileText, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar, Clock, Mail, MapPin, MonitorPlay, Phone, Video, ArrowRight, FileText, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { assets } from '../assets';
 import { useData } from '../contexts/DataContext';
 import { archivedPastEvents } from '../data/pastEvents';
 import { getArchivedEventReportByTitle } from '../data/eventReports';
-import { eventFallbackImages, getEventSlug, splitEventsByStatus } from '../utils/eventUtils';
+import { eventFallbackImages, formatEventTime, getEventSlug, splitEventsByStatus } from '../utils/eventUtils';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -158,11 +158,11 @@ export default function Events() {
                       </span>
                       {activeUpcomingEvent.time && (
                         <span className="inline-flex items-center bg-white border border-slate-200 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-slate-600">
-                          <Clock className="w-3.5 h-3.5 mr-2" /> {activeUpcomingEvent.time}
+                          <Clock className="w-3.5 h-3.5 mr-2" /> {formatEventTime(activeUpcomingEvent.time)}
                         </span>
                       )}
-                      <span className="inline-flex items-center bg-white border border-slate-200 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-slate-600">
-                        <MapPin className="w-3.5 h-3.5 mr-2" /> {activeUpcomingEvent.location}
+                      <span className="inline-flex max-w-full items-start bg-white border border-slate-200 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-slate-600">
+                        <MapPin className="mr-2 mt-0.5 h-3.5 w-3.5 shrink-0" /> <span className="min-w-0 break-words">{activeUpcomingEvent.location}</span>
                       </span>
                       <span className="inline-flex items-center bg-white border border-slate-200 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-slate-600">
                         <Video className="w-3.5 h-3.5 mr-2" /> {activeUpcomingEvent.format ?? 'Hybrid'}
@@ -187,10 +187,10 @@ export default function Events() {
                         </p>
                       )}
                     </div>
-                    <div className="mt-6 flex flex-wrap gap-3">
+                    <div className="mt-6 grid grid-cols-1 gap-3 sm:flex sm:flex-wrap">
                       <Link
                         to={`/events/${getEventSlug(activeUpcomingEvent)}`}
-                        className="inline-flex items-center justify-center self-start rounded-[6px] border border-emerald-700 px-5 py-3 text-xs font-bold uppercase tracking-wider text-emerald-800 transition-colors hover:bg-emerald-50"
+                        className="inline-flex min-h-11 w-full items-center justify-center rounded-[6px] border border-emerald-700 px-5 py-3 text-center text-xs font-bold uppercase tracking-wider text-emerald-800 transition-colors hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2 sm:w-auto"
                       >
                         View Details <ArrowRight className="ml-2 h-4 w-4" />
                       </Link>
@@ -199,9 +199,20 @@ export default function Events() {
                           href={activeUpcomingEvent.actionUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex items-center justify-center self-start px-5 py-3 bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider rounded-[6px] hover:bg-emerald-700 transition-colors"
+                          className="inline-flex min-h-11 w-full items-center justify-center rounded-[6px] bg-emerald-600 px-5 py-3 text-center text-xs font-bold uppercase tracking-wider text-white transition-colors hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2 sm:w-auto"
                         >
                           <Video className="w-4 h-4 mr-2" /> {activeUpcomingEvent.actionLabel ?? 'Register / Join Event'}
+                        </a>
+                      )}
+                      {activeUpcomingEvent.onlineViewingUrl && (
+                        <a
+                          href={activeUpcomingEvent.onlineViewingUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex min-h-11 w-full items-center justify-center rounded-[6px] border border-sky-700 bg-white px-5 py-3 text-center text-xs font-bold uppercase tracking-wider text-sky-900 transition-colors hover:bg-sky-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-700 focus-visible:ring-offset-2 sm:w-auto"
+                          aria-label={`Watch ${activeUpcomingEvent.title} online as a view-only attendee`}
+                        >
+                          <MonitorPlay aria-hidden="true" className="mr-2 h-4 w-4" /> Watch Online
                         </a>
                       )}
                     </div>

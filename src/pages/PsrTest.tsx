@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import {
   ArrowRight,
@@ -18,7 +19,107 @@ const fadeInUp = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
 };
 
-const chapters = [
+type ChapterLink = {
+  label: string;
+  url: string;
+};
+
+type Chapter = {
+  chapter: string;
+  title: string;
+  url?: string;
+  links?: ChapterLink[];
+};
+
+const ChapterSectionMenu = ({ links }: { links: ChapterLink[] }) => {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [menuStyle, setMenuStyle] = React.useState<React.CSSProperties>({});
+  const triggerRef = React.useRef<HTMLButtonElement>(null);
+  const menuRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (!isOpen) return;
+
+    const updateMenuPosition = () => {
+      const trigger = triggerRef.current;
+      if (!trigger) return;
+
+      const rect = trigger.getBoundingClientRect();
+      const menuHeight = Math.min(288, window.innerHeight - 32);
+      const opensBelow = rect.bottom + 8 + menuHeight <= window.innerHeight - 16;
+
+      setMenuStyle({
+        left: rect.left,
+        top: opensBelow ? rect.bottom + 8 : Math.max(16, rect.top - menuHeight - 8),
+        width: rect.width,
+        maxHeight: menuHeight
+      });
+    };
+
+    const closeOnOutsideClick = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (!triggerRef.current?.contains(target) && !menuRef.current?.contains(target)) {
+        setIsOpen(false);
+      }
+    };
+
+    updateMenuPosition();
+    window.addEventListener('resize', updateMenuPosition);
+    window.addEventListener('scroll', updateMenuPosition, true);
+    document.addEventListener('mousedown', closeOnOutsideClick);
+
+    return () => {
+      window.removeEventListener('resize', updateMenuPosition);
+      window.removeEventListener('scroll', updateMenuPosition, true);
+      document.removeEventListener('mousedown', closeOnOutsideClick);
+    };
+  }, [isOpen]);
+
+  return (
+    <>
+      <button
+        ref={triggerRef}
+        type="button"
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
+        onClick={() => setIsOpen((open) => !open)}
+        className="mt-auto inline-flex items-center justify-center w-full px-4 py-3 bg-white border border-slate-200 text-slate-900 font-bold text-xs tracking-widest uppercase hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-colors rounded-[6px] shadow-sm"
+      >
+        <FileText className="w-4 h-4 mr-2" /> Take Test
+      </button>
+      {isOpen && createPortal(
+        <div
+          ref={menuRef}
+          role="menu"
+          style={menuStyle}
+          className="fixed z-[100] overflow-y-auto rounded-[8px] border border-slate-200 bg-white p-2 shadow-xl"
+        >
+          <p className="px-2 pb-2 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+            Select a section
+          </p>
+          <div className="grid grid-cols-1 gap-1">
+            {links.map((link) => (
+              <a
+                key={link.label}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                role="menuitem"
+                onClick={() => setIsOpen(false)}
+                className="inline-flex items-center rounded-[6px] px-3 py-2.5 text-left text-xs font-bold uppercase tracking-wide text-slate-900 hover:bg-emerald-50 hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+              >
+                <FileText className="w-4 h-4 mr-2 shrink-0" /> {link.label}
+              </a>
+            ))}
+          </div>
+        </div>,
+        document.body
+      )}
+    </>
+  );
+};
+
+const chapters: Chapter[] = [
   {
     chapter: "Chapter 1",
     title: "Introduction",
@@ -27,7 +128,25 @@ const chapters = [
   {
     chapter: "Chapter 2",
     title: "Appointments and leaving the service",
-    url: "https://docs.google.com/forms/d/e/1FAIpQLSeuiFtncHon-6V9m6kGsnmPydyAQL5RKJpRaB9StM4lvzYF3Q/viewform?usp=sharing&ouid=117472840774183694399"
+    links: [
+      { label: "Section 1", url: "https://docs.google.com/forms/d/e/1FAIpQLSdir2lnZPhEWS2cUFMKCx1r9RZNJ07nGeHza9J5-Hr6O6N6yw/viewform" },
+      { label: "Section 2 - Part 1", url: "https://docs.google.com/forms/d/e/1FAIpQLSdCq4oMi5rHRZ8WWaCWxg6wHHhauvhq-lVyV7YsgPHMkDzs5g/viewform" },
+      { label: "Section 2 - Part 2", url: "https://docs.google.com/forms/d/e/1FAIpQLSd-bCT6QTR3YCLbEOgeZz-H2lxyXa4huF-dH0FOnku37Y7m7A/viewform" },
+      { label: "Section 3", url: "https://docs.google.com/forms/d/e/1FAIpQLSc3ThD2Yw3Sqyg4u8eyrm_vpFJorHmEQYByLZKhJBaTpL5FEg/viewform" },
+      { label: "Section 4 - Part 1", url: "https://docs.google.com/forms/d/e/1FAIpQLSf26UNauFfvOoBqrNVeSgxHf9X-sJOWFBfpzAnu0ZCwwNCoOA/viewform" },
+      { label: "Section 4 - Part 2", url: "https://docs.google.com/forms/d/e/1FAIpQLSf2f5eMX5LT-5BbDW-_7dHB-P8U6UFOTnV-XA5siWqf8SveEQ/viewform" },
+      { label: "Section 5", url: "https://docs.google.com/forms/d/e/1FAIpQLSd4V-OrmZgMEJ_GXWx6l63K7s5kS8H0gjRBx48aWEP7KLC7wA/viewform" },
+      { label: "Section 6", url: "https://docs.google.com/forms/d/e/1FAIpQLSfjqQCdTAT6wKiNUdKquHkyBe-VosagYl9yNqVNDaja78eH-g/viewform" },
+      { label: "Section 7", url: "https://docs.google.com/forms/d/e/1FAIpQLScakygsIWvlGpQavA0NGz1cNIz4BBZCNtxgAILW--ZskBrKng/viewform" },
+      { label: "Section 8 - Part 1", url: "https://docs.google.com/forms/d/e/1FAIpQLSejrCBFjYWyGI1WytVnIUYVV0W8sZWJAg1qAT_IGTPHi_IsEQ/viewform" },
+      { label: "Section 8 - Part 2", url: "https://docs.google.com/forms/d/e/1FAIpQLSdrKii7q34DnrXPZQ5OWgcaWisFBpvhMjBT2bu7AMiRAv6mIQ/viewform" },
+      { label: "Section 9 - Part 1", url: "https://docs.google.com/forms/d/e/1FAIpQLSdgBbUyCN6BHIOyYPlIXvPTEo5DOCI-sYr69XMIRJndJde2Ww/viewform" },
+      { label: "Section 9 - Part 2", url: "https://docs.google.com/forms/d/e/1FAIpQLSdDPUq2WRh7Lh-VtYfsR6Blx0xt0RhH8PPtaKIMM-5bKOU8jg/viewform" },
+      { label: "Section 10", url: "https://docs.google.com/forms/d/e/1FAIpQLSeGIt3rmspZUqiE6QbDxUmnK6V32znRz9Tb8qjJ8BqubSrGNw/viewform" },
+      { label: "Section 11", url: "https://docs.google.com/forms/d/e/1FAIpQLSeH-tsoRyQ0caZM2IlZvkcmhvszpT47mMvhlM1MbqEfGczQLw/viewform" },
+      { label: "Section 12 - Part 1", url: "https://docs.google.com/forms/d/e/1FAIpQLSdJcRMMYLj2kktxI8O17APH0riYYMrVR4JeTj48NgRWj10nWQ/viewform" },
+      { label: "Section 12 - Part 2", url: "https://docs.google.com/forms/d/e/1FAIpQLSfohNoP3sU_Uf-2fwReEpdiP5hoOlnkoDG6g9qONRBGpmfJdw/viewform" }
+    ]
   },
   {
     chapter: "Chapter 3",
@@ -402,14 +521,18 @@ export default function PsrTest() {
                   {item.title}
                 </h4>
                 
-                <a
-                  href={item.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-auto inline-flex items-center justify-center w-full px-4 py-3 bg-white border border-slate-200 text-slate-900 font-bold text-xs tracking-widest uppercase hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-colors rounded-[6px] shadow-sm"
-                >
-                  <FileText className="w-4 h-4 mr-2" /> Take Test
-                </a>
+                {item.links ? (
+                  <ChapterSectionMenu links={item.links} />
+                ) : (
+                  <a
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-auto inline-flex items-center justify-center w-full px-4 py-3 bg-white border border-slate-200 text-slate-900 font-bold text-xs tracking-widest uppercase hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-colors rounded-[6px] shadow-sm"
+                  >
+                    <FileText className="w-4 h-4 mr-2" /> Take Test
+                  </a>
+                )}
               </motion.div>
             ))}
           </div>
