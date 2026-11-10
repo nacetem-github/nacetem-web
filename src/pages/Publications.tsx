@@ -200,8 +200,8 @@ function PublicationVisual({ item }: { item: PublicationItem }) {
         <div className="absolute -bottom-14 -left-12 h-40 w-40 rounded-full bg-white/45" />
         <img
           src={imageSrc}
-          alt=""
-          className="relative h-24 w-24 rounded-[8px] border border-slate-200 bg-white object-cover shadow-sm"
+          alt={item.title}
+          className="relative h-full w-full object-contain"
           loading="lazy"
           onError={() => setImageFailed(true)}
         />
