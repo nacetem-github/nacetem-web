@@ -18,6 +18,7 @@ const Publications = lazy(() => import('./pages/Publications'));
 const CapacityBuilding = lazy(() => import('./pages/CapacityBuilding'));
 const CapacityBuildingDetail = lazy(() => import('./pages/CapacityBuildingDetail'));
 const PsrTest = lazy(() => import('./pages/PsrTest'));
+const DigitalTools = lazy(() => import('./pages/DigitalTools'));
 const WeldingInitiative = lazy(() => import('./pages/WeldingInitiative'));
 const SeminarSeries = lazy(() => import('./pages/SeminarSeries'));
 const Research = lazy(() => import('./pages/Research'));
@@ -54,6 +55,7 @@ export default function App() {
               <Route path="events/reports/:slug" element={<EventReport />} />
               <Route path="events/:slug" element={<EventDetail />} />
               <Route path="psr-test" element={<PsrTest />} />
+              <Route path="digital-tools" element={<DigitalTools />} />
               <Route path="initiatives" element={<Initiatives />} />
               <Route path="news" element={<News />} />
               <Route path="news/:slug" element={<NewsDetail />} />
