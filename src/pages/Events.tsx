@@ -6,7 +6,7 @@ import { assets } from '../assets';
 import { useData } from '../contexts/DataContext';
 import { archivedPastEvents } from '../data/pastEvents';
 import { getArchivedEventReportByTitle } from '../data/eventReports';
-import { eventFallbackImages, formatEventTime, getEventSlug, splitEventsByStatus } from '../utils/eventUtils';
+import { eventFallbackImages, formatEventTime, getEventSlug, sortByNewestFirst, splitEventsByStatus } from '../utils/eventUtils';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -17,6 +17,7 @@ export default function Events() {
   const { events: allEvents } = useData();
   const events = allEvents.filter((event) => event.status === 'published');
   const { upcomingEvents, pastEvents } = splitEventsByStatus(events);
+  const orderedArchivedPastEvents = sortByNewestFirst(archivedPastEvents, (event) => event.date);
   const [activeUpcomingIndex, setActiveUpcomingIndex] = useState(0);
   const activeUpcomingEvent = upcomingEvents.length ? upcomingEvents[activeUpcomingIndex % upcomingEvents.length] : null;
 
@@ -311,7 +312,7 @@ export default function Events() {
               </motion.article>
             ))}
 
-            {archivedPastEvents.map((event) => {
+            {orderedArchivedPastEvents.map((event) => {
               const report = getArchivedEventReportByTitle(event.title);
 
               return <motion.article

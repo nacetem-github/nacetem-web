@@ -211,15 +211,32 @@ export function getEventExpiryDate(eventDate: string) {
 }
 
 export function isEventVisibleAsUpcoming(event: EventItem, referenceDate = new Date()) {
+  const startTime = event.time?.match(/^(\d{2}):(\d{2})$/);
+  if (startTime && (!event.endDate || event.endDate === event.startDate)) {
+    const startTimestamp = Date.parse(`${event.startDate}T${startTime[1]}:${startTime[2]}:00+01:00`);
+    if (!Number.isNaN(startTimestamp)) return startTimestamp > referenceDate.getTime();
+  }
+
   const managedEndDate = parseIsoDate(event.endDate || event.startDate);
   const expiryDate = managedEndDate ?? getEventExpiryDate(event.date);
   if (!expiryDate) return true;
   return getStartOfDay(expiryDate) >= getStartOfDay(referenceDate);
 }
 
+function sortBySoonestFirst<T extends { startDate: string }>(events: T[]) {
+  return [...events].sort((left, right) => {
+    const leftTimestamp = normalizeDateToTimestamp(left.startDate);
+    const rightTimestamp = normalizeDateToTimestamp(right.startDate);
+    if (leftTimestamp === null && rightTimestamp === null) return 0;
+    if (leftTimestamp === null) return 1;
+    if (rightTimestamp === null) return -1;
+    return leftTimestamp - rightTimestamp;
+  });
+}
+
 export function splitEventsByStatus(events: EventItem[], referenceDate = new Date()) {
-  const upcomingEvents = events.filter((event) => isEventVisibleAsUpcoming(event, referenceDate));
-  const pastEvents = events.filter((event) => !isEventVisibleAsUpcoming(event, referenceDate));
+  const upcomingEvents = sortBySoonestFirst(events.filter((event) => isEventVisibleAsUpcoming(event, referenceDate)));
+  const pastEvents = sortByNewestFirst(events.filter((event) => !isEventVisibleAsUpcoming(event, referenceDate)), (event) => event.startDate);
 
   return { upcomingEvents, pastEvents };
 }

@@ -20,6 +20,29 @@ const defaultGallery: GalleryItem[] = [
   { id: 'gallery-media', title: 'Media Engagement', imageUrl: assets.ntaImage, imageAlt: 'NACETEM media engagement', album: 'Media Engagements' },
 ].map((item, index) => ({ ...item, url: item.imageUrl, status: 'published' as const, featured: index < 6, publishedAt: now }));
 const defaultEvents: EventItem[] = [{
+  id: 'nigeria-eu-info-day-matchmaking-2026',
+  title: 'Nigeria–EU Info Day and Matchmaking Event',
+  slug: 'nigeria-eu-info-day-matchmaking-2026',
+  startDate: '2026-11-11',
+  displayDate: 'Wednesday, November 11, 2026',
+  date: 'Wednesday, November 11, 2026',
+  time: '12:00',
+  description: 'Join NACETEM and the Ministry of Science, Technology and Innovation for an information day and matchmaking event connecting Nigerian and European research and innovation organisations. The programme will cover open calls under Horizon Europe, Erasmus+ and the European Solidarity Corps (ESC), networking opportunities, one-on-one matchmaking, and consortium requirements.',
+  location: 'Obasanjo Hall, Head of the Civil Service of the Federation, Block A, Federal Secretariat Complex, Phase II, Shehu Shagari Way, Abuja; online via Zoom',
+  host: 'National Centre for Technology Management (NACETEM) and the Ministry of Science, Technology and Innovation',
+  format: 'In person + online',
+  flyerUrl: '/uploads/events/flyers/2026/nigeria-eu-info-day-matchmaking/nigeria-eu-info-day-flyer.webp',
+  actionUrl: 'https://forms.gle/PdN57ECnUAShoQPM9',
+  actionLabel: 'Register Now',
+  onlineViewingUrl: 'https://us06web.zoom.us/j/85628264048?pwd=3khJEkRXZVBMMsrEZEJMKFGRKnzmPS.1',
+  onlineNotesUrl: 'https://us06web.zoom.us/j/85628264048?pwd=3khJEkRXZVBMMsrEZEJMKFGRKnzmPS.1&mynotes=on',
+  onlineChatUrl: 'https://us06web.zoom.us/launch/jc/85628264048',
+  onlineMeetingId: '856 2826 4048',
+  onlinePasscode: '114944',
+  status: 'published',
+  featured: true,
+  publishedAt: '2026-11-11T00:00:00+01:00',
+}, {
   id: 'world-climate-simulation-your-turn-to-negotiate-2026', title: 'World Climate Simulation — Your Turn to Negotiate', slug: 'world-climate-simulation-your-turn-to-negotiate-2026',
   startDate: '2026-09-02', displayDate: 'September 2, 2026', date: 'September 2, 2026', time: '09:00',
   description: 'Take part in an interactive roleplaying exercise developed by Climate Interactive and MIT Sloan using the En-ROADS climate simulator. Participants will represent world leaders, government officials, industry leaders, and advocates as they negotiate a climate deal and experience what it takes to address one of the defining challenges of our time.',
@@ -35,6 +58,19 @@ const defaultEvents: EventItem[] = [{
   contactPhones: ['07033091950', '08033640647'], contactEmail: 'nacetemsouthwest@gmail.com', status: 'published', featured: true, publishedAt: now,
 }];
 const defaultAnnouncements: AnnouncementItem[] = [{
+  id: 'nigeria-eu-info-day-matchmaking-announcement-2026',
+  title: 'Nigeria–EU Info Day and Matchmaking Event — Today at 12:00 p.m. WAT',
+  message: 'Join NACETEM and the Ministry of Science, Technology and Innovation to explore Horizon Europe, Erasmus+ and European Solidarity Corps open calls and matchmaking opportunities.',
+  category: 'event',
+  actionLabel: 'Register Now',
+  actionUrl: 'https://forms.gle/PdN57ECnUAShoQPM9',
+  startsAt: '2026-11-11T00:00:00+01:00',
+  endsAt: '2026-11-11T12:00:00+01:00',
+  priority: 200,
+  status: 'published',
+  featured: true,
+  publishedAt: '2026-11-11T00:00:00+01:00',
+}, {
   id: 'professional-mtech-digital-marketing-scholarship-2026',
   title: 'Promotional Scholarship Offer – Professional Master in Digital Marketing and Strategy',
   message: 'Apply by 20 August 2026. Classes commence on 29 August 2026.',
@@ -78,6 +114,10 @@ function withDefaultEvents(items: EventItem[]) {
   const ids = new Set(items.map((item) => item.id));
   return [...items, ...defaultEvents.filter((item) => !ids.has(item.id))];
 }
+function withDefaultAnnouncements(items: AnnouncementItem[]) {
+  const ids = new Set(items.map((item) => item.id));
+  return [...items, ...defaultAnnouncements.filter((item) => !ids.has(item.id))];
+}
 function sortItems<T extends { featured: boolean; publishedAt: string }>(items: T[]) {
   return [...items].sort((a, b) => Number(b.featured) - Number(a.featured) || String(b.publishedAt).localeCompare(String(a.publishedAt)));
 }
@@ -107,14 +147,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
         if (!error && data) {
           (Object.keys(setters) as CmsContentType[]).forEach((type) => {
             const items = data.filter((row) => row.type === type).map((row) => ({ ...row.data, id: row.id, createdAt: row.created_at, updatedAt: row.updated_at }));
-            setters[type](type === 'publication' ? withDefaultPublications(items as PublicationItem[]) : type === 'video' ? withDefaultVideos(items as VideoItem[]) : type === 'event' ? withDefaultEvents(items as EventItem[]) : items.length ? items : defaults[type]);
+            setters[type](type === 'publication' ? withDefaultPublications(items as PublicationItem[]) : type === 'video' ? withDefaultVideos(items as VideoItem[]) : type === 'event' ? withDefaultEvents(items as EventItem[]) : type === 'announcement' ? withDefaultAnnouncements(items as AnnouncementItem[]) : items.length ? items : defaults[type]);
           });
           return;
         }
       }
       (Object.keys(setters) as CmsContentType[]).forEach((type) => {
         const items = localItems<any>(type, defaults[type] as any[]);
-        setters[type](type === 'publication' ? withDefaultPublications(items) : type === 'video' ? withDefaultVideos(items) : type === 'event' ? withDefaultEvents(items) : items);
+        setters[type](type === 'publication' ? withDefaultPublications(items) : type === 'video' ? withDefaultVideos(items) : type === 'event' ? withDefaultEvents(items) : type === 'announcement' ? withDefaultAnnouncements(items) : items);
       });
     } finally { setIsLoading(false); }
   })(); }, []);

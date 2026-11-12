@@ -9,6 +9,7 @@ import { UpcomingEventCountdown } from '../components/UpcomingEventCountdown';
 import { formatEventTime, getEventSlug, splitEventsByStatus } from '../utils/eventUtils';
 import { officialMandates, officialMission, officialVision } from '../data/institutionalProfile';
 import { AnnouncementSlider } from '../components/AnnouncementSlider';
+import { FeaturedEventPopup } from '../components/FeaturedEventPopup';
 import { VideoShowcase } from '../components/VideoShowcase';
 import type { VideoItem } from '../types/content';
 
@@ -75,6 +76,7 @@ export default function Home() {
   const homepageEvents = splitEventsByStatus(events.filter((event) => event.status === 'published')).upcomingEvents
     .sort((a, b) => a.startDate.localeCompare(b.startDate)).slice(0, 5);
   const activeEvent = homepageEvents.length ? homepageEvents[activeEventIndex % homepageEvents.length] : null;
+  const featuredWebinar = events.find((event) => event.id === 'nigeria-eu-info-day-matchmaking-2026' && event.status === 'published') ?? null;
   const managedImpactVideos = videos.filter((video) => video.status === 'published' && (video.videoType === 'impact' || video.videoType === 'both'));
 
   useEffect(() => {
@@ -104,6 +106,7 @@ export default function Home() {
     <div className="flex-1">
       <UpcomingEventCountdown events={events.filter((event) => event.status === 'published')} />
       <AnnouncementSlider announcements={announcements} />
+      <FeaturedEventPopup event={featuredWebinar} />
 
       {/* Hero Section */}
       <section className="relative bg-slate-50 border-b border-slate-200 text-slate-900 overflow-hidden">

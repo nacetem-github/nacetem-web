@@ -58,6 +58,8 @@ export interface EventItem extends ManagedFields {
   actionUrl?: string;
   actionLabel?: string;
   onlineViewingUrl?: string;
+  onlineNotesUrl?: string;
+  onlineChatUrl?: string;
   onlineMeetingId?: string;
   onlinePasscode?: string;
   sourceFileUrl?: string;

@@ -179,6 +179,7 @@ export default function Layout() {
     { name: 'Welding Initiative', href: '/welding-initiative' },
     { name: 'PSR Test', href: '/psr-test' },
     { name: 'Digital Tools', href: '/digital-tools' },
+    { name: 'Staff Webmail', href: 'https://nacetem.gov.ng/webmail', external: true },
     {
       name: 'News & Gallery',
       href: '/news',
@@ -216,8 +217,8 @@ export default function Layout() {
           className="absolute bottom-0 left-0 h-[2px] bg-gold transition-all duration-75 z-50"
           style={{ width: `${scrollProgress}%` }}
         />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-24 items-center justify-between gap-8 sm:h-28 lg:gap-14">
+        <div className="mx-auto w-full max-w-screen-2xl px-4 sm:px-6 lg:px-8">
+          <div className="flex h-24 items-center justify-between gap-3 sm:h-28 sm:gap-4 2xl:gap-6">
             {/* Logo */}
             <Link
               to="/"
@@ -228,24 +229,36 @@ export default function Layout() {
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden items-center space-x-6 2xl:ml-10 2xl:flex">
-              {navigation.map((item) => (
+            <nav className="hidden items-center space-x-4 2xl:ml-auto 2xl:flex 2xl:space-x-5">
+              {navigation.filter((item) => !('external' in item && item.external)).map((item) => (
                 <div key={item.name} className="relative group shrink-0">
-                  <Link
-                    to={item.href}
-                    className={cn(
-                      'text-xs font-bold uppercase tracking-wider transition-colors inline-flex items-center whitespace-nowrap',
-                      'py-2 border-b-2',
-                      isActive(item.href)
-                        ? 'border-emerald-600 text-slate-900 opacity-100'
-                        : 'border-transparent text-slate-900 opacity-70 hover:opacity-100 hover:border-slate-300'
-                    )}
-                  >
-                    {item.name}
-                    {item.children && (
-                      <ChevronDown className="w-4 h-4 ml-1.5 mb-[2px] stroke-[2.75]" />
-                    )}
-                  </Link>
+                  {'external' in item && item.external ? (
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 whitespace-nowrap border-b-2 border-transparent py-2 text-xs font-bold uppercase tracking-wider text-emerald-800 transition-colors hover:border-emerald-600 hover:text-emerald-950"
+                    >
+                      <Mail aria-hidden="true" className="h-3.5 w-3.5" />
+                      {item.name}
+                    </a>
+                  ) : (
+                    <Link
+                      to={item.href}
+                      className={cn(
+                        'text-xs font-bold uppercase tracking-wider transition-colors inline-flex items-center whitespace-nowrap',
+                        'py-2 border-b-2',
+                        isActive(item.href)
+                          ? 'border-emerald-600 text-slate-900 opacity-100'
+                          : 'border-transparent text-slate-900 opacity-70 hover:opacity-100 hover:border-slate-300'
+                      )}
+                    >
+                      {item.name}
+                      {item.children && (
+                        <ChevronDown className="w-4 h-4 ml-1.5 mb-[2px] stroke-[2.75]" />
+                      )}
+                    </Link>
+                  )}
 
                   {item.children && (
                     <div className="absolute left-0 top-full mt-2 w-48 bg-white border border-slate-200 shadow-lg rounded-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
@@ -267,10 +280,23 @@ export default function Layout() {
             </nav>
 
             {/* Mobile menu button */}
-            <div className="flex items-center 2xl:hidden">
+            <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+              <a
+                href="https://nacetem.gov.ng/webmail"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Staff Webmail (opens in a new tab)"
+                className="inline-flex h-11 w-11 shrink-0 items-center justify-center gap-2 rounded-full bg-emerald-800 text-white shadow-sm transition-colors hover:bg-emerald-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2 sm:w-auto sm:px-3.5"
+              >
+                <Mail aria-hidden="true" className="h-4 w-4" />
+                <span className="hidden text-[10px] font-bold uppercase tracking-wider sm:inline">
+                  Staff Webmail
+                </span>
+                <ExternalLink aria-hidden="true" className="hidden h-3 w-3 opacity-75 sm:inline" />
+              </a>
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-emerald-600/25 hover:bg-emerald-50 hover:text-emerald-700"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-emerald-600/25 hover:bg-emerald-50 hover:text-emerald-700 2xl:hidden"
                 aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
               >
                 {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -283,23 +309,39 @@ export default function Layout() {
         {isMobileMenuOpen && (
           <div className="border-b border-slate-200 bg-white 2xl:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-              {navigation.map((item) => (
+              {navigation.filter((item) => !('external' in item && item.external)).map((item) => (
                 <div key={item.name}>
-                  <Link
-                    to={item.href}
-                    onClick={() => {
-                      if (!item.children) setIsMobileMenuOpen(false);
-                    }}
-                    className={cn(
-                      'flex items-center justify-between px-3 py-2 rounded-md text-base font-medium',
-                      isActive(item.href)
-                        ? 'bg-emerald-50 text-emerald-800'
-                        : 'text-slate-600 hover:text-emerald-700 hover:bg-slate-50'
-                    )}
-                  >
-                    {item.name}
-                    {item.children && <ChevronDown className="h-4 w-4" />}
-                  </Link>
+                  {'external' in item && item.external ? (
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center justify-between rounded-md px-3 py-2 text-base font-medium text-emerald-800 hover:bg-emerald-50"
+                    >
+                      <span className="flex items-center gap-2">
+                        <Mail aria-hidden="true" className="h-4 w-4" />
+                        {item.name}
+                      </span>
+                      <ExternalLink aria-hidden="true" className="h-4 w-4" />
+                    </a>
+                  ) : (
+                    <Link
+                      to={item.href}
+                      onClick={() => {
+                        if (!item.children) setIsMobileMenuOpen(false);
+                      }}
+                      className={cn(
+                        'flex items-center justify-between px-3 py-2 rounded-md text-base font-medium',
+                        isActive(item.href)
+                          ? 'bg-emerald-50 text-emerald-800'
+                          : 'text-slate-600 hover:text-emerald-700 hover:bg-slate-50'
+                      )}
+                    >
+                      {item.name}
+                      {item.children && <ChevronDown className="h-4 w-4" />}
+                    </Link>
+                  )}
                   {item.children && (
                     <div className="pl-4 pr-3 py-1 space-y-1">
                       {item.children.map((child) => (
@@ -387,7 +429,7 @@ export default function Layout() {
                   { name: 'Capacity Building', href: '/capacity-building' },
                   { name: 'STI Dashboard & Databank', href: 'https://stidashboard.nacetem.gov.ng', external: true },
                   { name: 'PSR Test', href: '/psr-test' },
-                ].map((item) => (
+                    ].map((item) => (
                   <li key={item.name}>
                     {'external' in item && item.external ? (
                       <a href={item.href} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-200 flex items-center transition-colors">
@@ -403,6 +445,16 @@ export default function Layout() {
                   </li>
                 ))}
               </ul>
+              <a
+                href="https://nacetem.gov.ng/webmail"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-md border border-white/25 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition-colors hover:border-gold/60 hover:bg-white/15 hover:text-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-[#004d26]"
+              >
+                <Mail aria-hidden="true" className="h-4 w-4" />
+                Staff Webmail
+                <ExternalLink aria-hidden="true" className="h-3.5 w-3.5 opacity-75" />
+              </a>
 
               <h3 className="text-xs font-bold text-white uppercase tracking-wider mt-8 mb-5 opacity-70">Publications</h3>
               <ul className="space-y-3 font-medium text-sm">

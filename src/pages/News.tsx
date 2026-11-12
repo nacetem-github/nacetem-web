@@ -87,6 +87,7 @@ export default function News() {
   const loadedAdditionalArticles = currentArticles.slice(3);
   const hasMoreArticles = visibleArticles < newsArticles.length;
   const { upcomingEvents, pastEvents } = splitEventsByStatus(events.filter((event) => event.status === 'published'));
+  const orderedArchivedPastEvents = sortByNewestFirst(archivedPastEvents, (event) => event.date);
   const managedGalleryEvents = sortByNewestFirst(
     Object.values(gallery.filter((item) => item.status === 'published').reduce<Record<string, GalleryAlbum>>((albums, item) => {
       const title = item.album || item.title;
@@ -350,7 +351,7 @@ export default function News() {
               </motion.article>
             ))}
 
-            {archivedPastEvents.map((event) => {
+            {orderedArchivedPastEvents.map((event) => {
               const report = getArchivedEventReportByTitle(event.title);
 
               return <motion.article

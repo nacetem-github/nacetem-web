@@ -126,8 +126,8 @@ export default function EventDetail() {
                     <MonitorPlay aria-hidden="true" className="h-5 w-5" />
                   </div>
                   <div className="min-w-0">
-                    <h2 className="text-xl font-serif text-slate-900">Unable to attend physically?</h2>
-                    <p className="mt-2 text-sm leading-7 text-slate-700">You may watch the event online. Online viewers will be able to observe the simulation but will not participate actively in the negotiation exercise.</p>
+                    <h2 className="text-xl font-serif text-slate-900">Join this event online</h2>
+                    <p className="mt-2 text-sm leading-7 text-slate-700">Join the programme online using the meeting link and credentials below.</p>
                     {(event.onlineMeetingId || event.onlinePasscode) && (
                       <dl className="mt-4 grid gap-2 text-sm sm:grid-cols-2">
                         {event.onlineMeetingId && <div><dt className="font-bold text-slate-900">Meeting ID</dt><dd className="mt-1 break-words font-mono tabular-nums text-slate-700">{event.onlineMeetingId}</dd></div>}
@@ -170,7 +170,27 @@ export default function EventDetail() {
                   rel="noreferrer"
                   className="inline-flex min-h-12 w-full items-center justify-center rounded-[6px] border border-sky-700 bg-white px-6 py-4 text-center text-xs font-bold uppercase tracking-widest text-sky-900 transition-colors hover:bg-sky-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-700 focus-visible:ring-offset-2 sm:w-auto"
                 >
-                  <MonitorPlay aria-hidden="true" className="mr-2 h-4 w-4" /> Watch Online
+                  <MonitorPlay aria-hidden="true" className="mr-2 h-4 w-4" /> Join Online
+                </a>
+              )}
+              {event.onlineNotesUrl && (
+                <a
+                  href={event.onlineNotesUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-12 w-full items-center justify-center rounded-[6px] border border-sky-700 px-6 py-4 text-center text-xs font-bold uppercase tracking-widest text-sky-900 transition-colors hover:bg-sky-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-700 focus-visible:ring-offset-2 sm:w-auto"
+                >
+                  <ExternalLink aria-hidden="true" className="mr-2 h-4 w-4" /> Join and Take Notes
+                </a>
+              )}
+              {event.onlineChatUrl && (
+                <a
+                  href={event.onlineChatUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-12 w-full items-center justify-center rounded-[6px] border border-sky-700 px-6 py-4 text-center text-xs font-bold uppercase tracking-widest text-sky-900 transition-colors hover:bg-sky-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-700 focus-visible:ring-offset-2 sm:w-auto"
+                >
+                  <ExternalLink aria-hidden="true" className="mr-2 h-4 w-4" /> Open Meeting Chat
                 </a>
               )}
               <Link to="/news#past-events" className="inline-flex min-h-12 w-full items-center justify-center rounded-[6px] border border-slate-300 px-6 py-4 text-center text-xs font-bold uppercase tracking-widest text-slate-700 transition-colors hover:border-emerald-700 hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2 sm:w-auto">
