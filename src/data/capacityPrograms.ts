@@ -186,8 +186,8 @@ export const capacityPrograms: CapacityProgram[] = [
     img: assets.digitalAcademyImage,
     cardImg: assets.mtechDigitalMarketingImage,
     imageFit: 'contain',
-    applyUrl: 'https://nlplimited.com/online-digital-marketing-course/',
-    secondaryCta: { type: 'external', label: 'NLP Limited Digital Marketing Course' },
+    applyUrl: 'https://admissions.nacetem.gov.ng/',
+    secondaryCta: { type: 'external', label: 'Apply on Admissions Portal' },
   },
   {
     slug: 'training-certification-drone-piloting',
