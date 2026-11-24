@@ -21,6 +21,8 @@ export type CapacityProgram = {
   img: string;
   cardImg?: string;
   imageFit?: 'cover' | 'contain';
+  applyUrl?: string;
+  secondaryCta?: { type: 'register' | 'external'; label: string };
 };
 
 export const capacityPrograms: CapacityProgram[] = [
@@ -77,6 +79,7 @@ export const capacityPrograms: CapacityProgram[] = [
     format: 'Hybrid',
     iconColor: 'text-emerald-500',
     img: assets.pgdImage,
+    secondaryCta: { type: 'register', label: 'Register Here' },
   },
   {
     slug: 'professional-master-technology-management',
@@ -113,6 +116,7 @@ export const capacityPrograms: CapacityProgram[] = [
     img: assets.capacityImage,
     cardImg: assets.mtechTechnologyManagementImage,
     imageFit: 'contain',
+    secondaryCta: { type: 'register', label: 'Register Here' },
   },
   {
     slug: 'professional-mtech-nanoscience-nanotechnology',
@@ -147,6 +151,7 @@ export const capacityPrograms: CapacityProgram[] = [
     img: assets.seminarImage,
     cardImg: assets.mtechNanotechnologyImage,
     imageFit: 'contain',
+    secondaryCta: { type: 'register', label: 'Register Here' },
   },
   {
     slug: 'professional-mtech-digital-marketing-strategy',
@@ -181,6 +186,8 @@ export const capacityPrograms: CapacityProgram[] = [
     img: assets.digitalAcademyImage,
     cardImg: assets.mtechDigitalMarketingImage,
     imageFit: 'contain',
+    applyUrl: 'https://nlplimited.com/online-digital-marketing-course/',
+    secondaryCta: { type: 'external', label: 'NLP Limited Digital Marketing Course' },
   },
   {
     slug: 'training-certification-drone-piloting',
@@ -214,6 +221,8 @@ export const capacityPrograms: CapacityProgram[] = [
     img: assets.dashboardImage,
     cardImg: assets.droneBannerImage,
     imageFit: 'contain',
+    applyUrl: 'https://drone.nacetem.gov.ng',
+    secondaryCta: { type: 'external', label: 'Visit Page' },
   },
 ];
 

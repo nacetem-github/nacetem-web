@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Database, Download, FileText, Search, UserRound, Video } from 'lucide-react';
+import { ArrowUpDown, Calendar, ChevronDown, Database, Download, FileText, Search, UserRound, Video } from 'lucide-react';
 import { assets } from '../assets';
 import { useData } from '../contexts/DataContext';
 
@@ -10,6 +10,8 @@ const fadeInUp = {
 };
 
 type YearFilter = 'all' | '2026' | '2025' | '2024' | 'archive';
+type MonthFilter = 'all' | `${number}`;
+type SortOrder = 'newest' | 'oldest';
 
 type DisplaySeminar = {
   title: string;
@@ -313,6 +315,27 @@ const yearOptions: Array<{ value: YearFilter; label: string }> = [
   { value: 'archive', label: 'Archive' },
 ];
 
+const monthNames = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+
+function seminarMonthIndex(value: string) {
+  const isoMatch = value.match(/^\d{4}-(\d{2})-\d{2}$/);
+  if (isoMatch) return Number(isoMatch[1]) - 1;
+  const normalized = value.toLowerCase();
+  const month = monthNames.findIndex((name) => normalized.includes(name.toLowerCase()));
+  return month >= 0 ? month : null;
+}
+
+function seminarDateValue(seminar: DisplaySeminar) {
+  const month = seminarMonthIndex(seminar.date) ?? 0;
+  const isoDay = seminar.date.match(/^\d{4}-\d{2}-(\d{2})$/)?.[1];
+  const writtenDay = seminar.date.match(/\b([0-2]?\d|3[01])(?:st|nd|rd|th)?\b/i)?.[1];
+  const day = Number(isoDay || writtenDay || 1);
+  return Date.UTC(seminar.year, month, day);
+}
+
 function formatSeminarDate(value: string) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
   const [year, month, day] = value.split('-').map(Number);
@@ -385,7 +408,7 @@ function searchableText(seminar: DisplaySeminar) {
     .toLowerCase();
 }
 
-function filterSeminars(seminars: DisplaySeminar[], query: string, year: YearFilter, author: string) {
+function filterSeminars(seminars: DisplaySeminar[], query: string, year: YearFilter, month: MonthFilter, author: string) {
   const normalizedQuery = query.trim().toLowerCase();
 
   return seminars.filter((seminar) => {
@@ -394,31 +417,40 @@ function filterSeminars(seminars: DisplaySeminar[], query: string, year: YearFil
       year === 'all' ||
       (year === 'archive' ? isArchiveYear(seminar.year) : seminar.year === Number(year));
     const matchesAuthor = author === 'all' || seminar.presenter === author;
+    const matchesMonth = month === 'all' || seminarMonthIndex(seminar.date) === Number(month);
 
-    return matchesSearch && matchesYear && matchesAuthor;
+    return matchesSearch && matchesYear && matchesMonth && matchesAuthor;
   });
 }
 
 function SeminarFilterBar({
   searchQuery,
   selectedYear,
+  selectedMonth,
   selectedAuthor,
+  sortOrder,
   authors,
   resultCount,
   totalCount,
   onSearchChange,
   onYearChange,
+  onMonthChange,
   onAuthorChange,
+  onSortChange,
 }: {
   searchQuery: string;
   selectedYear: YearFilter;
+  selectedMonth: MonthFilter;
   selectedAuthor: string;
+  sortOrder: SortOrder;
   authors: string[];
   resultCount: number;
   totalCount: number;
   onSearchChange(value: string): void;
   onYearChange(value: YearFilter): void;
+  onMonthChange(value: MonthFilter): void;
   onAuthorChange(value: string): void;
+  onSortChange(value: SortOrder): void;
 }) {
   return (
     <div className="mb-10 rounded-[8px] border border-slate-200 bg-slate-50 p-5 shadow-sm sm:p-6">
@@ -432,7 +464,7 @@ function SeminarFilterBar({
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(150px,0.55fr)_minmax(220px,0.8fr)]">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-[minmax(16rem,1.35fr)_minmax(8rem,0.5fr)_minmax(10rem,0.6fr)_minmax(13rem,0.85fr)_minmax(10rem,0.6fr)]">
         <label htmlFor="seminar-search" className="text-xs font-bold uppercase tracking-wider text-slate-500">
           Search
           <span className="relative mt-2 block">
@@ -446,6 +478,19 @@ function SeminarFilterBar({
               className="h-12 w-full rounded-[6px] border border-slate-200 bg-white pl-10 pr-4 text-sm font-semibold normal-case text-slate-800 outline-none transition-colors placeholder:text-slate-400 hover:border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
             />
           </span>
+        </label>
+
+        <label htmlFor="seminar-month" className="text-xs font-bold uppercase tracking-wider text-slate-500">
+          Month
+          <select
+            id="seminar-month"
+            value={selectedMonth}
+            onChange={(event) => onMonthChange(event.target.value as MonthFilter)}
+            className="mt-2 h-12 w-full rounded-[6px] border border-slate-200 bg-white px-3 text-sm font-semibold normal-case text-slate-800 outline-none transition-colors hover:border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
+          >
+            <option value="all">All Months</option>
+            {monthNames.map((month, index) => <option key={month} value={index}>{month}</option>)}
+          </select>
         </label>
 
         <label htmlFor="seminar-year" className="text-xs font-bold uppercase tracking-wider text-slate-500">
@@ -479,6 +524,22 @@ function SeminarFilterBar({
               </option>
             ))}
           </select>
+        </label>
+
+        <label htmlFor="seminar-sort" className="text-xs font-bold uppercase tracking-wider text-slate-500">
+          Sort by
+          <span className="relative mt-2 block">
+            <ArrowUpDown aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <select
+              id="seminar-sort"
+              value={sortOrder}
+              onChange={(event) => onSortChange(event.target.value as SortOrder)}
+              className="h-12 w-full rounded-[6px] border border-slate-200 bg-white pl-10 pr-3 text-sm font-semibold normal-case text-slate-800 outline-none transition-colors hover:border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
+            >
+              <option value="newest">Most Recent</option>
+              <option value="oldest">Oldest First</option>
+            </select>
+          </span>
         </label>
       </div>
     </div>
@@ -521,6 +582,49 @@ function MissingText({ children }: { children: string }) {
   return <span className={isMissing ? 'italic text-slate-400/80' : 'text-slate-800'}>{children}</span>;
 }
 
+function ExpandableSummary({ text }: { text: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const [canExpand, setCanExpand] = useState(false);
+  const paragraphRef = useRef<HTMLParagraphElement>(null);
+  const summaryId = useId();
+
+  useEffect(() => {
+    const paragraph = paragraphRef.current;
+    if (!paragraph) return;
+    const measure = () => { if (!expanded) setCanExpand(paragraph.scrollHeight > paragraph.clientHeight + 1); };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(paragraph);
+    document.fonts?.ready.then(measure);
+    return () => observer.disconnect();
+  }, [expanded]);
+
+  return (
+    <div className="mt-4">
+      <p
+        ref={paragraphRef}
+        id={summaryId}
+        className="text-sm leading-7 text-slate-600"
+        style={expanded ? undefined : { display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden' }}
+      >
+        {text}
+      </p>
+      {(canExpand || expanded) && (
+        <button
+          type="button"
+          aria-controls={summaryId}
+          aria-expanded={expanded}
+          onClick={() => setExpanded((value) => !value)}
+          className="mt-2 inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-md px-1 text-xs font-bold uppercase tracking-wider text-emerald-700 outline-none transition-colors hover:text-emerald-900 focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-4"
+        >
+          {expanded ? 'Show less' : 'Read summary'}
+          <ChevronDown aria-hidden="true" className={`h-4 w-4 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`} />
+        </button>
+      )}
+    </div>
+  );
+}
+
 function SeminarCard({ seminar }: { key?: string; seminar: DisplaySeminar }) {
   const hasPresentation = Boolean(seminar.presentationUrl);
 
@@ -530,7 +634,7 @@ function SeminarCard({ seminar }: { key?: string; seminar: DisplaySeminar }) {
       whileInView="visible"
       viewport={{ once: true, margin: '-40px' }}
       variants={fadeInUp}
-      className="overflow-hidden rounded-[8px] border border-slate-200 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-emerald-600 hover:shadow-md"
+      className="min-h-[22rem] overflow-hidden rounded-[11px] border border-slate-200 bg-white shadow-sm transition-colors hover:border-emerald-700"
     >
       <div className="flex flex-col lg:flex-row">
         <SeminarVisualBlock seminar={seminar} />
@@ -562,7 +666,7 @@ function SeminarCard({ seminar }: { key?: string; seminar: DisplaySeminar }) {
               </div>
             </div>
 
-            {seminar.summary ? <p className="mt-4 text-sm leading-6 text-slate-600">{seminar.summary}</p> : null}
+            {seminar.summary ? <ExpandableSummary text={seminar.summary} /> : null}
 
             <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_150px]">
               <div className="rounded-[6px] border border-slate-200 bg-white px-3 py-2">
@@ -622,7 +726,9 @@ export default function SeminarSeries() {
   const { seminars: managedSeminars } = useData();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedYear, setSelectedYear] = useState<YearFilter>('all');
+  const [selectedMonth, setSelectedMonth] = useState<MonthFilter>('all');
   const [selectedAuthor, setSelectedAuthor] = useState('all');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
 
   const seminars: DisplaySeminar[] = managedSeminars
     .filter((item) => item.status === 'published')
@@ -641,13 +747,17 @@ export default function SeminarSeries() {
     [displayedSeminars],
   );
   const filteredSeminars = useMemo(
-    () => filterSeminars(displayedSeminars, searchQuery, selectedYear, selectedAuthor).sort((a, b) => b.year - a.year || a.title.localeCompare(b.title)),
-    [displayedSeminars, searchQuery, selectedAuthor, selectedYear],
+    () => filterSeminars(displayedSeminars, searchQuery, selectedYear, selectedMonth, selectedAuthor)
+      .sort((a, b) => {
+        const direction = sortOrder === 'newest' ? -1 : 1;
+        return direction * (seminarDateValue(a) - seminarDateValue(b)) || a.title.localeCompare(b.title);
+      }),
+    [displayedSeminars, searchQuery, selectedAuthor, selectedMonth, selectedYear, sortOrder],
   );
 
   return (
     <div className="min-h-screen overflow-hidden bg-slate-50 font-sans">
-      <section className="relative overflow-hidden border-b-8 border-gold bg-slate-900 pb-24 pt-32 lg:pb-32 lg:pt-40">
+      <section className="relative overflow-hidden border-b-8 border-gold bg-slate-900 pb-20 pt-32 lg:pb-28 lg:pt-40">
         <div className="absolute inset-0">
           <img
             src={assets.seminarImage}
@@ -655,57 +765,74 @@ export default function SeminarSeries() {
             className="h-full w-full object-cover opacity-30 mix-blend-overlay"
             loading="lazy"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/90 to-slate-900/55" />
         </div>
 
-        <div className="relative z-10 mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-          <motion.div initial="hidden" animate="visible" variants={fadeInUp} className="mx-auto max-w-4xl">
+        <div className="relative z-10 mx-auto grid max-w-7xl items-end gap-12 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_21rem] lg:px-8">
+          <motion.div initial="hidden" animate="visible" variants={fadeInUp} className="max-w-4xl">
             <div className="mb-6 inline-flex items-center border-b border-gold px-1 pb-1 text-xs font-bold uppercase tracking-widest text-gold">
               Research
             </div>
-            <h1 className="mb-8 text-4xl font-serif leading-tight text-white md:text-5xl lg:text-7xl">Research Seminars</h1>
-            <p className="mx-auto mb-10 max-w-3xl text-xl font-light leading-relaxed text-slate-100/90">
+            <h1 className="mb-7 text-4xl font-serif leading-tight text-white md:text-5xl lg:text-7xl">Research Seminars</h1>
+            <p className="max-w-3xl text-lg font-light leading-8 text-slate-100/90 sm:text-xl">
               Sharing research findings, emerging ideas, and practical insights across science, technology,
               innovation, and public policy.
             </p>
           </motion.div>
+          <motion.aside initial="hidden" animate="visible" variants={fadeInUp} aria-label="Seminar archive features" className="hidden border-l border-white/20 pl-8 lg:block">
+            <p className="mb-5 text-[11px] font-bold uppercase tracking-[0.22em] text-gold">Explore the archive</p>
+            <ul className="space-y-5 text-sm leading-6 text-white">
+              {['Filter by year and month', 'Find authors and research topics', 'Download available materials'].map((item, index) => (
+                <li key={item} className="flex items-start gap-4">
+                  <span aria-hidden="true" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/30 font-semibold text-gold">{index + 1}</span>
+                  <span className="pt-1">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </motion.aside>
         </div>
       </section>
 
-      <section className="relative bg-white py-20">
-        <div className="mx-auto max-w-7xl px-4 pr-10 sm:px-6 sm:pr-12 lg:px-8 lg:pr-24 xl:pr-28">
-          <div className="mx-auto mb-12 max-w-3xl text-center">
-            <h2 className="mb-4 text-xs font-bold uppercase tracking-widest text-emerald-600">NACETEM Researchers' Seminar Series</h2>
-            <h3 className="text-3xl font-serif text-slate-900 sm:text-4xl">Research Archive</h3>
-            <p className="mt-5 text-sm leading-relaxed text-slate-600">
-              Filter high-volume seminar records by keyword, year, and author, then download the available presentation files.
+      <section className="relative bg-white py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-12 grid gap-6 lg:grid-cols-[minmax(0,0.8fr)_minmax(20rem,0.55fr)] lg:items-end">
+            <div>
+              <h2 className="mb-4 text-xs font-bold uppercase tracking-widest text-gold">NACETEM Researchers' Seminar Series</h2>
+              <h3 className="text-3xl font-serif text-slate-900 sm:text-5xl">Research Archive</h3>
+            </div>
+            <p className="max-w-xl text-base leading-8 text-slate-600 lg:justify-self-end">
+              Search seminar records, filter by month, year, or author, and access available presentation files in true chronological order.
             </p>
           </div>
 
           <SeminarFilterBar
             searchQuery={searchQuery}
             selectedYear={selectedYear}
+            selectedMonth={selectedMonth}
             selectedAuthor={selectedAuthor}
+            sortOrder={sortOrder}
             authors={authors}
             resultCount={filteredSeminars.length}
             totalCount={displayedSeminars.length}
             onSearchChange={setSearchQuery}
             onYearChange={setSelectedYear}
+            onMonthChange={setSelectedMonth}
             onAuthorChange={setSelectedAuthor}
+            onSortChange={setSortOrder}
           />
 
           {filteredSeminars.length > 0 ? (
-            <div className="space-y-5 lg:pr-20 xl:pr-24">
+            <div className="space-y-6">
               {filteredSeminars.map((seminar) => (
                 <SeminarCard key={`${seminar.title}-${seminar.presenter}-${seminar.year}`} seminar={seminar} />
               ))}
             </div>
           ) : (
-            <div className="rounded-[8px] border border-dashed border-slate-300 bg-slate-50 px-6 py-16 text-center lg:mr-20 xl:mr-24">
+            <div className="rounded-[11px] border border-dashed border-slate-300 bg-slate-50 px-6 py-16 text-center">
               <FileText className="mx-auto mb-5 h-9 w-9 text-emerald-700" />
               <h4 className="mb-3 text-2xl font-serif text-slate-900">No matching seminar records</h4>
               <p className="mx-auto max-w-xl text-sm leading-relaxed text-slate-600">
-                Adjust your search, year, or author filters to widen the archive results.
+                Adjust your search, month, year, or author filters to widen the archive results.
               </p>
             </div>
           )}
