@@ -1,11 +1,16 @@
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Calendar, Download, Tag, UserRound } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Calendar, Download, Play, Tag, UserRound } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { useData } from '../contexts/DataContext';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 24 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: 'easeOut' } },
+};
+
+// Event recordings, keyed by article slug.
+const articleVideoUrls: Record<string, string> = {
+  'nigeria-eu-info-day-and-matchmaking-event': 'https://youtu.be/0oAu1sYVhBg?si=NlR0KvooRWwHfi8f',
 };
 
 export default function NewsDetail() {
@@ -34,6 +39,7 @@ export default function NewsDetail() {
     );
   }
 
+  const videoUrl = articleVideoUrls[article.slug];
   const relatedArticles = newsArticles
     .filter((item) => item.id !== article.id)
     .slice(0, 3);
@@ -104,13 +110,23 @@ export default function NewsDetail() {
                 ))}
               </div>
 
-              <div className="mt-12 pt-8 border-t border-slate-200 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
+              <div className="mt-12 pt-8 border-t border-slate-200 flex flex-col sm:flex-row sm:flex-wrap gap-4 sm:items-center sm:justify-between">
                 <Link
                   to="/news"
                   className="inline-flex items-center justify-center px-6 py-3 border border-emerald-700 text-emerald-800 text-xs font-bold uppercase tracking-widest rounded-[6px] hover:bg-emerald-50 transition-colors"
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" /> Back to News
                 </Link>
+                {videoUrl && (
+                  <a
+                    href={videoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center px-6 py-3 bg-emerald-700 text-white text-xs font-bold uppercase tracking-widest rounded-[6px] hover:bg-emerald-800 transition-colors"
+                  >
+                    <Play className="h-4 w-4 mr-2" /> Watch Here
+                  </a>
+                )}
                 <Link
                   to="/contact"
                   className="inline-flex items-center justify-center px-6 py-3 bg-emerald-700 text-white text-xs font-bold uppercase tracking-widest rounded-[6px] hover:bg-emerald-800 transition-colors"
